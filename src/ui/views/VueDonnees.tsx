@@ -40,51 +40,102 @@ export function VueDonnees({ dataset }: { dataset: Dataset }) {
 
   const colGrimpeurs: Colonne<(typeof grimpeurs)[number]>[] = [
     { cle: 'nom', titre: 'Nom', principal: true, valeur: (g) => g.nom },
-    { cle: 'gym', titre: 'Salle principale', valeur: (g) => g.gymPrincipal },
-    { cle: 'sexe', titre: 'Sexe', valeur: (g) => g.sexe },
+    { cle: 'gym', titre: 'Salle principale', valeur: (g) => g.gymPrincipal, aide: 'Salle declaree a l inscription.' },
+    { cle: 'sexe', titre: 'Sexe', valeur: (g) => g.sexe, aide: "Enregistre, mais n'entre dans aucun calcul." },
+    {
+      cle: 'niveau',
+      titre: 'Niveau declare',
+      valeur: (g) => (g.niveauDeclare === null ? null : `V${g.niveauDeclare}`),
+      tri: (g) => g.niveauDeclare ?? -1,
+      rendu: (g) =>
+        g.niveauDeclare === null ? <span className="discret">non renseigne</span> : `V${g.niveauDeclare}`,
+      aide:
+        "Niveau annonce a l'inscription. Il sert de cote de depart au grimpeur ; s'il manque, elle est estimee depuis les blocs de ses douze premiers duels.",
+    },
     {
       cle: 'saison',
       titre: 'Premiere saison',
       num: true,
       valeur: (g) => g.premiereSaison,
       rendu: (g) => String(g.premiereSaison),
+      aide: "Annee de la premiere venue. Metadonnee : elle n'entre dans aucun calcul.",
     },
-    { cle: 'id', titre: 'Identifiant', valeur: (g) => g.id, rendu: (g) => <span className="mono">{g.id}</span> },
+    {
+      cle: 'id',
+      titre: 'Identifiant',
+      valeur: (g) => g.id,
+      rendu: (g) => <span className="mono">{g.id}</span>,
+      aide: "Cle utilisee dans le fichier des ascensions pour designer ce grimpeur.",
+    },
   ]
 
   const colBlocs: Colonne<(typeof blocs)[number]>[] = [
     { cle: 'nom', titre: 'Bloc', principal: true, valeur: (b) => b.nom },
     { cle: 'gym', titre: 'Salle', valeur: (b) => b.gym },
-    { cle: 'secteur', titre: 'Secteur', valeur: (b) => b.secteur },
-    { cle: 'couleur', titre: 'Couleur', valeur: (b) => b.couleur },
-    { cle: 'cotation', titre: 'Cotation', valeur: (b) => b.cotationOfficielle, tri: (b) => b.indexOfficiel },
-    { cle: 'ouverture', titre: 'Ouvert le', valeur: (b) => b.dateOuverture },
+    { cle: 'secteur', titre: 'Secteur', valeur: (b) => b.secteur, aide: 'Zone du mur.' },
+    {
+      cle: 'couleur',
+      titre: 'Couleur',
+      valeur: (b) => b.couleur,
+      aide: "Couleur des prises. Metadonnee : elle n'entre dans aucun calcul.",
+    },
+    {
+      cle: 'cotation',
+      titre: 'Cotation',
+      valeur: (b) => b.cotationOfficielle,
+      tri: (b) => b.indexOfficiel,
+      aide: "La cotation annoncee par l'ouvreur, telle qu'elle figure sur l'etiquette.",
+    },
+    { cle: 'ouverture', titre: 'Ouvert le', valeur: (b) => b.dateOuverture, aide: 'Date de mise en place du bloc.' },
     {
       cle: 'retrait',
       titre: 'Retire le',
       valeur: (b) => b.dateRetrait,
       rendu: (b) => b.dateRetrait ?? <span className="puce ok">en place</span>,
+      aide: "Date de demontage. Un bloc n'est grimpable qu'entre ces deux dates, ce qui borne le nombre de duels qu'il peut accumuler.",
     },
-    { cle: 'id', titre: 'Identifiant', valeur: (b) => b.id, rendu: (b) => <span className="mono">{b.id}</span> },
+    {
+      cle: 'id',
+      titre: 'Identifiant',
+      valeur: (b) => b.id,
+      rendu: (b) => <span className="mono">{b.id}</span>,
+      aide: "Cle utilisee dans le fichier des ascensions pour designer ce bloc.",
+    },
   ]
 
   const colAscensions: Colonne<(typeof ascensions)[number]>[] = [
-    { cle: 'date', titre: 'Date', valeur: (a) => a.date, tri: (a) => a.t, rendu: (a) => dateCourte(a.t) },
+    {
+      cle: 'date',
+      titre: 'Date',
+      valeur: (a) => a.date,
+      tri: (a) => a.t,
+      rendu: (a) => dateCourte(a.t),
+      aide: 'Jour de la seance. Une ligne par seance, pas par essai.',
+    },
     { cle: 'grimpeur', titre: 'Grimpeur', principal: true, valeur: (a) => a.grimpeur },
     { cle: 'bloc', titre: 'Bloc', valeur: (a) => a.bloc },
     { cle: 'gym', titre: 'Salle', valeur: (a) => a.gym },
-    { cle: 'cotation', titre: 'Cotation', valeur: (a) => a.cotation },
+    { cle: 'cotation', titre: 'Cotation', valeur: (a) => a.cotation, aide: "Cotation affichee du bloc ce jour-la." },
     {
       cle: 'resultat',
       titre: 'Resultat',
       valeur: (a) => a.resultat,
+      aide:
+        "Issue de la seance. Plusieurs lignes d'un meme couple grimpeur-bloc se replient ensuite en un seul duel : c'est le fait d'avoir fini par envoyer qui compte, pas le detail des seances.",
       rendu: (a) => (
         <span className={a.resultat === 'reussite' ? 'puce ok' : 'puce'}>
           {a.resultat === 'reussite' ? 'reussite' : 'echec'}
         </span>
       ),
     },
-    { cle: 'essais', titre: 'Essais', num: true, valeur: (a) => a.essais },
+    {
+      cle: 'essais',
+      titre: 'Essais',
+      num: true,
+      aide:
+        "Nombre de tentatives dans la seance. Il ne decide jamais de l'issue ; il sert seulement a ponderer une victoire, un flash pesant plus lourd qu'un enchainement laborieux.",
+      valeur: (a) => a.essais,
+    },
   ]
 
   const exporter = () => {

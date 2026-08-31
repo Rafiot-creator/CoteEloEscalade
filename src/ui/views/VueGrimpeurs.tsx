@@ -80,6 +80,7 @@ export function VueGrimpeurs({
       cle: 'rang',
       titre: '#',
       num: true,
+      aide: 'Rang au classement, par cote decroissante.',
       valeur: (g) => classement.indexOf(g) + 1,
       tri: (g) => classement.indexOf(g),
     },
@@ -87,6 +88,7 @@ export function VueGrimpeurs({
       cle: 'nom',
       titre: 'Grimpeur',
       principal: true,
+      aide: "Une pastille de couleur signale les grimpeurs traces dans la courbe de progression.",
       valeur: (g) => g.nom,
       rendu: (g) => {
         const i = choisis.indexOf(g.id)
@@ -114,6 +116,8 @@ export function VueGrimpeurs({
     {
       cle: 'niveau',
       titre: 'Niveau calcule',
+      aide:
+        "La cotation que ce grimpeur envoie une fois sur deux : sa cote traduite en crans V. La fraction entre parentheses evite d'arrondir un V5,4 en V5 tout court.",
       valeur: (g) => g.cotationNiveau,
       tri: (g) => g.indexNiveau,
       rendu: (g) => formaterIndex(g.indexNiveau),
@@ -122,6 +126,8 @@ export function VueGrimpeurs({
       cle: `cote-${c.formule.id}`,
       titre: c.formule.labelCourt ?? c.formule.label,
       num: true,
+      aide:
+        `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur cote 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
       valeur: (g: LigneGrimpeur) => c.parGrimpeur.get(g.id)?.rating ?? Number.NaN,
       rendu: (g: LigneGrimpeur) => {
         const ligne = c.parGrimpeur.get(g.id)
@@ -130,12 +136,34 @@ export function VueGrimpeurs({
         return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
       },
     })),
-    { cle: 'meilleure', titre: 'Plus dur envoye', valeur: (g) => g.meilleureCotation },
-    { cle: 'matchs', titre: 'Duels utiles', num: true, valeur: (g) => g.matchs },
-    { cle: 'taux', titre: 'Duels gagnes', num: true, valeur: (g) => g.tauxReussite, rendu: (g) => pourcent(g.tauxReussite) },
+    {
+      cle: 'meilleure',
+      titre: 'Plus dur envoye',
+      aide:
+        "La cotation *affichee* la plus dure qu'il ait reellement envoyee. Elle depasse souvent le niveau calcule, qui vise la cotation reussie une fois sur deux et non le record.",
+      valeur: (g) => g.meilleureCotation,
+    },
+    {
+      cle: 'matchs',
+      titre: 'Duels utiles',
+      num: true,
+      aide:
+        "Nombre de blocs qu'il a affrontes et dont l'issue a compte. Les blocs largement hors de sa portee, dans un sens comme dans l'autre, n'y figurent pas.",
+      valeur: (g) => g.matchs,
+    },
+    {
+      cle: 'taux',
+      titre: 'Duels gagnes',
+      num: true,
+      aide:
+        "Part de ces blocs qu'il a fini par envoyer. Un taux eleve signale surtout quelqu'un qui choisit des blocs a sa portee, pas necessairement un bon grimpeur.",
+      valeur: (g) => g.tauxReussite,
+      rendu: (g) => pourcent(g.tauxReussite),
+    },
     {
       cle: 'suivi',
       titre: 'Courbe',
+      aide: `Ajoute ou retire ce grimpeur de la courbe de progression, ${MAX_SERIES} au maximum.`,
       valeur: (g) => (choisis.includes(g.id) ? 'oui' : 'non'),
       rendu: (g) => (
         <button className="bouton discret" aria-pressed={choisis.includes(g.id)} onClick={() => basculer(g.id)}>

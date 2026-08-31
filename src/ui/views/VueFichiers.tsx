@@ -41,10 +41,16 @@ export function VueFichiers({ dataset }: { dataset: Dataset }) {
             <table className="donnees">
               <thead>
                 <tr>
-                  <th>Chemin</th>
-                  <th className="num">Taille</th>
-                  <th className="num">Lignes lues</th>
-                  <th className="num">Retenues</th>
+                  <th title="Chemin du fichier dans le depot.">Chemin</th>
+                  <th className="num" title="Poids du contenu, tel qu'il est embarque dans le bundle.">
+                    Taille
+                  </th>
+                  <th className="num" title="Lignes trouvees dans le fichier, en-tete exclue.">
+                    Lignes lues
+                  </th>
+                  <th className="num" title="Lignes ayant passe la validation. L'ecart avec les lignes lues est detaille dans le controle de validite.">
+                    Retenues
+                  </th>
                 </tr>
               </thead>
               <tbody>

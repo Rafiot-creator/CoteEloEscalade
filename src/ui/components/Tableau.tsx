@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { useInfobulle } from '../charts/base'
 import { nombre } from '../format'
 
 export interface Colonne<T> {
@@ -14,6 +15,11 @@ export interface Colonne<T> {
   rendu?: (ligne: T) => ReactNode
   /** Cle de tri si elle differe de la valeur affichee. */
   tri?: (ligne: T) => string | number
+  /**
+   * Ce que la colonne veut dire, montre au survol de son en-tete. Une colonne
+   * dont le titre ne suffit pas a se faire comprendre devrait en avoir une.
+   */
+  aide?: string
 }
 
 interface Props<T> {
@@ -43,6 +49,7 @@ export function Tableau<T>({
 }: Props<T>) {
   const [tri, setTri] = useState(triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 })
   const [limite, setLimite] = useState(pageTaille)
+  const { montrer, cacher, noeud } = useInfobulle()
 
   const triees = useMemo(() => {
     const col = colonnes.find((c) => c.cle === tri.cle)
@@ -69,11 +76,14 @@ export function Tableau<T>({
               {colonnes.map((c) => (
                 <th
                   key={c.cle}
-                  className={c.num ? 'num' : undefined}
+                  className={[c.num ? 'num' : '', c.aide ? 'avec-aide' : ''].filter(Boolean).join(' ') || undefined}
                   onClick={() =>
                     setTri((t) => (t.cle === c.cle ? { cle: c.cle, sens: (t.sens * -1) as 1 | -1 } : { cle: c.cle, sens: c.num ? -1 : 1 }))
                   }
-                  title="Trier"
+                  onMouseMove={(e) =>
+                    c.aide && montrer(e, { titre: c.titre, texte: c.aide, lignes: [['', 'Cliquer pour trier']] })
+                  }
+                  onMouseLeave={cacher}
                 >
                   {c.titre}
                   {tri.cle === c.cle && <span className="tri">{tri.sens === 1 ? '▲' : '▼'}</span>}
@@ -100,6 +110,7 @@ export function Tableau<T>({
           </tbody>
         </table>
       </div>
+      {noeud}
       <div className="pagination">
         <span>
           {nombre(visibles.length)} sur {nombre(lignes.length)} lignes

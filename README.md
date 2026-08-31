@@ -681,6 +681,12 @@ site soit utile.
 Chaque graphique a son équivalent en tableau : rien n'est accessible uniquement par la
 couleur ou par le survol.
 
+**Les en-têtes de colonne se survolent.** Toute colonne dont le titre ne se suffit pas à
+lui-même porte une description — ce qu'elle mesure, comment la lire, ce qu'elle ne dit pas.
+Elle s'affiche au survol de l'en-tête, signalé par un soulignement pointillé. C'est le champ
+`aide` du type `Colonne`, à renseigner pour toute nouvelle colonne un tant soit peu
+technique : « Écart », « Duels utiles » ou « Verdict » ne veulent rien dire sans explication.
+
 ## Prochaine étape prévue : l'import utilisateur
 
 L'architecture l'anticipe sans le coder. `src/core/sources/` définit un `SourceProvider` ;

@@ -97,16 +97,46 @@ export function VueBlocs({
   }, [cotesParFormule])
 
   const colonnes: Colonne<LigneBloc>[] = [
-    { cle: 'nom', titre: 'Bloc', principal: true, valeur: (b) => b.nom },
-    ...(plusieursSalles ? [{ cle: 'gym', titre: 'Salle', valeur: (b: LigneBloc) => b.gym }] : []),
-    { cle: 'secteur', titre: 'Secteur', valeur: (b) => b.secteur },
-    { cle: 'couleur', titre: 'Couleur', valeur: (b) => b.couleur },
-    { cle: 'officielle', titre: 'Affichee', valeur: (b) => b.cotationOfficielle, tri: (b) => b.indexOfficiel },
-    { cle: 'calculee', titre: 'Calculee', valeur: (b) => b.cotationCalculee, tri: (b) => b.indexCalcule },
+    {
+      cle: 'nom',
+      titre: 'Bloc',
+      principal: true,
+      valeur: (b) => b.nom,
+      aide: "Identifiant du bloc au mur, tel qu'il figure sur son etiquette.",
+    },
+    ...(plusieursSalles
+      ? [{ cle: 'gym', titre: 'Salle', valeur: (b: LigneBloc) => b.gym, aide: 'Salle ou le bloc est ouvert.' }]
+      : []),
+    { cle: 'secteur', titre: 'Secteur', valeur: (b) => b.secteur, aide: 'Zone du mur ou se trouve le bloc.' },
+    {
+      cle: 'couleur',
+      titre: 'Couleur',
+      valeur: (b) => b.couleur,
+      aide: "Couleur des prises. Metadonnee d'affichage : elle n'entre dans aucun calcul.",
+    },
+    {
+      cle: 'officielle',
+      titre: 'Affichee',
+      valeur: (b) => b.cotationOfficielle,
+      tri: (b) => b.indexOfficiel,
+      aide: "La cotation annoncee par l'ouvreur. C'est elle que le site met a l'epreuve, pas elle qui sert de reference.",
+    },
+    {
+      cle: 'calculee',
+      titre: 'Calculee',
+      valeur: (b) => b.cotationCalculee,
+      tri: (b) => b.indexCalcule,
+      aide: "La cotation deduite des reussites et des echecs par la formule active, sans regarder l'etiquette autrement que comme point de depart.",
+    },
     ...cotesParFormule.map((c) => ({
       cle: `cote-${c.formule.id}`,
       titre: c.formule.labelCourt ?? c.formule.label,
       num: true,
+      aide:
+        `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 4500 = V4,5. ` +
+        (c.formule.id === resultat.formuleId
+          ? "C'est la formule active : c'est elle qui donne la cotation calculee et l'ecart."
+          : "Quand deux formules s'ecartent nettement sur un bloc, c'est que ce bloc est mal connu."),
       valeur: (b: LigneBloc) => c.parBloc.get(b.id)?.rating ?? Number.NaN,
       rendu: (b: LigneBloc) => {
         const ligne = c.parBloc.get(b.id)
@@ -120,6 +150,8 @@ export function VueBlocs({
       cle: 'ecart',
       titre: 'Ecart',
       num: true,
+      aide:
+        "Cotation calculee moins cotation affichee, en crans V. Positif : le bloc resiste plus que son etiquette ne le laisse croire. Negatif : il est plus facile qu'annonce.",
       valeur: (b) => b.ecart,
       tri: (b) => b.ecart,
       rendu: (b) => <Ecart valeur={b.ecart} />,
@@ -130,6 +162,8 @@ export function VueBlocs({
             cle: 'avis',
             titre: 'Verdict',
             num: true,
+            aide:
+              "Ce que disent les formules qui votent. \"accord\" : aucune ne conteste l'ouvreur — ce n'est pas une absence de donnees, un bloc n'est liste que si toutes savent le juger. \"a verifier\" : une seule conteste. \"confirme\" : toutes contestent, et sur cette liste la precision mesuree est de 100 %.",
             valeur: (b: LigneBloc) => avisParBloc.get(b.id) ?? 0,
             rendu: (b: LigneBloc) => {
               const n = avisParBloc.get(b.id) ?? 0
@@ -146,12 +180,28 @@ export function VueBlocs({
           },
         ]
       : []),
-    { cle: 'matchs', titre: 'Duels utiles', num: true, valeur: (b) => b.matchs },
-    { cle: 'taux', titre: 'Envoye par', num: true, valeur: (b) => b.tauxReussite, rendu: (b) => pourcent(b.tauxReussite) },
+    {
+      cle: 'matchs',
+      titre: 'Duels utiles',
+      num: true,
+      aide:
+        "Nombre de grimpeurs dont l'affrontement avec ce bloc a compte. Les issues jouees d'avance — un grimpeur deux crans en dessous qui echoue — sont exclues : elles n'apprennent rien.",
+      valeur: (b) => b.matchs,
+    },
+    {
+      cle: 'taux',
+      titre: 'Envoye par',
+      num: true,
+      aide: 'Part des grimpeurs comptes qui ont fini par envoyer ce bloc, en un nombre quelconque de seances.',
+      valeur: (b) => b.tauxReussite,
+      rendu: (b) => pourcent(b.tauxReussite),
+    },
     {
       cle: 'incertitude',
       titre: 'Incertitude',
       num: true,
+      aide:
+        "Ecart-type de la cote, produit par Glicko. Comptez environ deux fois cette valeur pour la marge a 95 % : a plus ou moins 300, la cote est connue a un demi-cran pres.",
       valeur: (b) => incertitudeParBloc.get(b.id) ?? Number.NaN,
       rendu: (b) => {
         const rd = incertitudeParBloc.get(b.id)

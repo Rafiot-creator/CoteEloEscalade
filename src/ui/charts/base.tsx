@@ -45,6 +45,8 @@ export function useLargeur<T extends HTMLElement>(): [React.RefObject<T>, number
 export interface ContenuInfobulle {
   titre: string
   lignes: [string, string][]
+  /** Texte libre, pour expliquer plutot que d'enumerer des valeurs. */
+  texte?: string
 }
 
 export function useInfobulle() {
@@ -63,6 +65,7 @@ export function useInfobulle() {
       }}
     >
       <div className="t">{etat.contenu.titre}</div>
+      {etat.contenu.texte && <div className="d">{etat.contenu.texte}</div>}
       {etat.contenu.lignes.map(([k, v]) => (
         <div className="l" key={k}>
           <span>{k}</span>
