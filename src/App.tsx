@@ -67,8 +67,8 @@ export function App() {
 
         {atelier.dataset && atelier.resultat && (
           <>
-            {onglet === 'blocs' && <VueBlocs resultat={atelier.resultat} />}
-            {onglet === 'grimpeurs' && <VueGrimpeurs resultat={atelier.resultat} />}
+            {onglet === 'blocs' && <VueBlocs resultat={atelier.resultat} resultats={atelier.resultats} />}
+            {onglet === 'grimpeurs' && <VueGrimpeurs resultat={atelier.resultat} resultats={atelier.resultats} />}
             {onglet === 'formules' && <VueFormules atelier={atelier} />}
             {onglet === 'donnees' && <VueDonnees dataset={atelier.dataset} />}
             {onglet === 'fichiers' && <VueFichiers dataset={atelier.dataset} />}

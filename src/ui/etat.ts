@@ -32,6 +32,12 @@ export interface Atelier {
   reinitialiser: () => void
 
   resultat: Resultat | null
+  /**
+   * Le resultat de *chaque* formule, pour pouvoir les afficher cote a cote.
+   * Elles sont memoisees separement : bouger un reglage de l'une ne recalcule
+   * pas les autres.
+   */
+  resultats: Map<string, Resultat>
 
   /** Resultat mis de cote pour comparer deux reglages. */
   reference: { resultat: Resultat; etiquette: string } | null
@@ -67,15 +73,20 @@ export function useAtelier(): Atelier {
   const formule = formuleParId(formuleId) ?? FORMULE_PAR_DEFAUT
   const params = parFormule[formule.id] ?? paramsParDefaut(formule.params)
 
-  const resultat = useMemo(() => {
-    if (!dataset) return null
+  const resultats = useMemo(() => {
+    const parId = new Map<string, Resultat>()
+    if (!dataset) return parId
     try {
-      return executerMemo(dataset, formule, params, paramsCalibrage)
+      for (const f of FORMULES) {
+        parId.set(f.id, executerMemo(dataset, f, parFormule[f.id] ?? paramsParDefaut(f.params), paramsCalibrage))
+      }
     } catch (e) {
       setErreur(e instanceof Error ? e.message : String(e))
-      return null
     }
-  }, [dataset, formule, params, paramsCalibrage])
+    return parId
+  }, [dataset, parFormule, paramsCalibrage])
+
+  const resultat = resultats.get(formule.id) ?? null
 
   const setParam = useCallback(
     (nom: string, v: number | boolean | string) => {
@@ -110,6 +121,7 @@ export function useAtelier(): Atelier {
     setParamCalibrage,
     reinitialiser,
     resultat,
+    resultats,
     reference,
     memoriser,
     oublier: () => setReference(null),

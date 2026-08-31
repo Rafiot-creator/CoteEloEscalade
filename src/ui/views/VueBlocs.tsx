@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { FORMULES } from '../../core/formulas/registry'
 import { versCsv } from '../../core/loaders/csv'
 import { SEUIL_DESACCORD, type LigneBloc, type Resultat } from '../../core/pipeline'
 import { BasculeVue } from '../charts/base'
@@ -12,7 +13,14 @@ import { nombre, pourcent, signe, telecharger } from '../format'
  * L'ecran qui repond a la question du projet : les cotations affichees en salle
  * tiennent-elles face a ce que les grimpeurs envoient reellement ?
  */
-export function VueBlocs({ resultat }: { resultat: Resultat }) {
+export function VueBlocs({
+  resultat,
+  resultats,
+}: {
+  resultat: Resultat
+  /** Toutes les formules, pour afficher leurs cotes cote a cote. */
+  resultats: Map<string, Resultat>
+}) {
   const [gym, setGym] = useState('tous')
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
   const [tableauNuage, setTableauNuage] = useState(false)
@@ -37,6 +45,26 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
 
   const isoles = plusieursSalles ? resultat.resume.gyms.filter((g) => g.ponts === 0) : []
 
+  // Une colonne de cote par formule : on veut pouvoir constater leur accord —
+  // ou leur desaccord, qui est en soi un signal de fragilite sur ce bloc.
+  const cotesParFormule = useMemo(() => {
+    return FORMULES.map((f) => ({
+      formule: f,
+      parBloc: new Map((resultats.get(f.id)?.blocs ?? []).map((b) => [b.id, b])),
+    })).filter((c) => c.parBloc.size > 0)
+  }, [resultats])
+
+  /** L'incertitude vient de la formule qui en produit une, quelle qu'elle soit. */
+  const incertitudeParBloc = useMemo(() => {
+    const m = new Map<string, number>()
+    for (const c of cotesParFormule) {
+      for (const [id, b] of c.parBloc) {
+        if (b.incertitude !== undefined && !m.has(id)) m.set(id, b.incertitude)
+      }
+    }
+    return m
+  }, [cotesParFormule])
+
   const colonnes: Colonne<LigneBloc>[] = [
     { cle: 'nom', titre: 'Bloc', principal: true, valeur: (b) => b.nom },
     ...(plusieursSalles ? [{ cle: 'gym', titre: 'Salle', valeur: (b: LigneBloc) => b.gym }] : []),
@@ -44,13 +72,19 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
     { cle: 'couleur', titre: 'Couleur', valeur: (b) => b.couleur },
     { cle: 'officielle', titre: 'Affichee', valeur: (b) => b.cotationOfficielle, tri: (b) => b.indexOfficiel },
     { cle: 'calculee', titre: 'Calculee', valeur: (b) => b.cotationCalculee, tri: (b) => b.indexCalcule },
-    {
-      cle: 'cote',
-      titre: 'Cote Elo',
+    ...cotesParFormule.map((c) => ({
+      cle: `cote-${c.formule.id}`,
+      titre: c.formule.labelCourt ?? c.formule.label,
       num: true,
-      valeur: (b) => b.rating,
-      rendu: (b) => nombre(b.rating),
-    },
+      valeur: (b: LigneBloc) => c.parBloc.get(b.id)?.rating ?? Number.NaN,
+      rendu: (b: LigneBloc) => {
+        const ligne = c.parBloc.get(b.id)
+        if (!ligne || !Number.isFinite(ligne.rating)) return <span className="discret">—</span>
+        // La formule courante est celle qui pilote l'ecart : on la souligne.
+        const courante = c.formule.id === resultat.formuleId
+        return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
+      },
+    })),
     {
       cle: 'ecart',
       titre: 'Ecart',
@@ -65,8 +99,11 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
       cle: 'incertitude',
       titre: 'Incertitude',
       num: true,
-      valeur: (b) => b.incertitude ?? Number.NaN,
-      rendu: (b) => (b.incertitude === undefined ? <span className="discret">—</span> : `± ${nombre(b.incertitude)}`),
+      valeur: (b) => incertitudeParBloc.get(b.id) ?? Number.NaN,
+      rendu: (b) => {
+        const rd = incertitudeParBloc.get(b.id)
+        return rd === undefined ? <span className="discret">—</span> : `± ${nombre(rd)}`
+      },
     },
   ]
 
@@ -100,7 +137,12 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
                   couleur: b.couleur,
                   cotation_affichee: b.cotationOfficielle,
                   cotation_calculee: b.cotationCalculee,
-                  cote_elo: Math.round(b.rating),
+                  ...Object.fromEntries(
+                    cotesParFormule.map((c) => [
+                      `cote_${c.formule.id.replace(/-/g, '_')}`,
+                      Math.round(c.parBloc.get(b.id)?.rating ?? Number.NaN),
+                    ])
+                  ),
                   ecart_crans: Number(b.ecart.toFixed(2)),
                   duels_utiles: b.matchs,
                   taux_reussite: Number(b.tauxReussite.toFixed(3)),
@@ -144,7 +186,11 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
           {tableauNuage ? (
             <Tableau
               lignes={affiches}
-              colonnes={colonnes.filter((c) => ['nom', 'gym', 'officielle', 'calculee', 'cote', 'ecart'].includes(c.cle))}
+              colonnes={colonnes.filter(
+                (c) =>
+                  ['nom', 'gym', 'officielle', 'calculee', 'ecart'].includes(c.cle) ||
+                  c.cle.startsWith('cote-')
+              )}
               cleLigne={(b) => b.id}
               triInitial={{ cle: 'ecart', sens: -1 }}
               pageTaille={12}
@@ -180,7 +226,7 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
 
       <Carte
         titre="Tous les blocs exploitables"
-        sousTitre="Blocs ayant assez de duels utiles pour etre juges. Un bloc ouvert la semaine derniere n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touche. Seuils regles dans l'ecran Formules."
+        sousTitre="Blocs ayant assez de duels utiles pour etre juges. Un bloc ouvert la semaine derniere n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touche. Les deux formules sont affichees cote a cote : quand elles s'ecartent nettement, c'est que le bloc est mal connu. Seuils regles dans l'ecran Formules."
       >
         <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} />
       </Carte>

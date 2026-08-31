@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ratingVersIndex } from '../../core/calibrage'
+import { FORMULES } from '../../core/formulas/registry'
 import { formaterIndex } from '../../core/cotations'
 import type { LigneGrimpeur, Resultat } from '../../core/pipeline'
 import { BasculeVue } from '../charts/base'
@@ -12,12 +13,25 @@ import { echantillonner } from '../etat'
 /** Au-dela, les teintes ne se distinguent plus de facon fiable. */
 const MAX_SERIES = 4
 
-export function VueGrimpeurs({ resultat }: { resultat: Resultat }) {
+export function VueGrimpeurs({
+  resultat,
+  resultats,
+}: {
+  resultat: Resultat
+  resultats: Map<string, Resultat>
+}) {
   // Les colonnes de salle n'ont d'interet que si la communaute en frequente
   // plusieurs : sur une salle unique elles repetent la meme valeur partout.
   const plusieursSalles = resultat.resume.gyms.length > 1
   const [selection, setSelection] = useState<string[]>([])
   const [tableau, setTableau] = useState(false)
+
+  const cotesParFormule = useMemo(() => {
+    return FORMULES.map((f) => ({
+      formule: f,
+      parGrimpeur: new Map((resultats.get(f.id)?.grimpeurs ?? []).map((g) => [g.id, g])),
+    })).filter((c) => c.parGrimpeur.size > 0)
+  }, [resultats])
 
   const classement = useMemo(
     () => [...resultat.grimpeurs].filter((g) => g.matchs > 0).sort((a, b) => b.rating - a.rating),
@@ -104,13 +118,18 @@ export function VueGrimpeurs({ resultat }: { resultat: Resultat }) {
       tri: (g) => g.indexNiveau,
       rendu: (g) => formaterIndex(g.indexNiveau),
     },
-    {
-      cle: 'cote',
-      titre: 'Cote Elo',
+    ...cotesParFormule.map((c) => ({
+      cle: `cote-${c.formule.id}`,
+      titre: c.formule.labelCourt ?? c.formule.label,
       num: true,
-      valeur: (g) => g.rating,
-      rendu: (g) => nombre(g.rating),
-    },
+      valeur: (g: LigneGrimpeur) => c.parGrimpeur.get(g.id)?.rating ?? Number.NaN,
+      rendu: (g: LigneGrimpeur) => {
+        const ligne = c.parGrimpeur.get(g.id)
+        if (!ligne || !Number.isFinite(ligne.rating)) return <span className="discret">—</span>
+        const courante = c.formule.id === resultat.formuleId
+        return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
+      },
+    })),
     { cle: 'meilleure', titre: 'Plus dur envoye', valeur: (g) => g.meilleureCotation },
     { cle: 'matchs', titre: 'Duels utiles', num: true, valeur: (g) => g.matchs },
     { cle: 'taux', titre: 'Duels gagnes', num: true, valeur: (g) => g.tauxReussite, rendu: (g) => pourcent(g.tauxReussite) },
@@ -162,7 +181,10 @@ export function VueGrimpeurs({ resultat }: { resultat: Resultat }) {
         )}
       </Carte>
 
-      <Carte titre="Classement" sousTitre="Le niveau calcule est la cotation V que le grimpeur envoie une fois sur deux.">
+      <Carte
+        titre="Classement"
+        sousTitre="Le niveau calcule est la cotation V que le grimpeur envoie une fois sur deux. Les cotes des deux formules sont affichees cote a cote ; celle en gras est la formule active."
+      >
         <Tableau lignes={classement} colonnes={colonnes} cleLigne={(g) => g.id} triInitial={{ cle: 'rang', sens: 1 }} />
       </Carte>
     </div>

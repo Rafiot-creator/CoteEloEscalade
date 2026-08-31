@@ -31,6 +31,7 @@ import type { Formule } from '../types'
 const formule: Formule = {
   id: 'elo-bloc',
   label: 'Elo bloc',
+  labelCourt: 'Elo',
   description:
     "Un affrontement par couple grimpeur-bloc : envoye = gagne, jamais envoye = perdu, quel que soit le nombre d'essais. Le style ne change que le poids de la victoire.",
   params: [

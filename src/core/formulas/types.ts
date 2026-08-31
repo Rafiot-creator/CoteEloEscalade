@@ -78,6 +78,8 @@ export interface SortieFormule {
 export interface Formule<P extends Params = Params> {
   id: string
   label: string
+  /** Nom tenant dans un en-tete de colonne. A defaut, `label` est utilise. */
+  labelCourt?: string
   /** Une phrase : ce que la formule suppose, et pour qui elle est faite. */
   description: string
   params: ParamSpec[]

@@ -251,7 +251,7 @@ export function executer(
 // Bouger un curseur relance tout le calcul ; revenir en arriere doit etre
 // instantane. Cache minuscule, volontairement : les resultats sont gros.
 
-const CACHE_MAX = 6
+const CACHE_MAX = 12
 const cache = new Map<string, Resultat>()
 let datasetCourant: Dataset | null = null
 

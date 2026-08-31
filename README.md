@@ -445,6 +445,54 @@ ne fabrique pas de désaccords à partir de hasard — pas que tout désaccord r
 de cotation. Un bloc morpho, facile pour les grands et dur pour les petits, n'est pas mal coté
 et ressortirait pourtant.
 
+## Les deux formules sont affichées ensemble
+
+Les écrans **Blocs** et **Grimpeurs** montrent une colonne de cote **par formule**, en
+permanence, celle de la formule active étant en gras. Toutes les formules déclarées sont
+calculées à chaque fois — ça reste peu coûteux, la mémoïsation ne recalcule que celle dont on
+vient de bouger un réglage.
+
+L'intérêt n'est pas décoratif : **quand les deux formules s'écartent nettement sur un bloc,
+c'est que ce bloc est mal connu.** Sur le jeu livré, le bloc AR-0096 — que personne n'a envoyé —
+est coté 7 529 par l'Elo et 9 000 par Glicko, un cran et demi d'écart. Les deux disent « c'est
+dur », aucune ne sait dire à quel point. À l'inverse, un bloc sur lequel les deux tombent à
+50 points près est une mesure solide.
+
+La colonne **Incertitude** puise désormais dans la formule qui en produit une, quelle que soit
+la formule active : elle est donc toujours renseignée.
+
+## Faut-il passer à Glicko-2 ?
+
+**Non, pas sur ces données.** Ce que Glicko-2 ajoute à Glicko, c'est une **volatilité** σ par
+joueur : une mesure de l'irrégularité de ses performances, qui élargit son incertitude quand
+il est imprévisible. C'est utile, mais deux choses l'empêchent de servir ici.
+
+**Il n'y a pas assez de périodes de classement.** La volatilité s'estime en comparant les
+performances observées aux performances attendues *d'une période à l'autre*. Avec les réglages
+livrés (périodes de 120 jours sur cinq mois de données), Glicko en compte **deux**. Même en
+descendant à 30 jours on n'en a que six, avec 1 000 duels chacune. σ serait dominé par son
+a priori τ : on ajouterait un paramètre libre et un solveur itératif imbriqué pour n'estimer
+que du bruit.
+
+**Et la moitié des entités n'ont pas de volatilité.** Un bloc ne change pas de difficulté avec
+le temps — c'est l'hypothèse explicitement encodée dans la phase B, où toute l'histoire d'un
+bloc forme une seule période. Modéliser la volatilité d'un bloc reviendrait à estimer une
+grandeur qui n'existe pas.
+
+S'ajoute une friction : Glicko-2 travaille sur une échelle transformée bâtie autour de la
+convention des 400 points (μ = (r − 1500) / 173,7178, où 173,7178 = 400 / ln 10). L'adapter à
+la convention des 1000 points est faisable, mais ce serait un endroit de plus où une
+incohérence d'échelle peut se glisser sans bruit — le projet en a déjà fait les frais.
+
+**Ce qui limite la précision aujourd'hui, ce n'est pas la règle de mise à jour** : c'est le
+volume de données par bloc (28 duels médians) et le fait de partir de la cotation de
+l'ouvreur. Glicko-2 ne touche ni à l'un ni à l'autre.
+
+La question se reposera utilement le jour où il y aura **deux ou trois ans d'historique**,
+donc une vingtaine de périodes : la volatilité des grimpeurs deviendrait alors estimable, et
+elle dirait quelque chose de vrai — qui progresse, qui stagne, qui est irrégulier. À ce
+moment-là, l'appliquer aux grimpeurs seulement, en laissant les blocs sur Glicko-1.
+
 ## Volume de données et temps de calcul
 
 Le moteur relit tout l'historique à chaque passe : le coût est **linéaire en lignes × passes**.
