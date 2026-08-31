@@ -342,6 +342,36 @@ l'ouvreur.
 Descendre le seuil à 0,75 cran doublerait la récolte sans rien perdre en fiabilité — c'est la
 constante `SEUIL_DESACCORD` dans `pipeline.ts`.
 
+### Un biais à connaître : les blocs sous-cotés passent plus souvent au travers
+
+En séparant les erreurs par sens, la détection n'est pas symétrique :
+
+| Vraie erreur de l'ouvreur | Blocs | Détectés | Déplacement moyen |
+|---|---|---|---|
+| Bloc **plus dur** que son étiquette (sandbag) | 32 | 4 (13 %) | 0,54 cran |
+| Bloc **plus facile** que son étiquette | 24 | 10 (42 %) | 0,77 cran |
+
+Ce n'est pas un effet de volume : les deux groupes ont 34 duels en moyenne. C'est une
+sous-convergence. Un bloc plus dur que son étiquette ne produit que des échecs — or l'échec
+d'un grimpeur contre un bloc déjà coté au-dessus de lui est *attendu*, donc il ne corrige
+presque rien. À l'inverse, un bloc plus facile qu'annoncé produit des réussites *surprenantes*,
+qui le font chuter vite. La logistique sature d'un côté et pas de l'autre.
+
+C'est ennuyeux, parce que le sandbag est justement ce qu'une salle veut repérer. Les leviers,
+mesurés :
+
+| Réglage | Sous-cotés détectés | Sur-cotés détectés |
+|---|---|---|
+| Défaut (amorce cotation, 12 passes) | 13 % | 42 % |
+| 40 passes | 25 % | 58 % |
+| K = 100 | 25 % | 54 % |
+| Amorce uniforme | 53 % | 63 % |
+| **Glicko** | **66 %** | 58 % |
+
+Glicko est de loin le meilleur détecteur, et le seul à peu près symétrique : il amène chaque
+bloc à son point fixe au lieu de l'y faire ramper. Pour chasser les blocs mal cotés, c'est la
+formule à utiliser ; pour le classement au quotidien, Elo reste plus précis en médiane.
+
 **Limite honnête de cette démonstration** : le témoin réutilise les mêmes ascensions, il
 mesure donc le bruit de l'estimateur, pas celui de toute la chaîne. Il prouve que la méthode
 ne fabrique pas de désaccords à partir de hasard — pas que tout désaccord réel soit une erreur
