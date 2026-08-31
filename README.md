@@ -329,13 +329,16 @@ tentait de rattraper ; écarter les résultats joués d'avance en supprime la ca
 | **Glicko, seuil 1,00** | **2,5 %** | 97 % | **78 %** |
 | Glicko, seuil 0,75 | 4,0 % | 92 % | 89 % |
 
-Glicko trouve donc nettement plus de blocs mal cotés pour moins de fausses alertes. La formule
-livrée par défaut reste l'Elo — plus simple à expliquer, cinq fois plus rapide, et un peu plus
-précise sur les blocs déjà bien connus — mais **pour un audit d'ouverture, basculer sur Glicko
-dans l'écran Formules est le bon réflexe**.
+Glicko trouve donc nettement plus de blocs mal cotés pour moins de fausses alertes. **Pour un
+audit d'ouverture ciblé, basculer sur Glicko dans l'écran Formules reste le bon réflexe.**
 
-(Cette conclusion contredit ce que ce README affirmait avant l'ajout de la règle : Glicko y
-était donné pour trop bavard. C'était vrai à l'époque, et faux depuis.)
+(Cette conclusion contredit ce que ce README affirmait avant l'ajout de la règle des résultats
+joués d'avance : Glicko y était donné pour trop bavard. C'était vrai à l'époque, et faux
+depuis.)
+
+La formule **livrée par défaut est le mélange** — voir plus bas. Elle ne cherche pas à
+maximiser la détection mais à se tromper le moins gravement possible, et elle ne se prononce
+que là où les deux composantes ont un avis.
 
 **Ce qui fait la précision, par ordre d'importance :**
 
@@ -513,6 +516,12 @@ plus aventureux sur les cas limites.
 | **0,5 (par défaut)** | 0,203 | 0,296 |
 | 1,0 (Glicko seul) | 0,182 | 0,350 |
 
+C'est la formule montrée par défaut. Elle ne détecte pas le plus (Glicko fait mieux sur ce
+terrain) : elle **se trompe le moins gravement**, et elle est plus prudente — n'étant jugeable
+que là où les deux composantes le sont, elle ne se prononce que sur 189 blocs au lieu de 226
+pour l'Elo seul. L'écran Blocs affiche donc un peu moins de blocs, mais chacun repose sur deux
+estimations concordantes.
+
 Le poids par défaut est **la moitié**, volontairement, alors que l'optimum mesuré est vers 0,4.
 Cet optimum est estimé sur une vérité terrain simulée : le retenir serait du surajustement,
 alors que la moyenne simple en capte déjà l'essentiel — 0,296 contre 0,294 — sans aucun
@@ -532,7 +541,11 @@ donc déclarée `avisIndependant: false` et garde sa colonne sans sa voix. Un te
 Deux limites assumées : le mélange fait tourner les deux formules avec **leurs valeurs par
 défaut**, donc régler l'Elo ne le change pas (en échange, il reste une référence stable) ; et
 sa courbe de progression est celle de la formule qui pèse le plus lourd, les deux trajectoires
-n'étant pas alignables — l'Elo produit un point par événement, Glicko un par période.
+n'étant pas alignables — l'Elo produit un point par événement, Glicko un par période. Elle est
+en revanche **recalée** pour finir sur la cote mélangée, faute de quoi la courbe d'un grimpeur
+s'achèverait sur une valeur différente de celle affichée dans le classement. Le décalage étant
+constant par grimpeur, la forme de la trajectoire — la seule information qu'elle porte — n'est
+pas touchée.
 
 ## Faut-il passer à Glicko-2 ?
 

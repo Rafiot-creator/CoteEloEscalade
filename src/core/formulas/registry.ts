@@ -28,4 +28,10 @@ export function formuleParId(id: string): Formule | undefined {
   return parId.get(id)
 }
 
-export const FORMULE_PAR_DEFAUT = formuleParId('elo-bloc') ?? FORMULES[0]
+/**
+ * Le melange est la formule montree en premier : c'est celle qui fait le moins
+ * de grosses erreurs (erreur quadratique 0,296 contre 0,318 et 0,350), et elle
+ * n'est jugeable que la ou les deux composantes le sont, ce qui la rend plus
+ * prudente sur les blocs mal documentes.
+ */
+export const FORMULE_PAR_DEFAUT = formuleParId('melange') ?? FORMULES[0]

@@ -130,12 +130,27 @@ const formule: Formule = {
     // La trajectoire vient de la formule qui pese le plus lourd : les deux ne
     // sont pas alignables (l'Elo produit un point par evenement, Glicko un par
     // periode), et une moyenne de deux courbes decalees ne voudrait rien dire.
+    //
+    // Elle est en revanche *recalee* pour finir sur la cote melangee : sans ca,
+    // la courbe d'un grimpeur s'acheverait sur une valeur differente de celle
+    // affichee dans le classement, ce qui se verrait. Le decalage est constant
+    // par grimpeur, donc la forme de la trajectoire — la seule information
+    // qu'elle porte — n'est pas touchee.
     const dominante = poids > 0.5 ? gli : elo
+    const recalage = new Map<string, number>()
+    for (const [id, e] of grimpeurs) {
+      const source = dominante.grimpeurs.get(id)
+      if (source) recalage.set(id, e.rating - source.rating)
+    }
+    const historique = dominante.historique.map((p) => ({
+      ...p,
+      rating: p.rating + (recalage.get(p.grimpeurId) ?? 0),
+    }))
 
     return {
       grimpeurs,
       blocs,
-      historique: dominante.historique,
+      historique,
       convergence: dominante.convergence,
       diagnostics: [
         ...evaluateur.diagnostics(),
