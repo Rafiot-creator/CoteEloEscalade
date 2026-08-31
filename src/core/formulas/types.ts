@@ -88,6 +88,15 @@ export interface Formule<P extends Params = Params> {
    * comparable. A defaut, `SEUIL_DESACCORD` s'applique.
    */
   seuilDesaccord?: number
+  /**
+   * Cette formule apporte-t-elle un avis *independant* des autres ?
+   *
+   * L'ecran Blocs fait voter les formules pour signaler un bloc. Une formule
+   * derivee des autres — une moyenne, par exemple — ne peut rien signaler
+   * qu'elles ne signalent deja : compter sa voix serait compter deux fois la
+   * meme observation. Elle garde sa colonne de cotes, mais pas sa voix.
+   */
+  avisIndependant?: boolean
   /** Une phrase : ce que la formule suppose, et pour qui elle est faite. */
   description: string
   params: ParamSpec[]

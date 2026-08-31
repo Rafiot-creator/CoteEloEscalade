@@ -465,14 +465,39 @@ describe('formules', () => {
     const ds = await dataset()
     for (const f of FORMULES) {
       const r = executer(ds, f, paramsParDefaut(f.params), {})
-      expect(r.params.amorce).toBe('cotation')
-      expect(r.params.ptsParCran).toBe(1000)
+      // Les formules qui estiment elles-memes partent de la cotation affichee ;
+      // celles qui en combinent d'autres n'ont pas ces reglages, elles les
+      // heritent de leurs composantes.
+      if ('amorce' in r.params) {
+        expect(r.params.amorce).toBe('cotation')
+        expect(r.params.ptsParCran).toBe(1000)
+      }
       expect(r.calibrage.mode).toBe('ancre')
       // La conversion par defaut est exactement cote / 1000 = cran V.
       expect(1 / r.calibrage.pente).toBeCloseTo(1000, 6)
       expect(r.calibrage.ordonnee).toBeCloseTo(0, 6)
     }
   })
+
+  it('le melange est bien la moyenne des deux autres', async () => {
+    const ds = await dataset()
+    const par = (id: string) => {
+      const f = FORMULES.find((x) => x.id === id)!
+      return new Map(executer(ds, f, paramsParDefaut(f.params), {}).blocs.map((b) => [b.id, b.rating]))
+    }
+    const elo = par('elo-bloc')
+    const gli = par('glicko')
+    const mel = par('melange')
+    let verifies = 0
+    for (const [id, m] of mel) {
+      const e = elo.get(id)
+      const g = gli.get(id)
+      if (e === undefined || g === undefined) continue
+      expect(m).toBeCloseTo((e + g) / 2, 6)
+      verifies += 1
+    }
+    expect(verifies).toBeGreaterThan(300)
+  }, 60_000)
 
   it.each(FORMULES.map((f) => [f.id, f] as const))(
     '%s reste en accord avec l ouvreur sur la majorite des blocs',

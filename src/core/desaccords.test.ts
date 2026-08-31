@@ -188,6 +188,31 @@ describe('les desaccords ne sont pas du bruit', () => {
   )
 
   it(
+    'une formule derivee des autres ne vote pas',
+    async () => {
+      const ds = await dataset()
+      const derivees = FORMULES.filter((f) => f.avisIndependant === false)
+      expect(derivees.length).toBeGreaterThan(0)
+
+      const signalesPar = (f: (typeof FORMULES)[number]) => {
+        const r = executer(ds, f, paramsParDefaut(f.params), {})
+        const seuil = f.seuilDesaccord ?? 0.75
+        return new Set(r.blocs.filter((b) => b.fiable && Math.abs(b.ecart) >= seuil).map((b) => b.id))
+      }
+      const jures = FORMULES.filter((f) => f.avisIndependant !== false)
+      const vus = new Set(jures.flatMap((f) => [...signalesPar(f)]))
+
+      // Une moyenne ne peut franchir un seuil que si l'une de ses composantes le
+      // franchit : sa voix serait donc purement redondante. Le test le constate
+      // plutot que de s'en remettre a l'argument.
+      for (const d of derivees) {
+        for (const id of signalesPar(d)) expect(vus.has(id)).toBe(true)
+      }
+    },
+    120_000
+  )
+
+  it(
     'reste conservateur : il passe a cote de beaucoup de vraies erreurs',
     async () => {
       const juges = await juger(false)

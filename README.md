@@ -164,7 +164,7 @@ défaut. À utiliser pour vérifier une intuition, pas comme réglage permanent.
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test               # 58 tests sur le cœur de calcul
+npm test               # 62 tests sur le cœur de calcul
 npm run build          # site statique dans dist/
 npm run data:generate  # régénère le jeu de données de démonstration
 ```
@@ -299,6 +299,7 @@ Deux formules sont livrées :
 | Formule | Idée |
 |---|---|
 | **Elo bloc** | Le modèle de la maison, tel que décrit plus haut, avec la pondération du style. |
+| **Mélange Elo + Glicko** | La moyenne des deux autres. Elles ne se trompant pas de la même façon, leur moyenne fait moins de grosses erreurs que chacune prise seule. |
 | **Glicko (cote + fiabilité)** | Mêmes duels, sans pondération du style, mais chaque cote porte son incertitude — un bloc ouvert la semaine dernière et fait par trois personnes ne se fait plus passer pour une mesure. Sert aussi de point de comparaison propre : si elle donne les mêmes cotes, c'est que la pondération ne change pas grand-chose. |
 
 ## Ce que valent ces formules
@@ -497,6 +498,42 @@ Deux pistes ont été essayées et écartées, chiffres à l'appui :
 - **Un troisième juré** (l'Elo sans a priori, dont les erreurs sont indépendantes de
   l'étiquette) : trop bruyant seul — 42 % de fausses alertes — il dégrade le jury.
 
+### La troisième formule : le mélange
+
+`melange.ts` moyenne les cotes des deux autres. C'est mesurable et c'est vrai : sur les
+189 blocs que les deux jugent, l'erreur **quadratique** tombe à 0,296 contre 0,318 pour l'Elo
+et 0,350 pour Glicko. Autrement dit, le mélange fait moins de grosses erreurs que l'un *et*
+l'autre — l'Elo est prudent mais souvent imprécis, Glicko plus juste sur le bloc courant mais
+plus aventureux sur les cas limites.
+
+| Poids Glicko | Erreur médiane | Erreur quadratique |
+|---|---|---|
+| 0,0 (Elo seul) | 0,243 | 0,318 |
+| 0,4 (optimum) | 0,197 | **0,294** |
+| **0,5 (par défaut)** | 0,203 | 0,296 |
+| 1,0 (Glicko seul) | 0,182 | 0,350 |
+
+Le poids par défaut est **la moitié**, volontairement, alors que l'optimum mesuré est vers 0,4.
+Cet optimum est estimé sur une vérité terrain simulée : le retenir serait du surajustement,
+alors que la moyenne simple en capte déjà l'essentiel — 0,296 contre 0,294 — sans aucun
+paramètre à justifier.
+
+**Le gain reste modeste, et il faut savoir pourquoi** : la corrélation entre les erreurs des
+deux formules est de **0,73**. Elles partagent les mêmes données, le même repliement en duels,
+le même a priori et le même filtre — elles se trompent largement ensemble. Un vrai gain
+d'ensemble demanderait un point de vue réellement différent, pas une variante de la même
+mécanique.
+
+**Le mélange ne vote pas au jury.** Une moyenne ne peut franchir un seuil que si l'une de ses
+composantes le franchit : sa voix serait purement redondante, et la mesure le confirme — sur
+le jeu livré, elle ne signale **aucun** bloc que les deux autres ne signalent déjà. Elle est
+donc déclarée `avisIndependant: false` et garde sa colonne sans sa voix. Un test le vérifie.
+
+Deux limites assumées : le mélange fait tourner les deux formules avec **leurs valeurs par
+défaut**, donc régler l'Elo ne le change pas (en échange, il reste une référence stable) ; et
+sa courbe de progression est celle de la formule qui pèse le plus lourd, les deux trajectoires
+n'étant pas alignables — l'Elo produit un point par événement, Glicko un par période.
+
 ## Faut-il passer à Glicko-2 ?
 
 **Non, pas sur ces données.** Ce que Glicko-2 ajoute à Glicko, c'est une **volatilité** σ par
@@ -598,7 +635,7 @@ fichiers. GitHub Pages suffit, et le dépôt contient déjà tout ce qu'il faut.
 **Ce qui est en place :**
 
 - `.github/workflows/deploy.yml` — à chaque poussée sur `main`, GitHub vérifie les types,
-  lance les 58 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
+  lance les 62 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
   cœur de calcul est cassé, n'est jamais mis en ligne.
 - `base: './'` dans `vite.config.ts` — les chemins d'assets sont relatifs, donc le site
   fonctionne quel que soit le nom du dépôt, sans configuration à ajuster.

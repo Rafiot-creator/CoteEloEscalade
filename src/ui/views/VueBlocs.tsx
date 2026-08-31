@@ -57,9 +57,14 @@ export function VueBlocs({
    * part entiere : sur les blocs qu'elles signalent ensemble, la precision est
    * de 100 %.
    */
+  const juresIndependants = useMemo(
+    () => cotesParFormule.filter((c) => c.formule.avisIndependant !== false),
+    [cotesParFormule]
+  )
+
   const avisParBloc = useMemo(() => {
     const m = new Map<string, number>()
-    for (const c of cotesParFormule) {
+    for (const c of juresIndependants) {
       const seuil = resultats.get(c.formule.id)?.seuilDesaccord ?? SEUIL_DESACCORD
       for (const [id, b] of c.parBloc) {
         const compte = b.fiable && Math.abs(b.ecart) >= seuil ? 1 : 0
@@ -67,9 +72,9 @@ export function VueBlocs({
       }
     }
     return m
-  }, [cotesParFormule, resultats])
+  }, [juresIndependants, resultats])
 
-  const nbFormules = cotesParFormule.length
+  const nbFormules = juresIndependants.length
 
   const signale = (b: LigneBloc) => (avisParBloc.get(b.id) ?? 0) > 0
   const affiches = seulsDesaccords ? audites.filter(signale) : audites
