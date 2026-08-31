@@ -79,9 +79,20 @@ const formule: Formule = {
   id: 'glicko',
   label: 'Glicko (cote + fiabilite)',
   labelCourt: 'Glicko',
-  // Glicko bouge plus franchement que l'Elo : a 0,75 il signalerait deux fois
-  // plus de blocs pour 4 % de fausses alertes, contre 2,5 % a 1,0.
-  seuilDesaccord: 1,
+  /*
+   * C'est la voix sensible du jury : son role est de rattraper les blocs
+   * sous-cotes, que l'Elo laisse passer parce qu'un echec attendu ne le fait
+   * presque pas bouger. Le seuil est donc volontairement plus bas que ce que
+   * sa seule precision commanderait.
+   *
+   * Mesure sur le monde temoin, en reunion avec l'Elo a 0,75 :
+   *   Glicko a 1,00 : 52 % des sandbags, 2,4 % de fausses alertes, precision 96 %
+   *   Glicko a 0,75 : 58 % des sandbags, 3,0 % de fausses alertes, precision 92 %  <- retenu
+   *   Glicko a 0,60 : 61 % des sandbags, 5,1 % de fausses alertes, precision 90 %
+   * Descendre a 0,60 coute 70 % de fausses alertes en plus pour trois points de
+   * detection : le rapport n'y est plus.
+   */
+  seuilDesaccord: 0.75,
   description:
     "Memes affrontements, sans ponderation du style, mais chaque cote porte son incertitude. Les blocs peu repetes — ceux qui viennent d'etre ouverts — sont signales comme tels au lieu d'etre cotes avec un faux aplomb. Ses cotes sont un peu plus etalees que la convention des 1000 points par cran : passer le calibrage en mode regression les remet a l'echelle.",
   params: [

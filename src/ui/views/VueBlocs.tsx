@@ -128,14 +128,18 @@ export function VueBlocs({
       ? [
           {
             cle: 'avis',
-            titre: 'Avis',
+            titre: 'Verdict',
             num: true,
             valeur: (b: LigneBloc) => avisParBloc.get(b.id) ?? 0,
             rendu: (b: LigneBloc) => {
               const n = avisParBloc.get(b.id) ?? 0
-              if (n === 0) return <span className="discret">—</span>
-              // Les deux formules d'accord : sur ce sous-ensemble, la precision
-              // mesuree est de 100 %.
+              // Un bloc affiche ici est jugeable par toutes les formules, donc
+              // aucune ne s'abstient : zero voix veut dire qu'elles confirment
+              // toutes l'ouvreur. On l'ecrit, plutot que de laisser un tiret que
+              // l'on lirait comme "pas de donnees".
+              if (n === 0) return <span className="discret">accord</span>
+              // Les deux formules d'accord contre l'ouvreur : sur ce
+              // sous-ensemble, la precision mesuree est de 100 %.
               if (n >= nbFormules) return <span className="puce alerte">confirme</span>
               return <span className="puce">a verifier</span>
             },
@@ -285,7 +289,7 @@ export function VueBlocs({
 
       <Carte
         titre="Tous les blocs exploitables"
-        sousTitre="Blocs ayant assez de duels utiles pour etre juges. Un bloc ouvert la semaine derniere n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touche. Les deux formules sont affichees cote a cote : quand elles s'ecartent nettement, c'est que le bloc est mal connu. Seuils regles dans l'ecran Formules."
+        sousTitre="Blocs ayant assez de duels utiles pour etre juges. Un bloc ouvert la semaine derniere n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touche. Le verdict resume l'avis des formules qui votent : accord avec l'ouvreur, a verifier si l'une le conteste, confirme si toutes le contestent. Les cotes de chaque formule sont affichees a cote : quand elles s'ecartent nettement, c'est que le bloc est mal connu."
       >
         <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} />
       </Carte>

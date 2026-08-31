@@ -473,18 +473,45 @@ le font. Chacune ayant son propre bruit, elle a son propre seuil, déclaré dans
 (`seuilDesaccord`) : 0,75 cran pour l'Elo, 1,00 pour Glicko, choisis pour un taux de fausses
 alertes comparable sur le monde témoin.
 
-Le gain est réel et mesuré sur l'ensemble des blocs :
+### Détecter et coter sont deux métiers différents
+
+La **cote affichée** vient du mélange : c'est la formule qui se trompe le moins gravement.
+La **détection** des blocs mal cotés, elle, est confiée au jury Elo + Glicko, réglé pour la
+sensibilité — deux objectifs distincts, deux réglages distincts.
+
+Glicko y joue le rôle de la voix sensible : son seuil est descendu à 0,75 alors que sa seule
+précision commanderait 1,00. Son rôle est de rattraper les blocs sous-cotés, que l'Elo laisse
+passer parce qu'un échec attendu ne le fait presque pas bouger.
+
+Mesuré sur l'ensemble des 369 blocs, dont 33 sont réellement sous-cotés d'un cran ou plus :
 
 | Méthode | Fausses alertes | Précision | Sandbags trouvés |
 |---|---|---|---|
-| Elo seul | 1,6 % | 98 % | 39 % |
-| Glicko seul | 1,4 % | 97 % | 42 % |
-| Moyenne des deux écarts | 2,7 % | 92 % | 52 % |
-| **Au moins une des deux** | **2,4 %** | **96 %** | **52 %** |
-| Les deux (« confirmé ») | 0,5 % | **100 %** | 30 % |
+| Elo seul (0,75) | 1,6 % | 98 % | 39 % |
+| Glicko seul (1,00) | 1,4 % | 97 % | 42 % |
+| Mélange seul (0,75) | 1,4 % | 98 % | 42 % |
+| Union, Glicko à 1,00 | 2,4 % | 96 % | 52 % |
+| **Union, Glicko à 0,75** | **3,0 %** | **92 %** | **58 %** |
+| Union, Glicko à 0,60 | 5,1 % | 90 % | 61 % |
+| Les deux (« confirmé ») | 0,8 % | **100 %** | 30 % |
 
-Treize points de détection en plus pour huit dixièmes de point de fausses alertes. Et le
-niveau « confirmé » donne une liste sur laquelle agir sans vérifier : **précision 100 %**.
+Dix-neuf points de détection en plus que l'Elo seul, pour 1,4 point de fausses alertes. On
+s'arrête à 0,75 : descendre Glicko à 0,60 coûterait 70 % de fausses alertes en plus pour trois
+points de détection. Et le niveau « confirmé » donne une liste sur laquelle agir sans
+vérifier : **précision 100 %**.
+
+(Les chiffres de sensibilité cités plus haut dans ce fichier avant cette section utilisaient
+un dénominateur restreint aux blocs jugés par la formule concernée, ce qui les flattait. Ceux
+de ce tableau portent sur l'ensemble des blocs — c'est la mesure honnête de « quelle part des
+vrais sandbags le site trouve-t-il ».)
+
+### Lire la colonne « Verdict »
+
+- **accord** — aucune formule ne conteste l'ouvreur. Ce n'est *pas* une absence de données :
+  un bloc n'apparaît dans ce tableau que s'il est jugeable par toutes les formules, donc
+  aucune ne s'abstient. C'est un vrai verdict d'accord.
+- **à vérifier** — une seule formule conteste.
+- **confirmé** — toutes le contestent. C'est la liste à 100 % de précision.
 
 Deux pistes ont été essayées et écartées, chiffres à l'appui :
 
