@@ -126,7 +126,7 @@ défaut. À utiliser pour vérifier une intuition, pas comme réglage permanent.
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test               # 45 tests sur le cœur de calcul
+npm test               # 51 tests sur le cœur de calcul
 npm run build          # site statique dans dist/
 npm run data:generate  # régénère le jeu de données de démonstration
 ```
@@ -371,7 +371,7 @@ fichiers. GitHub Pages suffit, et le dépôt contient déjà tout ce qu'il faut.
 **Ce qui est en place :**
 
 - `.github/workflows/deploy.yml` — à chaque poussée sur `main`, GitHub vérifie les types,
-  lance les 45 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
+  lance les 51 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
   cœur de calcul est cassé, n'est jamais mis en ligne.
 - `base: './'` dans `vite.config.ts` — les chemins d'assets sont relatifs, donc le site
   fonctionne quel que soit le nom du dépôt, sans configuration à ajuster.
