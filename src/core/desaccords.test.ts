@@ -70,13 +70,14 @@ describe('les desaccords ne sont pas du bruit', () => {
     async () => {
       const juges = await juger(true)
       expect(juges.length).toBeGreaterThan(200)
-      // C'est le resultat central. Au seuil de 0,75 cran il vaut 1,2 % — quatre
-      // blocs sur 321 — contre 0 % au seuil d'un cran. C'est le prix assume du
-      // seuil plus bas, qui double en echange le nombre de vraies erreurs
-      // trouvees. Si ce taux derivait nettement au-dessus, c'est que le calcul
-      // se serait mis a fabriquer des desaccords a partir de rien.
+      // C'est le resultat central. Il vaut 2,7 % avec les reglages livres —
+      // six blocs sur 226 — contre 0 % avec un seuil d'un cran et sans ecart
+      // neglige. C'est le prix assume de deux choix qui, en echange, font
+      // passer la detection des blocs sous-cotes de 13 % a 57 %. Si ce taux
+      // derivait nettement au-dessus, c'est que le calcul se serait mis a
+      // fabriquer des desaccords a partir de rien.
       const faux = juges.filter(signale)
-      expect(faux.length / juges.length).toBeLessThan(0.03)
+      expect(faux.length / juges.length).toBeLessThan(0.05)
     },
     120_000
   )
@@ -145,6 +146,25 @@ describe('les desaccords ne sont pas du bruit', () => {
       // Un artefact de bruit ferait l'inverse : il se concentrerait sur les
       // blocs peu repetes, ou l'estimation est la plus incertaine.
       expect(tauxFournis).toBeGreaterThan(tauxMaigres)
+    },
+    120_000
+  )
+
+  it(
+    'ecarter les resultats joues d avance rattrape des blocs sous-cotes',
+    async () => {
+      const ds = await dataset()
+      const elo = FORMULES.find((f) => f.id === 'elo-bloc')!
+      const detection = (ecartNeglige: number) => {
+        const r = executer(ds, elo, { ...paramsParDefaut(elo.params), ecartNeglige }, {})
+        const juges = r.blocs.filter((b) => b.fiable)
+        // Blocs reellement plus durs que leur etiquette : les sandbags.
+        const durs = juges.filter((b) => vraiIndex(b.id) - b.indexOfficiel >= 1)
+        return durs.filter(signale).length / durs.length
+      }
+      // Un bloc plus dur que son etiquette ne recoit que des echecs, dont la
+      // plupart etaient acquis d'avance : les ecarter debloque son estimation.
+      expect(detection(2000)).toBeGreaterThan(detection(0) * 1.4)
     },
     120_000
   )

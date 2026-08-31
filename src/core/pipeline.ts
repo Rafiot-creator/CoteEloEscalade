@@ -33,7 +33,7 @@ export interface LigneBloc {
   dateRetrait: string | null
   rating: number
   incertitude?: number
-  /** Duels : un par grimpeur ayant affronte ce bloc. */
+  /** Duels *comptes* : ceux dont l'issue n'etait pas jouee d'avance. */
   matchs: number
   reussites: number
   tauxReussite: number
@@ -89,8 +89,10 @@ export interface Resume {
   surCotes: number
   ecartMedianAbs: number
   lignes: number
-  /** Nombre de duels, c'est-a-dire de couples grimpeur-bloc distincts. */
+  /** Couples grimpeur-bloc distincts presents dans les donnees. */
   duels: number
+  /** Ceux que le calcul a reellement utilises (cf. l'ecart neglige). */
+  duelsComptes: number
   tauxReussiteGlobal: number
   gyms: EtatGym[]
 }
@@ -213,7 +215,8 @@ export function executer(
   // --- Resume -----------------------------------------------------------------
   const audites = blocs.filter((b) => b.fiable)
   const reussitesTotal = dataset.ascensions.filter((a) => a.resultat === 'reussite').length
-  const duels = blocs.reduce((s, b) => s + b.matchs, 0)
+  const duels = new Set(dataset.ascensions.map((a) => a.grimpeurId + '|' + a.blocId)).size
+  const duelsComptes = blocs.reduce((s, b) => s + b.matchs, 0)
   const resume: Resume = {
     blocsAudites: audites.length,
     blocsTotal: blocs.length,
@@ -223,6 +226,7 @@ export function executer(
     ecartMedianAbs: mediane(audites.map((b) => Math.abs(b.ecart))),
     lignes: dataset.ascensions.length,
     duels,
+    duelsComptes,
     tauxReussiteGlobal: dataset.ascensions.length ? reussitesTotal / dataset.ascensions.length : 0,
     gyms,
   }

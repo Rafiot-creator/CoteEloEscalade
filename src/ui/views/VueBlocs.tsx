@@ -59,7 +59,7 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
       tri: (b) => b.ecart,
       rendu: (b) => <Ecart valeur={b.ecart} />,
     },
-    { cle: 'matchs', titre: 'Duels', num: true, valeur: (b) => b.matchs },
+    { cle: 'matchs', titre: 'Duels utiles', num: true, valeur: (b) => b.matchs },
     { cle: 'taux', titre: 'Envoye par', num: true, valeur: (b) => b.tauxReussite, rendu: (b) => pourcent(b.tauxReussite) },
     {
       cle: 'incertitude',
@@ -102,7 +102,7 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
                   cotation_calculee: b.cotationCalculee,
                   cote_elo: Math.round(b.rating),
                   ecart_crans: Number(b.ecart.toFixed(2)),
-                  duels: b.matchs,
+                  duels_utiles: b.matchs,
                   taux_reussite: Number(b.tauxReussite.toFixed(3)),
                 }))
               )
@@ -180,7 +180,7 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
 
       <Carte
         titre="Tous les blocs exploitables"
-        sousTitre="Blocs ayant assez de duels pour etre juges — un bloc ouvert la semaine derniere n'y est pas encore. Seuil regle dans l'ecran Formules."
+        sousTitre="Blocs ayant assez de duels utiles pour etre juges. Un bloc ouvert la semaine derniere n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touche. Seuils regles dans l'ecran Formules."
       >
         <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} />
       </Carte>

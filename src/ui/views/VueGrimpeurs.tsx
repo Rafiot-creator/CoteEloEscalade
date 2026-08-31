@@ -112,7 +112,7 @@ export function VueGrimpeurs({ resultat }: { resultat: Resultat }) {
       rendu: (g) => nombre(g.rating),
     },
     { cle: 'meilleure', titre: 'Plus dur envoye', valeur: (g) => g.meilleureCotation },
-    { cle: 'matchs', titre: 'Duels', num: true, valeur: (g) => g.matchs },
+    { cle: 'matchs', titre: 'Duels utiles', num: true, valeur: (g) => g.matchs },
     { cle: 'taux', titre: 'Duels gagnes', num: true, valeur: (g) => g.tauxReussite, rendu: (g) => pourcent(g.tauxReussite) },
     {
       cle: 'suivi',

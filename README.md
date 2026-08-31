@@ -57,6 +57,44 @@ Les réglages sont dans l'écran **Formules**, groupe « Poids de la victoire »
 « victoire après travail » à 1 annule complètement l'effet du style, ce qui permet de voir ce
 qu'il apporte.
 
+### On n'apprend rien d'un résultat joué d'avance
+
+Un grimpeur situé deux crans sous un bloc qui échoue, ou deux crans au-dessus qui réussit :
+le modèle l'avait déjà prédit, la correction est infime. Le problème n'est pas qu'elle soit
+petite, c'est qu'elle est **systématiquement dans le même sens**. Un bloc que seuls des
+grimpeurs bien plus faibles touchent ne reçoit que des échecs, donc une poussée vers le haut
+que rien ne compense — et il dérive indéfiniment.
+
+Ces duels sont donc écartés au-delà de **2000 points d'écart** (paramètre « Écart au-delà
+duquel un résultat attendu est ignoré »). Un exploit reste évidemment compté : c'est
+l'*issue attendue* qui est ignorée, pas l'écart.
+
+| | Sans la règle | **Avec (2000 pts)** |
+|---|---|---|
+| Erreur médiane | 0,253 cran | **0,243 cran** |
+| Blocs sous-cotés détectés | 34 % | **57 %** |
+| Précision des signalements | 100 % | 98 % |
+| Blocs jugeables | 321 | 226 |
+
+La chute du nombre de blocs jugeables n'est pas une perte, c'est le point. Un duel écarté ne
+compte plus dans les « duels utiles » d'un bloc, donc un bloc dont toutes les confrontations
+étaient jouées d'avance tombe sous le seuil et n'est plus jugé. Ce sont exactement les
+extrêmes de l'échelle :
+
+| Cotation | V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | V10 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Blocs jugés, sans la règle | 26 | 35 | 36 | 33 | 35 | 43 | 36 | 33 | 23 | 21 |
+| Blocs jugés, avec | **0** | 27 | 35 | 33 | 35 | 43 | 34 | 19 | **0** | **0** |
+
+Et ces 95 blocs écartés étaient précisément les plus mal estimés : **0,46 cran d'erreur
+moyenne, contre 0,29 pour ceux qui restent**. Autrement dit, le site cesse d'inventer une
+cotation pour les V10 que personne n'envoie et les V1 que personne ne rate ; il dit « je n'ai
+pas d'information » au lieu de produire un chiffre qui n'en était pas un.
+
+C'est une conséquence de l'ouverture uniforme de V1 à V10 face à une communauté centrée sur
+V5. Une salle réelle, qui ouvre surtout dans la fourchette de ses habitués, en perdrait
+beaucoup moins.
+
 ### Il faut journaliser les échecs
 
 Conséquence directe du modèle, et c'est la contrainte la plus importante côté données : sur
@@ -126,7 +164,7 @@ défaut. À utiliser pour vérifier une intuition, pas comme réglage permanent.
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test               # 51 tests sur le cœur de calcul
+npm test               # 57 tests sur le cœur de calcul
 npm run build          # site statique dans dist/
 npm run data:generate  # régénère le jeu de données de démonstration
 ```
@@ -287,8 +325,10 @@ d'incertitude, indispensable sur les blocs récents et sur les extrêmes de l'é
 1. *Partir de la cotation de l'ouvreur* — sans cet a priori, l'erreur passe de 0,25 à
    0,82 cran (voir plus haut le prix de ce choix) ;
 2. *Concentrer sur une seule salle* — le même code sur quatre salles donnait 0,42 cran ;
-3. *Pondérer le style* — modeste mais réel, et un test le vérifie ;
-4. *L'amorce des grimpeurs* — sans effet mesurable sur les cotes finales ; elle sert à ce que
+3. *Écarter les résultats joués d'avance* — gain modeste sur l'erreur médiane, mais c'est le
+   levier décisif pour la détection des blocs sous-cotés : 34 % → 57 % ;
+4. *Pondérer le style* — modeste mais réel, et un test le vérifie ;
+5. *L'amorce des grimpeurs* — sans effet mesurable sur les cotes finales ; elle sert à ce que
    les cotes soient justes tout de suite, pas à ce qu'elles finissent mieux.
 
 Le paramétrage par défaut vient d'un balayage : K 30, demi-vie 200, 12 passes. Les écueils
@@ -312,14 +352,14 @@ vraie difficulté. Tout désaccord qui subsiste là-bas est du bruit pur.
 
 | | Monde réel | Témoin (ouvreur infaillible) |
 |---|---|---|
-| Blocs signalés | 43 sur 321 | **4 sur 321** (1,2 %) |
+| Blocs signalés | 45 sur 226 | **6 sur 226** (2,7 %) |
 | Écart médian | 0,18 cran | 0,10 cran |
 
 Trois vérifications confirment que ces désaccords sont réels :
 
-- **Précision 100 %** — les 43 blocs signalés sont tous réellement à plus d'un demi-cran de
-  leur étiquette ;
-- **Sens correct 43 fois sur 43** — le hasard en donnerait la moitié ;
+- **Précision 98 %** — les blocs signalés sont presque tous réellement à plus d'un demi-cran
+  de leur étiquette ;
+- **Sens correct dans plus de 90 % des cas** — le hasard en donnerait la moitié ;
 - **Corrélation 0,73** entre l'écart calculé et la vraie erreur de l'ouvreur, avec une pente
   de 1,01 : l'écart affiché n'est ni tassé ni exagéré.
 
@@ -366,16 +406,17 @@ qui le font chuter vite. La logistique sature d'un côté et pas de l'autre.
 C'est ennuyeux, parce que le sandbag est justement ce qu'une salle veut repérer. Les leviers,
 mesurés :
 
-| Réglage (au seuil de 1 cran) | Sous-cotés détectés | Sur-cotés détectés |
+| Réglage (au seuil de 1 cran, sans écart négligé) | Sous-cotés détectés | Sur-cotés détectés |
 |---|---|---|
-| Défaut (amorce cotation, 12 passes) | 13 % | 42 % |
+| Défaut de l'époque | 13 % | 42 % |
 | 40 passes | 25 % | 58 % |
 | K = 100 | 25 % | 54 % |
 | Amorce uniforme | 53 % | 63 % |
 | Glicko | 66 % | 58 % |
 
-Abaisser le seuil à 0,75 est le levier retenu : il porte la détection des sandbags à **34 %**
-sans toucher aux réglages du modèle.
+Deux leviers ont été retenus, et ils se cumulent : abaisser le seuil de signalement à 0,75
+cran (13 % → 34 %) puis écarter les résultats joués d'avance (34 % → **57 %**). Aucun des deux
+ne touche aux réglages du modèle lui-même.
 
 **Attention au piège de comparaison** : ce tableau met toutes les variantes au même seuil, ce
 qui n'a pas de sens — chacune se place où elle veut sur la courbe précision/rappel. À taux de
@@ -465,7 +506,7 @@ fichiers. GitHub Pages suffit, et le dépôt contient déjà tout ce qu'il faut.
 **Ce qui est en place :**
 
 - `.github/workflows/deploy.yml` — à chaque poussée sur `main`, GitHub vérifie les types,
-  lance les 51 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
+  lance les 57 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
   cœur de calcul est cassé, n'est jamais mis en ligne.
 - `base: './'` dans `vite.config.ts` — les chemins d'assets sont relatifs, donc le site
   fonctionne quel que soit le nom du dépôt, sans configuration à ajuster.

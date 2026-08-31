@@ -252,6 +252,9 @@ describe('defaite provisoire et remboursement', () => {
     // A K constant, un projet echoue puis envoye doit laisser les memes cotes
     // qu'un envoi direct : la defaite provisoire a ete integralement remboursee.
     const options = {
+      // Le test isole le remboursement : on ne veut ni ecartement de duels
+      // attendus, ni decroissance de K, qui brouilleraient l'egalite exacte.
+      ecartNeglige: 0,
       ratingInitial: 5000,
       k: 30,
       kMin: 30,
@@ -287,6 +290,7 @@ describe('defaite provisoire et remboursement', () => {
     const sortie = moteurElo(ds, {
       duels: construireDuels(projet).duels,
       amorcesGrimpeurs: new Map([['g1', 5000]]),
+      ecartNeglige: 0,
       ratingInitial: 5000,
       k: 30,
       kMin: 8,
@@ -300,6 +304,78 @@ describe('defaite provisoire et remboursement', () => {
     expect(sortie.grimpeurs.get('g1')!.matchs).toBe(1)
     expect(sortie.grimpeurs.get('g1')!.reussites).toBe(1)
     expect(sortie.blocs.get('b1')!.matchs).toBe(1)
+  })
+})
+
+describe('resultats joues d avance', () => {
+  const options = {
+    ratingInitial: 5000,
+    k: 30,
+    kMin: 30,
+    kDemiVie: 0,
+    echelle: ECHELLE_REFERENCE,
+    passes: 1,
+    amorce: 'cotation' as const,
+    ptsParCran: 1000,
+    score: () => 1,
+  }
+
+  /** Un grimpeur cote `niveau` affronte un bloc V5, et gagne ou perd. */
+  const jouer = (niveau: number, resultat: 'reussite' | 'echec', ecartNeglige: number) => {
+    const ds = datasetMinimal({ indexBloc: 5 })
+    const sortie = moteurElo(ds, {
+      ...options,
+      ecartNeglige,
+      duels: construireDuels([ligne(1, 'g1', 'b1', resultat)]).duels,
+      amorcesGrimpeurs: new Map([['g1', niveau]]),
+    })
+    return {
+      grimpeur: sortie.grimpeurs.get('g1')!.rating,
+      bloc: sortie.blocs.get('b1')!.rating,
+      duels: sortie.blocs.get('b1')!.matchs,
+    }
+  }
+
+  it('ne bouge rien quand un grimpeur tres au-dessous echoue', () => {
+    // 3000 contre un bloc a 5000 : deux crans d'ecart, l'echec etait acquis.
+    const r = jouer(3000, 'echec', 2000)
+    expect(r.grimpeur).toBe(3000)
+    expect(r.bloc).toBe(5000)
+    // Et le duel ne compte pas comme une observation utile.
+    expect(r.duels).toBe(0)
+  })
+
+  it('ne bouge rien quand un grimpeur tres au-dessus reussit', () => {
+    const r = jouer(7000, 'reussite', 2000)
+    expect(r.grimpeur).toBe(7000)
+    expect(r.bloc).toBe(5000)
+    expect(r.duels).toBe(0)
+  })
+
+  it('compte au contraire les resultats surprenants', () => {
+    // Le meme ecart, mais l'issue inverse : la, on apprend quelque chose.
+    const exploit = jouer(3000, 'reussite', 2000)
+    expect(exploit.grimpeur).toBeGreaterThan(3000)
+    expect(exploit.bloc).toBeLessThan(5000)
+    expect(exploit.duels).toBe(1)
+
+    const echec = jouer(7000, 'echec', 2000)
+    expect(echec.grimpeur).toBeLessThan(7000)
+    expect(echec.bloc).toBeGreaterThan(5000)
+  })
+
+  it('compte tout quand la regle est desactivee', () => {
+    const r = jouer(3000, 'echec', 0)
+    expect(r.grimpeur).toBeLessThan(3000)
+    expect(r.bloc).toBeGreaterThan(5000)
+    expect(r.duels).toBe(1)
+  })
+
+  it('laisse passer ce qui reste en deca du seuil', () => {
+    // 1500 points d'ecart, sous le seuil de 2000 : le resultat compte.
+    const r = jouer(3500, 'echec', 2000)
+    expect(r.grimpeur).toBeLessThan(3500)
+    expect(r.duels).toBe(1)
   })
 })
 
@@ -439,6 +515,8 @@ describe('formules', () => {
       const r = executer(ds, f, paramsParDefaut(f.params), {})
       expect(r.resume.duels).toBe(couples)
       expect(r.resume.duels).toBeLessThan(r.resume.lignes)
+      // Une partie d'entre eux est ecartee : issue jouee d'avance.
+      expect(r.resume.duelsComptes).toBeLessThanOrEqual(r.resume.duels)
     }
   })
 

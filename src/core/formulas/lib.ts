@@ -310,6 +310,19 @@ const DUELS_POUR_ESTIMER = 12
 export interface OptionsElo {
   /** Les duels, tries chronologiquement. */
   duels: Duel[]
+  /**
+   * Ecart de cote au-dela duquel un resultat *attendu* n'est plus compte, en
+   * points. 0 = tout compte.
+   *
+   * Un grimpeur tres au-dessous d'un bloc qui echoue, ou tres au-dessus qui
+   * reussit, ne nous apprend rien : le modele le predisait deja. Le probleme
+   * est que ces resultats ne sont pas seulement inutiles, ils sont biaises —
+   * un bloc que seuls des grimpeurs bien plus faibles affrontent ne recoit que
+   * des echecs, donc une poussee vers le haut que rien ne compense, et il
+   * derive indefiniment. Les ecarter revient a dire "aucune information" plutot
+   * que de laisser la cote glisser.
+   */
+  ecartNeglige: number
   /** Cote de depart de chaque grimpeur (cf. `amorcesGrimpeurs`). */
   amorcesGrimpeurs: Map<string, number>
   ratingInitial: number
@@ -365,15 +378,20 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
   const historique: PointHistorique[] = []
   const evaluateur = new Evaluateur()
   const passes = Math.max(1, Math.round(o.passes))
+  /** Evenements ecartes a la derniere passe, pour le diagnostic. */
+  let negliges = 0
 
   for (let passe = 1; passe <= passes; passe++) {
     const dernierePasse = passe === passes
     let deplacement = 0
     let nEvenements = 0
+    negliges = 0
     if (dernierePasse) historique.length = 0
 
     /** Deplacements appliques par une defaite, en attente d'un remboursement. */
     const aRembourser = new Map<string, { grimpeur: number; bloc: number }>()
+    /** Duels deja comptes dans les effectifs, a la premiere passe. */
+    const comptes = new Set<string>()
 
     for (const ev of evenements) {
       const d = ev.duel
@@ -389,6 +407,21 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
           eg.rating -= rendu.grimpeur
           eb.rating -= rendu.bloc
           aRembourser.delete(cle)
+        }
+      }
+
+      // Le test vient apres le remboursement, donc sur les cotes restaurees.
+      // Si une victoire est ecartee ici, la defaite provisoire a tout de meme
+      // ete rendue : le duel ne laisse alors aucune trace, ce qui est bien ce
+      // qu'on veut dire par "ce duel n'apprend rien".
+      if (o.ecartNeglige > 0) {
+        const avance = eg.rating - eb.rating
+        const attenduSansSurprise =
+          (ev.type === 'defaite' && avance <= -o.ecartNeglige) ||
+          (ev.type === 'victoire' && avance >= o.ecartNeglige)
+        if (attenduSansSurprise) {
+          negliges += 1
+          continue
         }
       }
 
@@ -409,8 +442,11 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
       eb.rating += db
       if (ev.type === 'defaite') aRembourser.set(cle, { grimpeur: dg, bloc: db })
 
-      // Les effectifs se comptent une fois par duel, a son premier evenement.
-      if (passe === 1 && ev.premier) {
+      // Les effectifs comptent les duels qui ont *servi* : un bloc dont tous
+      // les duels sont ecartes affiche zero, n'est pas juge, et reste a son
+      // amorce. C'est plus honnete que de le presenter comme bien documente.
+      if (passe === 1 && !comptes.has(cle)) {
+        comptes.add(cle)
         eg.matchs += 1
         eb.matchs += 1
         if (d.gagne) {
@@ -435,6 +471,12 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
     convergence,
     diagnostics: [
       ...evaluateur.diagnostics(),
+      {
+        label: 'Duels ecartes',
+        valeur: negliges,
+        aide:
+          "Resultats attendus entre adversaires trop eloignes, ecartes du calcul : ils n'apprennent rien et poussent la cote toujours dans le meme sens. Regle par 'Ecart au-dela duquel un resultat attendu est ignore'.",
+      },
       {
         label: 'Deplacement final',
         valeur: convergence[convergence.length - 1] ?? 0,

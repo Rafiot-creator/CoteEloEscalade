@@ -60,7 +60,7 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
         <div>
           <Carte
             titre="Qualite du calcul"
-            sousTitre={`${resultat.formuleLabel} — ${nombre(resultat.dureeMs)} ms sur ${nombre(resultat.resume.duels)} affrontements.`}
+            sousTitre={`${resultat.formuleLabel} — ${nombre(resultat.dureeMs)} ms — ${nombre(resultat.resume.duelsComptes)} duels comptes sur ${nombre(resultat.resume.duels)} affrontements.`}
           >
             <div className="grille tuiles">
               {resultat.diagnostics.map((d) => (

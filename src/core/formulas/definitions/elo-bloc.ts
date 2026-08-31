@@ -104,6 +104,18 @@ const formule: Formule = {
       aide: "Nombre d'essais cumules a partir duquel la victoire ne vaut plus que le poids 'apres travail'. Entre 1 essai et ce seuil, le score descend progressivement.",
     },
     {
+      nom: 'ecartNeglige',
+      label: 'Ecart au-dela duquel un resultat attendu est ignore',
+      type: 'nombre',
+      defaut: 2000,
+      min: 0,
+      max: 5000,
+      pas: 250,
+      unite: 'pts',
+      groupe: 'Regle de comptage',
+      aide: "Un grimpeur situe tres au-dessous d'un bloc qui echoue, ou tres au-dessus qui reussit, ne nous apprend rien — le modele le predisait deja. Pire, ces resultats poussent la cote toujours dans le meme sens : un bloc que seuls des grimpeurs bien plus faibles tentent ne recoit que des echecs et derive vers le haut sans contrepartie. A 2000 points, soit deux crans V, on les ecarte. 0 = tout compte.",
+    },
+    {
       nom: 'kMin',
       label: 'K minimum',
       type: 'nombre',
@@ -194,6 +206,7 @@ const formule: Formule = {
     const affrontements = construireDuels(dataset.ascensions)
     const sortie = moteurElo(dataset, {
       duels: affrontements.duels,
+      ecartNeglige: p.ecartNeglige as number,
       amorcesGrimpeurs: amorcesGrimpeurs(
         dataset,
         affrontements.duels,
