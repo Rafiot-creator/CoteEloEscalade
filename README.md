@@ -11,6 +11,10 @@ de leur étiquette sont, au choix, sous-cotés ou généreux.
 
 Tout tourne dans le navigateur. Pas de serveur, pas de base de données, pas de compte.
 
+> Ce fichier décrit ce que le projet **fait**. Pour savoir **pourquoi** — les choix de modèle,
+> les pistes essayées et rejetées avec leurs chiffres, les erreurs de raisonnement corrigées
+> en chemin — voir [DECISIONS.md](DECISIONS.md).
+
 ## Le modèle
 
 **Un seul affrontement par couple grimpeur–bloc.** Toutes les séances passées sur un bloc se
