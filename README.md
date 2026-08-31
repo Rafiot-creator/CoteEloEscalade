@@ -381,17 +381,13 @@ fichiers. GitHub Pages suffit, et le dépôt contient déjà tout ce qu'il faut.
 
 **Les trois étapes à faire une seule fois :**
 
-1. Créer un dépôt vide sur github.com (sans README, sans .gitignore : le projet en a déjà).
-2. Le brancher et pousser :
-   ```bash
-   git remote add origin https://github.com/VOTRE-COMPTE/cote-elo-escalade.git
-   git push -u origin main
-   ```
-3. Dans **Settings → Pages**, choisir **Source : GitHub Actions**. Rien d'autre à régler.
+Le dépôt est déjà branché sur <https://github.com/EricPrieur/CoteEloEscalade>. Il ne reste
+qu'une chose à faire une seule fois, dans l'interface GitHub : **Settings → Pages → Source :
+GitHub Actions**. Rien d'autre à régler.
 
-La première poussée déclenche le déploiement ; l'URL apparaît dans l'onglet **Actions** et
-dans **Settings → Pages**, sous la forme
-`https://VOTRE-COMPTE.github.io/cote-elo-escalade/`.
+Chaque poussée sur `main` déclenche alors le déploiement ; l'avancement se suit dans l'onglet
+**Actions**, et le site est servi sur
+<https://ericprieur.github.io/CoteEloEscalade/>.
 
 Ensuite, publier une correction ou de nouvelles données revient à `git push` : le site se
 reconstruit tout seul.
