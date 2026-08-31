@@ -302,6 +302,52 @@ rencontrés, tous commentés dans le code :
   faciles. Le lissage des scores à 2 % (le correctif standard contre la séparation) le rend
   fini. L'Elo, lui, n'en a pas besoin : son pas borné s'auto-limite.
 
+## Les désaccords signalés sont-ils réels ?
+
+La question mérite d'être posée sérieusement : les blocs démarrent à la cotation de l'ouvreur,
+l'estimation est bruitée, et un bruit suffit à faire franchir un seuil. `desaccords.test.ts`
+y répond par une **expérience témoin** plutôt que par un raisonnement — on rejoue tout le
+pipeline sur un monde où l'ouvreur ne se trompe jamais, l'étiquette de chaque bloc étant sa
+vraie difficulté. Tout désaccord qui subsiste là-bas est du bruit pur.
+
+| | Monde réel | Témoin (ouvreur infaillible) |
+|---|---|---|
+| Blocs signalés | 22 sur 321 | **0 sur 321** |
+| Écart médian | 0,18 cran | 0,10 cran |
+
+Le taux de faux positifs est nul. Trois vérifications le confirment :
+
+- **Précision 100 %** — les 22 blocs signalés sont tous réellement à plus d'un demi-cran de
+  leur étiquette ;
+- **Sens correct 22 fois sur 22** — le hasard en donnerait la moitié ;
+- **Corrélation 0,73** entre l'écart calculé et la vraie erreur de l'ouvreur, avec une pente
+  de 1,01 : l'écart affiché n'est ni tassé ni exagéré.
+
+Et un indice qui vaut à lui seul démonstration : **les désaccords se concentrent là où les
+données abondent** — 15 % des blocs à 40 duels et plus, contre 0 % en dessous de 10. Un
+artefact de bruit ferait exactement l'inverse, puisque c'est sur les blocs peu répétés que
+l'estimation est la plus incertaine.
+
+**La contrepartie : le test est très conservateur.** Il ne se trompe pas sur ce qu'il signale,
+mais il signale peu — 87 blocs réellement mal cotés passent au travers. Un bloc doit cumuler
+une grosse erreur *et* beaucoup de duels pour franchir le seuil d'un cran contre l'a priori de
+l'ouvreur.
+
+| Seuil de signalement | Blocs signalés | Précision |
+|---|---|---|
+| 1,00 cran (actuel) | 22 | 100 % |
+| 0,75 cran | 43 | 100 % |
+| 0,50 cran | 67 | 79 % |
+
+Descendre le seuil à 0,75 cran doublerait la récolte sans rien perdre en fiabilité — c'est la
+constante `SEUIL_DESACCORD` dans `pipeline.ts`.
+
+**Limite honnête de cette démonstration** : le témoin réutilise les mêmes ascensions, il
+mesure donc le bruit de l'estimateur, pas celui de toute la chaîne. Il prouve que la méthode
+ne fabrique pas de désaccords à partir de hasard — pas que tout désaccord réel soit une erreur
+de cotation. Un bloc morpho, facile pour les grands et dur pour les petits, n'est pas mal coté
+et ressortirait pourtant.
+
 ## Volume de données et temps de calcul
 
 Le moteur relit tout l'historique à chaque passe : le coût est **linéaire en lignes × passes**.
