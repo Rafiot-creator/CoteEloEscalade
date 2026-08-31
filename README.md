@@ -505,6 +505,34 @@ un dénominateur restreint aux blocs jugés par la formule concernée, ce qui le
 de ce tableau portent sur l'ensemble des blocs — c'est la mesure honnête de « quelle part des
 vrais sandbags le site trouve-t-il ».)
 
+**L'union produit plus de fausses alertes que l'Elo seul. Est-ce le prix de l'union ?** Non :
+c'est le prix de la sensibilité. En réglant chaque formule seule pour produire exactement les
+mêmes 3,0 % de fausses alertes que l'union, elle reste devant sur les deux axes :
+
+| Méthode, réglée à 3,0 % de fausses alertes | Précision | Sandbags |
+|---|---|---|
+| Elo seul, seuil 0,61 | 89 % | 55 % |
+| Glicko seul, seuil 0,68 | 92 % | 48 % |
+| Mélange seul, seuil 0,55 | 88 % | 52 % |
+| **Union Elo 0,75 + Glicko 0,75** | **92 %** | **58 %** |
+
+Aucune formule seule n'atteint 58 % de détection sous 3 % de fausses alertes. Le choix du
+point de fonctionnement — 3 % plutôt que 2,4 % — est une décision de produit, séparée de celle
+de la structure ; la structure, elle, est démontrée meilleure.
+
+**Ce que coûte et rapporte concrètement ce point de fonctionnement.** Le jeu livré contient
+33 blocs réellement sous-cotés. Passer Glicko de 1,00 à 0,75 en fait trouver **deux de plus**
+(17 → 19) et ajoute **deux fausses alertes** (9 → 11) sur 369 blocs. À cette échelle, le débat
+porte donc sur une poignée de blocs — il ne faut pas le surestimer.
+
+Ce qui a emporté la décision est ailleurs : la liste **« confirmé »**, celle sur laquelle on
+agit sans revérifier, passe de **28 à 35 blocs en conservant 100 % de précision**. Sept blocs
+mal cotés de plus, certifiés, pour un coût nul sur la fiabilité de cette liste.
+
+**Et si la précision comptait plus que la détection**, remonter le `seuilDesaccord` de Glicko
+à 1,00 dans sa définition ramène l'union à 2,4 % de fausses alertes et 96 % de précision, pour
+52 % de détection. Une ligne.
+
 ### Lire la colonne « Verdict »
 
 - **accord** — aucune formule ne conteste l'ouvreur. Ce n'est *pas* une absence de données :
