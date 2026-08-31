@@ -47,7 +47,13 @@ jobs:
       - name: Construire le site
         run: npm run build
 
+      # `enablement` active GitHub Pages sur le depot si ce n'est pas deja fait,
+      # et le regle sur "GitHub Actions" comme source. Sans ce parametre, le
+      # premier deploiement d'un depot neuf echoue tant que personne n'est alle
+      # cocher la case a la main dans Settings.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
