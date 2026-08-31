@@ -21,6 +21,18 @@ import type { Bloc, Dataset } from './types'
  * trompe jamais**, l'etiquette de chaque bloc etant sa vraie difficulte. Tout
  * desaccord qui subsiste la-bas est du bruit pur, et sa frequence donne
  * directement le taux de faux positifs.
+ *
+ * C'est ce protocole qui a servi a choisir `SEUIL_DESACCORD`. Mesure sur ce jeu
+ * de donnees, formule Elo :
+ *
+ *   seuil 0,50 : 67 signales, precision  79 %, faux positifs 6,5 %
+ *   seuil 0,75 : 43 signales, precision 100 %, faux positifs 1,2 %  <- retenu
+ *   seuil 1,00 : 22 signales, precision 100 %, faux positifs 0,0 %
+ *
+ * Comparer deux formules a seuil egal n'a pas de sens : chacune se place ou
+ * elle veut sur cette courbe. A taux de faux positifs comparable, Glicko (seuil
+ * 1,25 : 2,8 %) et l'Elo (seuil 0,75 : 1,2 %) trouvent autant de blocs
+ * sous-cotes — 38 % contre 34 % — mais l'Elo est plus precis, 100 % contre 84 %.
  */
 
 const vraiIndex = (id: string) => (verite.blocs as Record<string, number>)[id] / verite.ptsParCranReel
@@ -58,11 +70,13 @@ describe('les desaccords ne sont pas du bruit', () => {
     async () => {
       const juges = await juger(true)
       expect(juges.length).toBeGreaterThan(200)
-      // C'est le resultat central : le taux de faux positifs est nul, ou presque.
-      // S'il derive un jour, c'est que le calcul s'est mis a fabriquer des
-      // desaccords a partir de rien.
+      // C'est le resultat central. Au seuil de 0,75 cran il vaut 1,2 % — quatre
+      // blocs sur 321 — contre 0 % au seuil d'un cran. C'est le prix assume du
+      // seuil plus bas, qui double en echange le nombre de vraies erreurs
+      // trouvees. Si ce taux derivait nettement au-dessus, c'est que le calcul
+      // se serait mis a fabriquer des desaccords a partir de rien.
       const faux = juges.filter(signale)
-      expect(faux.length / juges.length).toBeLessThan(0.01)
+      expect(faux.length / juges.length).toBeLessThan(0.03)
     },
     120_000
   )
@@ -141,10 +155,10 @@ describe('les desaccords ne sont pas du bruit', () => {
       const juges = await juger(false)
       const vraiment = juges.filter(malCote)
       const rappel = vraiment.filter(signale).length / vraiment.length
-      // Documente la contrepartie de la precision : le seuil d'un cran, combine
-      // a une amorce partant de l'ouvreur, laisse passer la majorite des
-      // erreurs. Le site montre les fautes certaines, pas toutes les fautes.
-      expect(rappel).toBeLessThan(0.5)
+      // Documente la contrepartie de la precision : l'amorce partant de
+      // l'ouvreur laisse passer la majorite des erreurs. Le site montre les
+      // fautes certaines, pas toutes les fautes.
+      expect(rappel).toBeLessThan(0.6)
     },
     120_000
   )

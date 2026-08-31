@@ -118,7 +118,7 @@ export function VueBlocs({ resultat }: { resultat: Resultat }) {
           heros
           etiquette="Blocs en desaccord avec leur cotation"
           valeur={nombre(sousCotes.length + surCotes.length)}
-          note={`sur ${nombre(audites.length)} blocs exploitables — au moins un cran V d'ecart`}
+          note={`sur ${nombre(audites.length)} blocs exploitables — au moins ${nombre(SEUIL_DESACCORD, 2)} cran V d'ecart`}
         />
         <Tuile etiquette="Sous-cotes" valeur={nombre(sousCotes.length)} note="plus durs que ce qui est affiche" />
         <Tuile etiquette="Sur-cotes" valeur={nombre(surCotes.length)} note="plus faciles que ce qui est affiche" />

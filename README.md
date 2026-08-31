@@ -312,14 +312,14 @@ vraie difficulté. Tout désaccord qui subsiste là-bas est du bruit pur.
 
 | | Monde réel | Témoin (ouvreur infaillible) |
 |---|---|---|
-| Blocs signalés | 22 sur 321 | **0 sur 321** |
+| Blocs signalés | 43 sur 321 | **4 sur 321** (1,2 %) |
 | Écart médian | 0,18 cran | 0,10 cran |
 
-Le taux de faux positifs est nul. Trois vérifications le confirment :
+Trois vérifications confirment que ces désaccords sont réels :
 
-- **Précision 100 %** — les 22 blocs signalés sont tous réellement à plus d'un demi-cran de
+- **Précision 100 %** — les 43 blocs signalés sont tous réellement à plus d'un demi-cran de
   leur étiquette ;
-- **Sens correct 22 fois sur 22** — le hasard en donnerait la moitié ;
+- **Sens correct 43 fois sur 43** — le hasard en donnerait la moitié ;
 - **Corrélation 0,73** entre l'écart calculé et la vraie erreur de l'ouvreur, avec une pente
   de 1,01 : l'écart affiché n'est ni tassé ni exagéré.
 
@@ -328,19 +328,25 @@ données abondent** — 15 % des blocs à 40 duels et plus, contre 0 % en dessou
 artefact de bruit ferait exactement l'inverse, puisque c'est sur les blocs peu répétés que
 l'estimation est la plus incertaine.
 
-**La contrepartie : le test est très conservateur.** Il ne se trompe pas sur ce qu'il signale,
-mais il signale peu — 87 blocs réellement mal cotés passent au travers. Un bloc doit cumuler
-une grosse erreur *et* beaucoup de duels pour franchir le seuil d'un cran contre l'a priori de
-l'ouvreur.
+### Le choix du seuil
 
-| Seuil de signalement | Blocs signalés | Précision |
-|---|---|---|
-| 1,00 cran (actuel) | 22 | 100 % |
-| 0,75 cran | 43 | 100 % |
-| 0,50 cran | 67 | 79 % |
+`SEUIL_DESACCORD` (dans `pipeline.ts`) vaut **0,75 cran**, et ce n'est pas une intuition : le
+protocole du témoin permet de tracer la courbe complète.
 
-Descendre le seuil à 0,75 cran doublerait la récolte sans rien perdre en fiabilité — c'est la
-constante `SEUIL_DESACCORD` dans `pipeline.ts`.
+| Seuil | Signalés | Précision | Faux positifs (témoin) | Sandbags détectés |
+|---|---|---|---|---|
+| 0,50 | 67 | 79 % | 6,5 % | 56 % |
+| **0,75** | **43** | **100 %** | **1,2 %** | **34 %** |
+| 1,00 | 22 | 100 % | 0,0 % | 13 % |
+| 1,25 | 12 | 100 % | 0,0 % | 6 % |
+
+0,75 double la récolte par rapport à 1,00 sans perdre en précision, et surtout fait passer la
+détection des blocs sous-cotés de 13 % à 34 %. Le prix est visible et assumé : quatre faux
+positifs sur 321 dans le monde témoin, au lieu d'aucun. À 0,50 la précision s'effondre à
+79 %, ce qui abîmerait la confiance dans la liste.
+
+**Le test reste conservateur** : 66 blocs réellement mal cotés passent encore au travers. Le
+site montre les fautes certaines, pas toutes les fautes.
 
 ### Un biais à connaître : les blocs sous-cotés passent plus souvent au travers
 
@@ -360,17 +366,29 @@ qui le font chuter vite. La logistique sature d'un côté et pas de l'autre.
 C'est ennuyeux, parce que le sandbag est justement ce qu'une salle veut repérer. Les leviers,
 mesurés :
 
-| Réglage | Sous-cotés détectés | Sur-cotés détectés |
+| Réglage (au seuil de 1 cran) | Sous-cotés détectés | Sur-cotés détectés |
 |---|---|---|
 | Défaut (amorce cotation, 12 passes) | 13 % | 42 % |
 | 40 passes | 25 % | 58 % |
 | K = 100 | 25 % | 54 % |
 | Amorce uniforme | 53 % | 63 % |
-| **Glicko** | **66 %** | 58 % |
+| Glicko | 66 % | 58 % |
 
-Glicko est de loin le meilleur détecteur, et le seul à peu près symétrique : il amène chaque
-bloc à son point fixe au lieu de l'y faire ramper. Pour chasser les blocs mal cotés, c'est la
-formule à utiliser ; pour le classement au quotidien, Elo reste plus précis en médiane.
+Abaisser le seuil à 0,75 est le levier retenu : il porte la détection des sandbags à **34 %**
+sans toucher aux réglages du modèle.
+
+**Attention au piège de comparaison** : ce tableau met toutes les variantes au même seuil, ce
+qui n'a pas de sens — chacune se place où elle veut sur la courbe précision/rappel. À taux de
+faux positifs comparable, l'avantage apparent de Glicko disparaît :
+
+| | Faux positifs | Sandbags détectés | Précision |
+|---|---|---|---|
+| Elo, seuil 0,75 | 1,2 % | 34 % | 100 % |
+| Glicko, seuil 1,25 | 2,8 % | 38 % | 84 % |
+
+Glicko ne détecte pas mieux : il est simplement plus bavard. Au seuil de 0,75 il signale 124
+blocs sur 321 avec 26 % de faux positifs — le seuil livré est calibré pour l'Elo, pas pour
+lui.
 
 **Limite honnête de cette démonstration** : le témoin réutilise les mêmes ascensions, il
 mesure donc le bruit de l'estimateur, pas celui de toute la chaîne. Il prouve que la méthode

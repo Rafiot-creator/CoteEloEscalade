@@ -12,8 +12,16 @@ import type { Dataset } from './types'
  * de cette couche.
  */
 
-/** Au-dela de ce nombre de crans, on considere que le calcul contredit l'ouvreur. */
-export const SEUIL_DESACCORD = 1
+/**
+ * Ecart, en crans V, a partir duquel on considere que le calcul contredit
+ * l'ouvreur.
+ *
+ * Le seuil vient d'une mesure, pas d'une intuition (cf. `desaccords.test.ts`) :
+ * a 0,75 cran, tous les blocs signales sont reellement mal cotes, et on en
+ * signale deux fois plus qu'a 1 cran. Descendre a 0,5 ferait tomber la
+ * precision a 79 %, ce qui abimerait la confiance dans la liste.
+ */
+export const SEUIL_DESACCORD = 0.75
 
 export interface LigneBloc {
   id: string
