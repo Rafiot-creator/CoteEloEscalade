@@ -109,6 +109,8 @@ export interface Resultat {
   diagnostics: Diagnostic[]
   calibrage: Calibrage
   resume: Resume
+  /** Seuil de desaccord effectivement applique par cette formule. */
+  seuilDesaccord: number
   dureeMs: number
 }
 
@@ -131,6 +133,7 @@ export function executer(
 
   const pc = normaliserParams(PARAMS_CALIBRAGE, paramsCalibrage)
   const minMatchs = pc.minMatchs as number
+  const seuil = formule.seuilDesaccord ?? SEUIL_DESACCORD
 
   // --- Calibrage sur les blocs suffisamment repetes ---------------------------
   const pointsCalibrage: PointCalibrage[] = []
@@ -220,9 +223,9 @@ export function executer(
   const resume: Resume = {
     blocsAudites: audites.length,
     blocsTotal: blocs.length,
-    desaccords: audites.filter((b) => Math.abs(b.ecart) >= SEUIL_DESACCORD).length,
-    sousCotes: audites.filter((b) => b.ecart >= SEUIL_DESACCORD).length,
-    surCotes: audites.filter((b) => b.ecart <= -SEUIL_DESACCORD).length,
+    desaccords: audites.filter((b) => Math.abs(b.ecart) >= seuil).length,
+    sousCotes: audites.filter((b) => b.ecart >= seuil).length,
+    surCotes: audites.filter((b) => b.ecart <= -seuil).length,
     ecartMedianAbs: mediane(audites.map((b) => Math.abs(b.ecart))),
     lignes: dataset.ascensions.length,
     duels,
@@ -243,6 +246,7 @@ export function executer(
     diagnostics: sortie.diagnostics,
     calibrage,
     resume,
+    seuilDesaccord: seuil,
     dureeMs: performance.now() - debut,
   }
 }

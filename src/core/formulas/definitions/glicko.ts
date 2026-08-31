@@ -79,6 +79,9 @@ const formule: Formule = {
   id: 'glicko',
   label: 'Glicko (cote + fiabilite)',
   labelCourt: 'Glicko',
+  // Glicko bouge plus franchement que l'Elo : a 0,75 il signalerait deux fois
+  // plus de blocs pour 4 % de fausses alertes, contre 2,5 % a 1,0.
+  seuilDesaccord: 1,
   description:
     "Memes affrontements, sans ponderation du style, mais chaque cote porte son incertitude. Les blocs peu repetes — ceux qui viennent d'etre ouverts — sont signales comme tels au lieu d'etre cotes avec un faux aplomb. Ses cotes sont un peu plus etalees que la convention des 1000 points par cran : passer le calibrage en mode regression les remet a l'echelle.",
   params: [

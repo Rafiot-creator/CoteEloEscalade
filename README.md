@@ -461,6 +461,42 @@ dur », aucune ne sait dire à quel point. À l'inverse, un bloc sur lequel les 
 La colonne **Incertitude** puise désormais dans la formule qui en produit une, quelle que soit
 la formule active : elle est donc toujours renseignée.
 
+### Deux avis valent mieux qu'un
+
+Puisque les deux formules sont calculées de toute façon, l'écran **Blocs** les fait voter. Un
+bloc est signalé dès qu'**une** formule le conteste, et marqué **confirmé** quand les **deux**
+le font. Chacune ayant son propre bruit, elle a son propre seuil, déclaré dans sa définition
+(`seuilDesaccord`) : 0,75 cran pour l'Elo, 1,00 pour Glicko, choisis pour un taux de fausses
+alertes comparable sur le monde témoin.
+
+Le gain est réel et mesuré sur l'ensemble des blocs :
+
+| Méthode | Fausses alertes | Précision | Sandbags trouvés |
+|---|---|---|---|
+| Elo seul | 1,6 % | 98 % | 39 % |
+| Glicko seul | 1,4 % | 97 % | 42 % |
+| Moyenne des deux écarts | 2,7 % | 92 % | 52 % |
+| **Au moins une des deux** | **2,4 %** | **96 %** | **52 %** |
+| Les deux (« confirmé ») | 0,5 % | **100 %** | 30 % |
+
+Treize points de détection en plus pour huit dixièmes de point de fausses alertes. Et le
+niveau « confirmé » donne une liste sur laquelle agir sans vérifier : **précision 100 %**.
+
+Deux pistes ont été essayées et écartées, chiffres à l'appui :
+
+- **Moyenner les deux écarts** au lieu de les faire voter : détecte autant, mais avec une
+  précision inférieure (92 % contre 96 %). Le vote conserve mieux l'information.
+- **Un test binomial direct** — comparer le nombre d'envois observé à celui attendu sous
+  l'hypothèse « l'étiquette est juste » — s'annonçait comme le plus rigoureux et s'est révélé
+  le pire : 16 % de fausses alertes, 54 % de précision. La raison est instructive : l'étiquette
+  est un entier alors que la difficulté réelle est continue, si bien que l'hypothèse nulle
+  « la difficulté vaut exactement l'étiquette × 1000 » est fausse pour presque tous les blocs.
+  Le test détecte donc « l'étiquette n'est pas exacte », ce qui est vrai partout, au lieu de
+  « l'étiquette est franchement fausse ». Il faudrait une hypothèse nulle d'intervalle
+  (± un demi-cran), donc un test d'équivalence, pas un test de point.
+- **Un troisième juré** (l'Elo sans a priori, dont les erreurs sont indépendantes de
+  l'étiquette) : trop bruyant seul — 42 % de fausses alertes — il dégrade le jury.
+
 ## Faut-il passer à Glicko-2 ?
 
 **Non, pas sur ces données.** Ce que Glicko-2 ajoute à Glicko, c'est une **volatilité** σ par

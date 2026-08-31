@@ -80,6 +80,14 @@ export interface Formule<P extends Params = Params> {
   label: string
   /** Nom tenant dans un en-tete de colonne. A defaut, `label` est utilise. */
   labelCourt?: string
+  /**
+   * Ecart, en crans, a partir duquel *cette* formule contredit l'ouvreur.
+   *
+   * Il est propre a chaque formule parce que leur bruit differe : le seuil se
+   * choisit sur le monde temoin, en visant un taux de fausses alertes
+   * comparable. A defaut, `SEUIL_DESACCORD` s'applique.
+   */
+  seuilDesaccord?: number
   /** Une phrase : ce que la formule suppose, et pour qui elle est faite. */
   description: string
   params: ParamSpec[]
