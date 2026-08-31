@@ -66,8 +66,8 @@ grimpeurs bien plus faibles touchent ne reçoit que des échecs, donc une pouss�
 que rien ne compense — et il dérive indéfiniment.
 
 Ces duels sont donc écartés au-delà de **2000 points d'écart** (paramètre « Écart au-delà
-duquel un résultat attendu est ignoré »). Un exploit reste évidemment compté : c'est
-l'*issue attendue* qui est ignorée, pas l'écart.
+duquel un résultat attendu est ignoré »), dans les deux formules. Un exploit reste évidemment
+compté : c'est l'*issue attendue* qui est ignorée, pas l'écart.
 
 | | Sans la règle | **Avec (2000 pts)** |
 |---|---|---|
@@ -164,7 +164,7 @@ défaut. À utiliser pour vérifier une intuition, pas comme réglage permanent.
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test               # 57 tests sur le cœur de calcul
+npm test               # 58 tests sur le cœur de calcul
 npm run build          # site statique dans dist/
 npm run data:generate  # régénère le jeu de données de démonstration
 ```
@@ -308,17 +308,33 @@ Le jeu de démonstration ayant une vérité terrain, on peut mesurer plutôt que
 
 | Formule | Erreur médiane | Corrélation avec la difficulté réelle | Brier | Temps |
 |---|---|---|---|---|
-| Elo bloc | **0,25 cran V** | **0,987** | 0,062 | 53 ms |
-| Glicko | 0,30 cran V | 0,984 | 0,058 | 119 ms |
+| Elo bloc | 0,24 cran V | **0,985** | 0,062 | 22 ms |
+| **Glicko** | **0,19 cran V** | 0,979 | 0,058 | 119 ms |
 
 Autrement dit : sur les 321 blocs jugeables, la cote calculée tombe à un quart de cran de la
 difficulté réelle.
 
-Glicko est ici moins précis, pour une raison identifiée : son atténuation par l'incertitude
-(le facteur `g(RD)` du papier de Glickman) élargit mécaniquement l'échelle, si bien que ses
-cotes ne tombent pas exactement sur la convention des 1000 points par cran. Passer le
-calibrage en mode régression les remet à l'échelle. Sa valeur reste ailleurs : la colonne
-d'incertitude, indispensable sur les blocs récents et sur les extrêmes de l'échelle.
+**Glicko est passé devant.** Écarter les résultats joués d'avance l'a transformé : son erreur
+médiane tombe de 0,295 à 0,188 cran, et son taux de fausses alertes de 26 % à 4 %. La raison
+est nette — sa méthode pousse chaque bloc à son point fixe, y compris quand ce point fixe est
+à l'infini faute de contre-exemple. C'est cette séparation que le lissage des scores à 2 %
+tentait de rattraper ; écarter les résultats joués d'avance en supprime la cause.
+
+À taux de fausses alertes égal, la comparaison est sans appel :
+
+| | Fausses alertes | Précision | Sandbags détectés |
+|---|---|---|---|
+| Elo, seuil 0,75 | 2,8 % | 98 % | 57 % |
+| **Glicko, seuil 1,00** | **2,5 %** | 97 % | **78 %** |
+| Glicko, seuil 0,75 | 4,0 % | 92 % | 89 % |
+
+Glicko trouve donc nettement plus de blocs mal cotés pour moins de fausses alertes. La formule
+livrée par défaut reste l'Elo — plus simple à expliquer, cinq fois plus rapide, et un peu plus
+précise sur les blocs déjà bien connus — mais **pour un audit d'ouverture, basculer sur Glicko
+dans l'écran Formules est le bon réflexe**.
+
+(Cette conclusion contredit ce que ce README affirmait avant l'ajout de la règle : Glicko y
+était donné pour trop bavard. C'était vrai à l'époque, et faux depuis.)
 
 **Ce qui fait la précision, par ordre d'importance :**
 
@@ -419,17 +435,9 @@ cran (13 % → 34 %) puis écarter les résultats joués d'avance (34 % → **57
 ne touche aux réglages du modèle lui-même.
 
 **Attention au piège de comparaison** : ce tableau met toutes les variantes au même seuil, ce
-qui n'a pas de sens — chacune se place où elle veut sur la courbe précision/rappel. À taux de
-faux positifs comparable, l'avantage apparent de Glicko disparaît :
-
-| | Faux positifs | Sandbags détectés | Précision |
-|---|---|---|---|
-| Elo, seuil 0,75 | 1,2 % | 34 % | 100 % |
-| Glicko, seuil 1,25 | 2,8 % | 38 % | 84 % |
-
-Glicko ne détecte pas mieux : il est simplement plus bavard. Au seuil de 0,75 il signale 124
-blocs sur 321 avec 26 % de faux positifs — le seuil livré est calibré pour l'Elo, pas pour
-lui.
+qui n'a pas de sens — chacune se place où elle veut sur la courbe précision/rappel. Deux
+formules ne se comparent qu'à **taux de fausses alertes égal**, mesuré sur le monde témoin.
+C'est ainsi qu'est établi le classement Elo / Glicko donné plus haut.
 
 **Limite honnête de cette démonstration** : le témoin réutilise les mêmes ascensions, il
 mesure donc le bruit de l'estimateur, pas celui de toute la chaîne. Il prouve que la méthode
@@ -506,7 +514,7 @@ fichiers. GitHub Pages suffit, et le dépôt contient déjà tout ce qu'il faut.
 **Ce qui est en place :**
 
 - `.github/workflows/deploy.yml` — à chaque poussée sur `main`, GitHub vérifie les types,
-  lance les 57 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
+  lance les 58 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
   cœur de calcul est cassé, n'est jamais mis en ligne.
 - `base: './'` dans `vite.config.ts` — les chemins d'assets sont relatifs, donc le site
   fonctionne quel que soit le nom du dépôt, sans configuration à ajuster.

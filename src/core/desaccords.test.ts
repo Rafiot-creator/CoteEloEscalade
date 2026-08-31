@@ -170,6 +170,24 @@ describe('les desaccords ne sont pas du bruit', () => {
   )
 
   it(
+    'ecarter les resultats joues d avance profite aussi a Glicko',
+    async () => {
+      const ds = await dataset()
+      const gli = FORMULES.find((f) => f.id === 'glicko')!
+      const faussesAlertes = (ecartNeglige: number) => {
+        const t = executer(datasetTemoin(ds), gli, { ...paramsParDefaut(gli.params), ecartNeglige }, {})
+        const juges = t.blocs.filter((b) => b.fiable)
+        return juges.filter(signale).length / juges.length
+      }
+      // Glicko poussait chaque bloc a son point fixe, y compris quand ce point
+      // etait a l'infini faute de contre-exemple. Ecarter les resultats joues
+      // d'avance retire la separation elle-meme, et son bavardage avec.
+      expect(faussesAlertes(2000)).toBeLessThan(faussesAlertes(0) / 3)
+    },
+    120_000
+  )
+
+  it(
     'reste conservateur : il passe a cote de beaucoup de vraies erreurs',
     async () => {
       const juges = await juger(false)

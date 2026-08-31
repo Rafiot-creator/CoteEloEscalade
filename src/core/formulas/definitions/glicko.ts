@@ -105,6 +105,18 @@ const formule: Formule = {
       groupe: 'Base',
     },
     {
+      nom: 'ecartNeglige',
+      label: 'Ecart au-dela duquel un resultat attendu est ignore',
+      type: 'nombre',
+      defaut: 2000,
+      min: 0,
+      max: 5000,
+      pas: 250,
+      unite: 'pts',
+      groupe: 'Base',
+      aide: "Meme regle que dans la formule maison : un grimpeur tres au-dessous d'un bloc qui echoue, ou tres au-dessus qui reussit, n'apprend rien et pousse la cote toujours dans le meme sens. La decision est figee au debut de chaque passe, sinon l'ensemble des observations changerait pendant l'iteration vers le point fixe et celle-ci ne convergerait plus. 0 = tout compte.",
+    },
+    {
       nom: 'rdInitial',
       label: 'Incertitude initiale (RD)',
       type: 'nombre',
@@ -240,21 +252,23 @@ const formule: Formule = {
       grimpeurs.set(g0.id, etatVide(amorces.get(g0.id) ?? ratingInitial, rdInitial))
     }
 
-    // Effectifs : constants d'une passe a l'autre, calcules une fois.
-    for (const d of retenus) {
-      const eg = grimpeurs.get(d.grimpeurId)
-      const eb = blocs.get(d.blocId)
-      if (!eg || !eb) continue
-      eg.matchs += 1
-      eb.matchs += 1
-      if (d.gagne) {
-        eg.reussites += 1
-        eb.reussites += 1
-      }
-    }
+    const ecartNeglige = p.ecartNeglige as number
+
+    /**
+     * Ce duel etait-il joue d'avance ? `avance` est la cote du grimpeur moins
+     * celle du bloc : tres positive et gagne, ou tres negative et perdu, le
+     * resultat n'apprend rien — et sa correction va toujours dans le meme sens.
+     */
+    const jouedAvance = (avance: number, gagne: boolean) =>
+      ecartNeglige > 0 && (gagne ? avance >= ecartNeglige : avance <= -ecartNeglige)
+
+    // Les effectifs ne comptent que les duels retenus, et comme la retenue
+    // depend des cotes, ils sont recalcules a la derniere passe.
 
     // Niveau de depart des grimpeurs, raffine d'une passe a l'autre.
     const niveauInitial = new Map<string, number>()
+    /** Duels ecartes a la derniere passe, pour le diagnostic. */
+    let negliges = 0
     const convergence: number[] = []
     let historique: PointHistorique[] = []
     const evaluateur = new Evaluateur()
@@ -279,6 +293,17 @@ const formule: Formule = {
     for (let passe = 1; passe <= passes; passe++) {
       const dernierePasse = passe === passes
       const cotesBlocsAvant = new Map([...blocs].map(([id, e]) => [id, e.rating]))
+      if (dernierePasse) {
+        negliges = 0
+        for (const e of grimpeurs.values()) {
+          e.matchs = 0
+          e.reussites = 0
+        }
+        for (const e of blocs.values()) {
+          e.matchs = 0
+          e.reussites = 0
+        }
+      }
 
       // === Phase A : estimer les grimpeurs, blocs figes =====================
       // Le point de depart n'est pas `ratingInitial` des la 2e passe mais le
@@ -307,10 +332,18 @@ const formule: Formule = {
           const eg = grimpeurs.get(d.grimpeurId)
           const eb = blocs.get(d.blocId)
           if (!eg || !eb) continue
+          if (jouedAvance(eg.rating - eb.rating, d.gagne)) {
+            if (dernierePasse) negliges += 1
+            continue
+          }
           const rdB = eb.incertitude ?? rdInitial
           const s = d.gagne ? 1 : 0
           const attendu = esperanceGlicko(eg.rating, eb.rating, rdB, qv, echelle)
-          if (dernierePasse) evaluateur.ajouter(attendu, d.gagne)
+          if (dernierePasse) {
+            evaluateur.ajouter(attendu, d.gagne)
+            eg.matchs += 1
+            if (d.gagne) eg.reussites += 1
+          }
 
           const gB = g(rdB, qv)
           const ag = accG.get(d.grimpeurId) ?? { invD2: 0, delta: 0 }
@@ -340,12 +373,22 @@ const formule: Formule = {
       // Un bloc ne vieillit pas : toute son histoire forme une seule periode de
       // classement. On accumule donc ses duels sur toute la chronologie, chacun
       // contre le niveau qu'avait le grimpeur ce jour-la.
+      // La retenue est decidee ici, une fois, sur les cotes de debut de passe :
+      // si elle etait reevaluee a chaque iteration de Newton, l'ensemble des
+      // observations changerait en cours de route et le point fixe n'existerait
+      // plus.
       const duelsBlocs: { blocId: string; rG: number; rdG: number; s: number }[] = []
       periodes.forEach((lot, iPeriode) => {
         const niveaux = niveauxParPeriode[iPeriode]
         for (const d of lot) {
           const ng = niveaux?.get(d.grimpeurId)
-          if (!ng || !blocs.has(d.blocId)) continue
+          const eb = blocs.get(d.blocId)
+          if (!ng || !eb) continue
+          if (jouedAvance(ng.rating - (cotesBlocsAvant.get(d.blocId) ?? eb.rating), d.gagne)) continue
+          if (dernierePasse) {
+            eb.matchs += 1
+            if (d.gagne) eb.reussites += 1
+          }
           duelsBlocs.push({ blocId: d.blocId, rG: ng.rating, rdG: ng.rd, s: d.gagne ? 1 : 0 })
         }
       })
@@ -406,6 +449,12 @@ const formule: Formule = {
           unite: 'pts',
           basMieux: true,
           aide: "RD moyen. Environ 2 x RD = la marge a 95 % autour de la cote calculee.",
+        },
+        {
+          label: 'Duels ecartes',
+          valeur: negliges,
+          aide:
+            "Resultats attendus entre adversaires trop eloignes, ecartes du calcul. Compte sur la phase d'estimation des grimpeurs ; celle des blocs applique la meme regle.",
         },
         {
           label: 'Periodes de classement',
