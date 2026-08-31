@@ -1,0 +1,64 @@
+name: Deploiement GitHub Pages
+
+# Le site est entierement statique : on le construit a chaque poussee sur main,
+# et on publie le contenu de `dist/`. Rien n'est commite : `dist/` reste ignore
+# par git, c'est cette action qui le fabrique.
+
+on:
+  push:
+    branches: [main]
+  # Permet aussi de relancer un deploiement a la main depuis l'onglet Actions.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul deploiement a la fois ; si deux poussees se suivent, seule la
+# derniere est publiee.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dependances
+        run: npm ci
+
+      # On ne publie pas un site qui ne compile pas ou dont le coeur de calcul
+      # est casse : les tests sont un garde-fou de deploiement, pas une
+      # formalite.
+      - name: Verifier les types
+        run: npx tsc --noEmit
+
+      - name: Lancer les tests
+        run: npm test
+
+      - name: Construire le site
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deployer:
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4

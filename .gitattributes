@@ -1,0 +1,6 @@
+# Le depot stocke tout en LF, quelle que soit la machine qui commite : les CSV
+# de data/ sont lus par le code, et une difference de fin de ligne entre
+# Windows et l'integration continue ferait diverger les tailles affichees.
+* text=auto eol=lf
+*.png binary
+*.jpg binary

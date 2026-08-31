@@ -1,0 +1,348 @@
+/* =========================================================================
+   Jetons de design.
+   Les couleurs de donnees viennent d'une palette validee (bande de clarte,
+   plancher de chroma, separation daltonisme). Ne pas les remplacer a l'oeil :
+   toute nouvelle teinte doit repasser la validation.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+
+  --surface: #fcfcfb;
+  --plan: #f9f9f7;
+  --plan-creux: #f2f2ee;
+  --encre: #0b0b0b;
+  --encre-2: #52514e;
+  --encre-3: #898781;
+  --grille: #e1e0d9;
+  --axe: #c3c2b7;
+  --bord: rgba(11, 11, 11, 0.1);
+  --bord-fort: rgba(11, 11, 11, 0.18);
+
+  --serie-1: #2a78d6;
+  --serie-2: #eb6834;
+  --serie-3: #1baf7a;
+  --serie-4: #eda100;
+
+  /* Divergent : bleu (plus facile que sa cotation) <-> rouge (plus dur). */
+  --div-froid: #2a78d6;
+  --div-chaud: #e34948;
+  --div-milieu: #f0efec;
+
+  --bon: #0ca30c;
+  --attention: #fab219;
+  --critique: #d03b3b;
+
+  --r: 8px;
+  --r-s: 5px;
+  --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+    --surface: #1a1a19;
+    --plan: #0d0d0d;
+    --plan-creux: #141413;
+    --encre: #ffffff;
+    --encre-2: #c3c2b7;
+    --encre-3: #898781;
+    --grille: #2c2c2a;
+    --axe: #383835;
+    --bord: rgba(255, 255, 255, 0.1);
+    --bord-fort: rgba(255, 255, 255, 0.2);
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
+    --serie-3: #199e70;
+    --serie-4: #c98500;
+    --div-froid: #3987e5;
+    --div-chaud: #e66767;
+    --div-milieu: #383835;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --surface: #1a1a19;
+  --plan: #0d0d0d;
+  --plan-creux: #141413;
+  --encre: #ffffff;
+  --encre-2: #c3c2b7;
+  --encre-3: #898781;
+  --grille: #2c2c2a;
+  --axe: #383835;
+  --bord: rgba(255, 255, 255, 0.1);
+  --bord-fort: rgba(255, 255, 255, 0.2);
+  --serie-1: #3987e5;
+  --serie-2: #d95926;
+  --serie-3: #199e70;
+  --serie-4: #c98500;
+  --div-froid: #3987e5;
+  --div-chaud: #e66767;
+  --div-milieu: #383835;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--encre);
+  background: var(--plan);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: 17px; }
+h2 { font-size: 15px; }
+h3 { font-size: 13px; }
+p { margin: 0; }
+
+/* --- Ossature ------------------------------------------------------------ */
+
+.appli {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 20px;
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--bord);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.marque { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; }
+.marque small { color: var(--encre-3); font-size: 12px; }
+
+.nav { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; }
+
+.nav button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--encre-2);
+  background: none;
+  border: 0;
+  padding: 6px 11px;
+  border-radius: var(--r-s);
+  cursor: pointer;
+}
+.nav button:hover { background: var(--plan-creux); color: var(--encre); }
+.nav button[aria-current='page'] { background: var(--encre); color: var(--surface); }
+
+.contenu { overflow-x: hidden; overflow-y: auto; padding: 20px; }
+.large { max-width: 1180px; margin: 0 auto; }
+
+/* --- Cartes -------------------------------------------------------------- */
+
+.carte {
+  background: var(--surface);
+  border: 1px solid var(--bord);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.carte + .carte, .grille + .carte, .carte + .grille { margin-top: 16px; }
+
+.carte-entete {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.carte-entete .titre { flex: 1; min-width: 0; }
+.sous-titre { color: var(--encre-2); font-size: 12.5px; margin-top: 2px; }
+
+.grille { display: grid; gap: 16px; }
+/* Sans ce min-width, un tableau en `nowrap` impose sa largeur minimale a la
+   colonne de grille et fait deborder la page horizontalement. */
+.grille > * { min-width: 0; }
+.grille.deux { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.grille.tuiles { grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); }
+.grille.atelier { grid-template-columns: minmax(260px, 330px) minmax(0, 1fr); }
+
+@media (max-width: 900px) {
+  .grille.atelier { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .entete { height: auto; padding: 8px 14px; flex-wrap: wrap; gap: 8px; }
+  .nav { margin-left: 0; }
+  .contenu { padding: 14px; }
+}
+
+/* --- Tuiles de chiffres --------------------------------------------------- */
+
+.tuile {
+  background: var(--surface);
+  border: 1px solid var(--bord);
+  border-radius: var(--r);
+  padding: 12px 14px;
+}
+.tuile .etiquette { color: var(--encre-2); font-size: 12px; }
+.tuile .valeur { font-size: 24px; font-weight: 600; margin-top: 2px; }
+.tuile .valeur .unite { font-size: 14px; font-weight: 500; color: var(--encre-2); margin-left: 3px; }
+.tuile .note {
+  color: var(--encre-3);
+  font-size: 11.5px;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.heros .valeur { font-size: 44px; line-height: 1.1; }
+
+/* --- Formulaires ---------------------------------------------------------- */
+
+.param { padding: 9px 0; border-top: 1px solid var(--bord); }
+.param:first-child { border-top: 0; }
+.param-tete { display: flex; align-items: baseline; gap: 8px; }
+.param-tete label { flex: 1; font-size: 13px; }
+.param-valeur { font-variant-numeric: tabular-nums; color: var(--encre-2); font-size: 12.5px; }
+.param-aide { color: var(--encre-3); font-size: 11.5px; margin-top: 3px; }
+.groupe-titre {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--encre-3);
+  margin: 14px 0 2px;
+}
+.groupe-titre:first-child { margin-top: 0; }
+
+input[type='range'] { width: 100%; accent-color: var(--serie-1); margin: 5px 0 0; }
+input[type='checkbox'] { accent-color: var(--serie-1); width: 15px; height: 15px; }
+
+select, input[type='search'], input[type='text'] {
+  font: inherit;
+  font-size: 13px;
+  color: var(--encre);
+  background: var(--surface);
+  border: 1px solid var(--bord-fort);
+  border-radius: var(--r-s);
+  padding: 5px 8px;
+  max-width: 100%;
+}
+select { width: 100%; }
+
+.bouton {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--encre-2);
+  background: var(--surface);
+  border: 1px solid var(--bord-fort);
+  border-radius: var(--r-s);
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bouton:hover { background: var(--plan-creux); color: var(--encre); }
+.bouton[aria-pressed='true'] { background: var(--encre); color: var(--surface); border-color: var(--encre); }
+.bouton.discret { border-color: transparent; }
+
+.barre-outils {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.barre-outils .espace { flex: 1; }
+
+/* --- Tableaux ------------------------------------------------------------- */
+
+.table-enveloppe { overflow-x: auto; }
+
+table.donnees {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+table.donnees th, table.donnees td {
+  text-align: left;
+  padding: 5px 10px 5px 0;
+  border-bottom: 1px solid var(--grille);
+  white-space: nowrap;
+}
+table.donnees th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--encre-2);
+  font-weight: 500;
+  font-size: 11.5px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 1;
+}
+table.donnees th.num, table.donnees td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.donnees tbody tr:hover { background: var(--plan-creux); }
+table.donnees td.principal { font-weight: 500; }
+.tri { color: var(--encre-3); margin-left: 3px; }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  color: var(--encre-3);
+  font-size: 12px;
+}
+
+/* --- Divers --------------------------------------------------------------- */
+
+.puce {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 11px;
+  border: 1px solid var(--bord-fort);
+  color: var(--encre-2);
+}
+.puce.alerte { border-color: var(--critique); color: var(--critique); }
+.puce.ok { border-color: var(--bon); color: var(--bon); }
+
+.pastille { width: 9px; height: 9px; border-radius: 99px; display: inline-block; }
+
+.mono { font-family: var(--mono); font-size: 12px; }
+.discret { color: var(--encre-3); }
+.vide { color: var(--encre-3); padding: 28px 0; text-align: center; font-size: 13px; }
+
+.anomalie { display: flex; gap: 10px; padding: 6px 0; border-top: 1px solid var(--grille); font-size: 12.5px; }
+.anomalie:first-child { border-top: 0; }
+.anomalie .ou { color: var(--encre-3); font-family: var(--mono); font-size: 11.5px; white-space: nowrap; }
+
+.legende { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--encre-2); }
+.legende span { display: inline-flex; align-items: center; gap: 5px; }
+
+.infobulle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  background: var(--surface);
+  border: 1px solid var(--bord-fort);
+  border-radius: var(--r-s);
+  padding: 7px 9px;
+  font-size: 12px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+  max-width: 240px;
+}
+.infobulle .t { font-weight: 600; margin-bottom: 3px; }
+.infobulle .l { display: flex; justify-content: space-between; gap: 14px; color: var(--encre-2); }
+.infobulle .l b { color: var(--encre); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+svg text { font-family: var(--sans); }
+.axe-texte { fill: var(--encre-3); font-size: 10.5px; }
+.etiquette-serie { fill: var(--encre-2); font-size: 11px; }
+
+.barre-ecart { height: 7px; border-radius: 2px; display: block; }
