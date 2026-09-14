@@ -678,9 +678,9 @@ site soit utile.
 |---|---|
 | **Blocs** | Le verdict : combien de blocs contredisent leur étiquette, lesquels, de combien. Cote Elo, nuage calculé/affiché, distribution des écarts, tableau exportable. Un filtre par salle apparaît s'il y en a plusieurs. |
 | **Grimpeurs** | Classement avec cote Elo, niveau calculé (la cotation V envoyée une fois sur deux), courbes de progression. |
-| **Formules** | Choix de la formule, réglage des paramètres, diagnostics, convergence, comparaison A/B de deux réglages. |
-| **Données** | Les tables après validation, filtrables, exportables — y compris toutes les lignes repliées dans les duels. |
-| **Fichiers** | Ce que le site sait de ses propres fichiers — et ce qu'il a refusé d'y lire. |
+| **Formules** *(accès complet)* | Choix de la formule, réglage des paramètres, diagnostics, convergence, comparaison A/B de deux réglages. |
+| **Données** *(accès complet)* | Les tables après validation, filtrables, exportables — y compris toutes les lignes repliées dans les duels. |
+| **Fichiers** *(accès complet)* | Ce que le site sait de ses propres fichiers — et ce qu'il a refusé d'y lire. |
 
 Chaque graphique a son équivalent en tableau : rien n'est accessible uniquement par la
 couleur ou par le survol.
@@ -690,6 +690,30 @@ lui-même porte une description — ce qu'elle mesure, comment la lire, ce qu'el
 Elle s'affiche au survol de l'en-tête, signalé par un soulignement pointillé. C'est le champ
 `aide` du type `Colonne`, à renseigner pour toute nouvelle colonne un tant soit peu
 technique : « Écart », « Duels utiles » ou « Verdict » ne veulent rien dire sans explication.
+
+## Deux niveaux d'accès : visiteur et complet
+
+Le site n'a ni serveur ni compte, donc pas de vraie authentification. Par défaut, un visiteur
+ne voit que les écrans **Blocs** et **Grimpeurs** — les trois autres, plus techniques, sont
+masqués. Visiter une fois une URL contenant un paramètre secret débloque l'« accès complet »
+sur ce navigateur (mémorisé en `localStorage`, `src/ui/acces.ts`) ; les cinq écrans
+apparaissent alors, et un bouton dans l'en-tête permet de basculer à volonté entre « Vue
+complète » et « Vue visiteur » sans perdre le déverrouillage.
+
+**Ce n'est qu'un masquage d'interface, pas une protection réelle** : le site étant statique,
+le paramètre secret est visible dans le code source par quiconque le cherche. Suffisant tant
+que les données restent factices ; le jour où de vraies données personnelles entrent en jeu,
+il faudra un vrai compte côté serveur (voir « Quand vous ajouterez une deuxième salle » et la
+note sur les données personnelles plus haut).
+
+## Plusieurs centres d'escalade (à venir)
+
+L'en-tête propose un menu déroulant pour choisir un centre — en plus du jeu de démonstration,
+six centres réels sont listés (Bloc Shop Chabanel, Bloc Shop Hochelaga, Bloc Shop Mile-End, Le
+Mouv', Rose Bloc 1, Rose Bloc 2). Aucun n'a encore de données connectées : les choisir affiche
+un message d'attente plutôt que le jeu de démo. C'est un premier pas visuel vers l'idée
+décrite plus haut (« Quand vous ajouterez une deuxième salle ») — brancher de vraies données
+par centre reste à faire.
 
 ## Prochaine étape prévue : l'import utilisateur
 
@@ -751,3 +775,20 @@ Les couleurs de données viennent d'une palette validée : bande de clarté, pla
 séparation sous daltonisme, contraste sur les deux surfaces. Elles sont déclarées en jetons
 CSS dans `src/styles.css`. Ne pas les remplacer à l'œil — toute nouvelle teinte doit repasser
 la validation.
+
+## Journal des sessions
+
+Courtes entrées datées sur ce qui a été fait, pour reprendre le fil d'une session à l'autre.
+Le pourquoi des choix de fond reste dans [DECISIONS.md](DECISIONS.md) ; ceci ne trace que le
+fait accompli.
+
+### 2026-09-14
+
+- Reprise du projet en solo par Raphaël sur sa machine (environnement Windows remis en place :
+  Git, Node, `npm install`, `npm test`).
+- Correction de références oubliées vers le dépôt et l'URL GitHub Pages de l'ami
+  (`EricPrieur/CoteEloEscalade`) au lieu de la copie propre `Rafiot-creator/CoteEloEscalade`.
+- Ajout de l'accès à deux niveaux (visiteur / complet) décrit plus haut, avec un bouton pour
+  prévisualiser la vue visiteur sans perdre son déverrouillage.
+- Ajout du menu déroulant de centres d'escalade décrit plus haut (visuel seulement pour
+  l'instant, aucun centre autre que la démo n'a de données).
