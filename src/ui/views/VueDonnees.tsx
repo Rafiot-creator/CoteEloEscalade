@@ -4,13 +4,21 @@ import type { Dataset } from '../../core/types'
 import { Carte } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { dateCourte, nombre, telecharger } from '../format'
+import { useLangue } from '../langue'
 
 type Onglet = 'grimpeurs' | 'blocs' | 'ascensions'
 
 /** Les donnees telles qu'elles sont, apres validation : filtrables et exportables. */
 export function VueDonnees({ dataset }: { dataset: Dataset }) {
+  const { t } = useLangue()
   const [onglet, setOnglet] = useState<Onglet>('blocs')
   const [recherche, setRecherche] = useState('')
+
+  const ongletLabel: Record<Onglet, string> = {
+    grimpeurs: t('Grimpeurs', 'Climbers'),
+    blocs: t('Blocs', 'Boulders'),
+    ascensions: t('Ascensions', 'Ascents'),
+  }
 
   const q = recherche.trim().toLowerCase()
   const correspond = (...champs: (string | number | null)[]) =>
@@ -39,101 +47,115 @@ export function VueDonnees({ dataset }: { dataset: Dataset }) {
   }, [dataset, q])
 
   const colGrimpeurs: Colonne<(typeof grimpeurs)[number]>[] = [
-    { cle: 'nom', titre: 'Nom', principal: true, valeur: (g) => g.nom },
-    { cle: 'gym', titre: 'Salle principale', valeur: (g) => g.gymPrincipal, aide: 'Salle declaree a l inscription.' },
-    { cle: 'sexe', titre: 'Sexe', valeur: (g) => g.sexe, aide: "Enregistre, mais n'entre dans aucun calcul." },
+    { cle: 'nom', titre: t('Nom', 'Name'), principal: true, valeur: (g) => g.nom },
+    {
+      cle: 'gym',
+      titre: t('Salle principale', 'Main gym'),
+      valeur: (g) => g.gymPrincipal,
+      aide: t("Salle déclarée à l'inscription.", 'Gym declared at sign-up.'),
+    },
+    { cle: 'sexe', titre: t('Sexe', 'Sex'), valeur: (g) => g.sexe, aide: t("Enregistré, mais n'entre dans aucun calcul.", "Recorded, but plays no part in any calculation.") },
     {
       cle: 'niveau',
-      titre: 'Niveau declare',
+      titre: t('Niveau déclaré', 'Declared level'),
       valeur: (g) => (g.niveauDeclare === null ? null : `V${g.niveauDeclare}`),
       tri: (g) => g.niveauDeclare ?? -1,
       rendu: (g) =>
-        g.niveauDeclare === null ? <span className="discret">non renseigne</span> : `V${g.niveauDeclare}`,
-      aide:
-        "Niveau annonce a l'inscription. Il sert de cote de depart au grimpeur ; s'il manque, elle est estimee depuis les blocs de ses douze premiers duels.",
+        g.niveauDeclare === null ? <span className="discret">{t('non renseigné', 'not provided')}</span> : `V${g.niveauDeclare}`,
+      aide: t(
+        "Niveau annoncé à l'inscription. Il sert de cote de départ au grimpeur ; s'il manque, elle est estimée depuis les blocs de ses douze premiers duels.",
+        "Level announced at sign-up. It serves as the climber's starting rating; if missing, it is estimated from the boulders in their first twelve duels."
+      ),
     },
     {
       cle: 'saison',
-      titre: 'Premiere saison',
+      titre: t('Première saison', 'First season'),
       num: true,
       valeur: (g) => g.premiereSaison,
       rendu: (g) => String(g.premiereSaison),
-      aide: "Annee de la premiere venue. Metadonnee : elle n'entre dans aucun calcul.",
+      aide: t("Année de la première venue. Métadonnée : elle n'entre dans aucun calcul.", "Year of the first visit. Metadata only: it plays no part in any calculation."),
     },
     {
       cle: 'id',
-      titre: 'Identifiant',
+      titre: t('Identifiant', 'ID'),
       valeur: (g) => g.id,
       rendu: (g) => <span className="mono">{g.id}</span>,
-      aide: "Cle utilisee dans le fichier des ascensions pour designer ce grimpeur.",
+      aide: t('Clé utilisée dans le fichier des ascensions pour désigner ce grimpeur.', 'Key used in the ascents file to reference this climber.'),
     },
   ]
 
   const colBlocs: Colonne<(typeof blocs)[number]>[] = [
-    { cle: 'nom', titre: 'Bloc', principal: true, valeur: (b) => b.nom },
-    { cle: 'gym', titre: 'Salle', valeur: (b) => b.gym },
-    { cle: 'secteur', titre: 'Secteur', valeur: (b) => b.secteur, aide: 'Zone du mur.' },
+    { cle: 'nom', titre: t('Bloc', 'Boulder'), principal: true, valeur: (b) => b.nom },
+    { cle: 'gym', titre: t('Salle', 'Gym'), valeur: (b) => b.gym },
+    { cle: 'secteur', titre: t('Secteur', 'Sector'), valeur: (b) => b.secteur, aide: t('Zone du mur.', 'Area of the wall.') },
     {
       cle: 'couleur',
-      titre: 'Couleur',
+      titre: t('Couleur', 'Color'),
       valeur: (b) => b.couleur,
-      aide: "Couleur des prises. Metadonnee : elle n'entre dans aucun calcul.",
+      aide: t("Couleur des prises. Métadonnée : elle n'entre dans aucun calcul.", "Hold color. Metadata only: it plays no part in any calculation."),
     },
     {
       cle: 'cotation',
-      titre: 'Cotation',
+      titre: t('Cotation', 'Grade'),
       valeur: (b) => b.cotationOfficielle,
       tri: (b) => b.indexOfficiel,
-      aide: "La cotation annoncee par l'ouvreur, telle qu'elle figure sur l'etiquette.",
+      aide: t("La cotation annoncée par l'ouvreur, telle qu'elle figure sur l'étiquette.", "The grade announced by the setter, as it appears on the tag."),
     },
-    { cle: 'ouverture', titre: 'Ouvert le', valeur: (b) => b.dateOuverture, aide: 'Date de mise en place du bloc.' },
+    { cle: 'ouverture', titre: t('Ouvert le', 'Set on'), valeur: (b) => b.dateOuverture, aide: t('Date de mise en place du bloc.', 'Date the boulder was set.') },
     {
       cle: 'retrait',
-      titre: 'Retire le',
+      titre: t('Retiré le', 'Stripped on'),
       valeur: (b) => b.dateRetrait,
-      rendu: (b) => b.dateRetrait ?? <span className="puce ok">en place</span>,
-      aide: "Date de demontage. Un bloc n'est grimpable qu'entre ces deux dates, ce qui borne le nombre de duels qu'il peut accumuler.",
+      rendu: (b) => b.dateRetrait ?? <span className="puce ok">{t('en place', 'in place')}</span>,
+      aide: t(
+        "Date de démontage. Un bloc n'est grimpable qu'entre ces deux dates, ce qui borne le nombre de duels qu'il peut accumuler.",
+        "Strip date. A boulder is only climbable between these two dates, which caps the number of duels it can accumulate."
+      ),
     },
     {
       cle: 'id',
-      titre: 'Identifiant',
+      titre: t('Identifiant', 'ID'),
       valeur: (b) => b.id,
       rendu: (b) => <span className="mono">{b.id}</span>,
-      aide: "Cle utilisee dans le fichier des ascensions pour designer ce bloc.",
+      aide: t('Clé utilisée dans le fichier des ascensions pour désigner ce bloc.', 'Key used in the ascents file to reference this boulder.'),
     },
   ]
 
   const colAscensions: Colonne<(typeof ascensions)[number]>[] = [
     {
       cle: 'date',
-      titre: 'Date',
+      titre: t('Date', 'Date'),
       valeur: (a) => a.date,
       tri: (a) => a.t,
       rendu: (a) => dateCourte(a.t),
-      aide: 'Jour de la seance. Une ligne par seance, pas par essai.',
+      aide: t('Jour de la séance. Une ligne par séance, pas par essai.', 'Day of the session. One row per session, not per attempt.'),
     },
-    { cle: 'grimpeur', titre: 'Grimpeur', principal: true, valeur: (a) => a.grimpeur },
-    { cle: 'bloc', titre: 'Bloc', valeur: (a) => a.bloc },
-    { cle: 'gym', titre: 'Salle', valeur: (a) => a.gym },
-    { cle: 'cotation', titre: 'Cotation', valeur: (a) => a.cotation, aide: "Cotation affichee du bloc ce jour-la." },
+    { cle: 'grimpeur', titre: t('Grimpeur', 'Climber'), principal: true, valeur: (a) => a.grimpeur },
+    { cle: 'bloc', titre: t('Bloc', 'Boulder'), valeur: (a) => a.bloc },
+    { cle: 'gym', titre: t('Salle', 'Gym'), valeur: (a) => a.gym },
+    { cle: 'cotation', titre: t('Cotation', 'Grade'), valeur: (a) => a.cotation, aide: t('Cotation affichée du bloc ce jour-là.', "The boulder's displayed grade on that day.") },
     {
       cle: 'resultat',
-      titre: 'Resultat',
+      titre: t('Résultat', 'Result'),
       valeur: (a) => a.resultat,
-      aide:
-        "Issue de la seance. Plusieurs lignes d'un meme couple grimpeur-bloc se replient ensuite en un seul duel : c'est le fait d'avoir fini par envoyer qui compte, pas le detail des seances.",
+      aide: t(
+        "Issue de la séance. Plusieurs lignes d'un même couple grimpeur-bloc se replient ensuite en un seul duel : c'est le fait d'avoir fini par envoyer qui compte, pas le détail des séances.",
+        "Outcome of the session. Several rows for the same climber-boulder pair later fold into a single duel: what matters is whether they eventually sent it, not the session-by-session detail."
+      ),
       rendu: (a) => (
         <span className={a.resultat === 'reussite' ? 'puce ok' : 'puce'}>
-          {a.resultat === 'reussite' ? 'reussite' : 'echec'}
+          {a.resultat === 'reussite' ? t('réussite', 'send') : t('échec', 'fail')}
         </span>
       ),
     },
     {
       cle: 'essais',
-      titre: 'Essais',
+      titre: t('Essais', 'Attempts'),
       num: true,
-      aide:
-        "Nombre de tentatives dans la seance. Il ne decide jamais de l'issue ; il sert seulement a ponderer une victoire, un flash pesant plus lourd qu'un enchainement laborieux.",
+      aide: t(
+        "Nombre de tentatives dans la séance. Il ne décide jamais de l'issue ; il sert seulement à pondérer une victoire, un flash pesant plus lourd qu'un enchaînement laborieux.",
+        "Number of attempts in the session. It never decides the outcome; it only weights a win, a flash counting for more than a hard-fought send."
+      ),
       valeur: (a) => a.essais,
     },
   ]
@@ -155,29 +177,32 @@ export function VueDonnees({ dataset }: { dataset: Dataset }) {
       <div className="barre-outils">
         {(['grimpeurs', 'blocs', 'ascensions'] as Onglet[]).map((o) => (
           <button key={o} className="bouton" aria-pressed={onglet === o} onClick={() => setOnglet(o)}>
-            {o[0].toUpperCase() + o.slice(1)}
+            {ongletLabel[o]}
           </button>
         ))}
         <input
           type="search"
-          placeholder="Filtrer..."
+          placeholder={t('Filtrer...', 'Filter...')}
           value={recherche}
           onChange={(e) => setRecherche(e.currentTarget.value)}
           style={{ width: 220 }}
         />
         <span className="discret" style={{ fontSize: 12 }}>
-          {nombre(total)} lignes
+          {t(`${nombre(total)} lignes`, `${nombre(total)} rows`)}
         </span>
         <span className="espace" />
         <button className="bouton" onClick={exporter}>
-          Exporter en CSV
+          {t('Exporter en CSV', 'Export as CSV')}
         </button>
       </div>
 
       <Carte
         sousTitre={
           onglet === 'ascensions'
-            ? "Toutes les lignes, y compris celles que la regle du premier envoi ecarte du calcul. Le nombre d'essais est conserve mais n'entre dans aucune cote."
+            ? t(
+                "Toutes les lignes, y compris celles que la règle du premier envoi écarte du calcul. Le nombre d'essais est conservé mais n'entre dans aucune cote.",
+                "All rows, including those the first-send rule excludes from the calculation. The number of attempts is kept but plays no part in any rating."
+              )
             : undefined
         }
       >

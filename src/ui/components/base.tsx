@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import type { ParamSpec, Params } from '../../core/formulas/types'
 import { nombre } from '../format'
+import { bilingue, useLangue } from '../langue'
 
 export function Carte({
   titre,
@@ -75,22 +76,25 @@ export function ControleParam({
   onChange: (v: number | boolean | string) => void
 }) {
   const [aideOuverte, setAideOuverte] = useState(false)
+  const { langue, t } = useLangue()
+  const unite = bilingue(spec.type === 'nombre' ? spec.unite : undefined, spec.type === 'nombre' ? spec.uniteEn : undefined, langue)
+  const aide = bilingue(spec.aide, spec.aideEn, langue)
 
   return (
     <div className="param">
       <div className="param-tete">
-        <label htmlFor={`p-${spec.nom}`}>{spec.label}</label>
+        <label htmlFor={`p-${spec.nom}`}>{bilingue(spec.label, spec.labelEn, langue)}</label>
         {spec.type === 'nombre' && (
           <span className="param-valeur">
             {nombre(valeur as number, (spec.pas ?? 1) < 1 ? 2 : 0)}
-            {spec.unite ? ` ${spec.unite}` : ''}
+            {unite ? ` ${unite}` : ''}
           </span>
         )}
-        {spec.aide && (
+        {aide && (
           <button
             className="bouton discret"
             aria-expanded={aideOuverte}
-            title="A quoi sert ce reglage"
+            title={t('A quoi sert ce réglage', 'What this setting does')}
             onClick={() => setAideOuverte((v) => !v)}
           >
             ?
@@ -122,13 +126,13 @@ export function ControleParam({
         <select id={`p-${spec.nom}`} value={valeur as string} onChange={(e) => onChange(e.currentTarget.value)}>
           {spec.options.map((o) => (
             <option key={o.valeur} value={o.valeur}>
-              {o.label}
+              {bilingue(o.label, o.labelEn, langue)}
             </option>
           ))}
         </select>
       )}
 
-      {aideOuverte && spec.aide && <p className="param-aide">{spec.aide}</p>}
+      {aideOuverte && aide && <p className="param-aide">{aide}</p>}
     </div>
   )
 }
@@ -143,6 +147,7 @@ export function PanneauParams({
   valeurs: Params
   onChange: (nom: string, v: number | boolean | string) => void
 }) {
+  const { langue } = useLangue()
   const groupes = new Map<string, ParamSpec[]>()
   for (const s of specs) {
     const g = s.groupe ?? ''
@@ -154,7 +159,7 @@ export function PanneauParams({
     <>
       {[...groupes].map(([groupe, membres]) => (
         <div key={groupe}>
-          {groupe && <h3 className="groupe-titre">{groupe}</h3>}
+          {groupe && <h3 className="groupe-titre">{bilingue(groupe, membres[0].groupeEn, langue)}</h3>}
           {membres.map((s) => (
             <ControleParam key={s.nom} spec={s} valeur={valeurs[s.nom] ?? s.defaut} onChange={(v) => onChange(s.nom, v)} />
           ))}

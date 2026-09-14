@@ -8,6 +8,7 @@ import { Nuage } from '../charts/Nuage'
 import { Carte, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { nombre, pourcent, signe, telecharger } from '../format'
+import { bilingue, useLangue } from '../langue'
 
 /**
  * L'ecran qui repond a la question du projet : les cotations affichees en salle
@@ -24,6 +25,7 @@ export function VueBlocs({
   /** Vue visiteur : une seule colonne de cote (le melange), appelee simplement "Cote". */
   simplifie?: boolean
 }) {
+  const { langue, t } = useLangue()
   const [gym, setGym] = useState('tous')
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
   const [tableauNuage, setTableauNuage] = useState(false)
@@ -105,45 +107,78 @@ export function VueBlocs({
   const colonnes: Colonne<LigneBloc>[] = [
     {
       cle: 'nom',
-      titre: 'Bloc',
+      titre: t('Bloc', 'Boulder'),
       principal: true,
       valeur: (b) => b.nom,
-      aide: "Identifiant du bloc au mur, tel qu'il figure sur son etiquette.",
+      aide: t(
+        "Identifiant du bloc au mur, tel qu'il figure sur son étiquette.",
+        'The boulder\'s identifier on the wall, as it appears on its tag.'
+      ),
     },
     ...(plusieursSalles
-      ? [{ cle: 'gym', titre: 'Salle', valeur: (b: LigneBloc) => b.gym, aide: 'Salle ou le bloc est ouvert.' }]
+      ? [
+          {
+            cle: 'gym',
+            titre: t('Salle', 'Gym'),
+            valeur: (b: LigneBloc) => b.gym,
+            aide: t('Salle où le bloc est ouvert.', 'The gym where the boulder is set.'),
+          },
+        ]
       : []),
-    { cle: 'secteur', titre: 'Secteur', valeur: (b) => b.secteur, aide: 'Zone du mur ou se trouve le bloc.' },
+    {
+      cle: 'secteur',
+      titre: t('Secteur', 'Sector'),
+      valeur: (b) => b.secteur,
+      aide: t('Zone du mur où se trouve le bloc.', 'Area of the wall where the boulder is located.'),
+    },
     {
       cle: 'couleur',
-      titre: 'Couleur',
+      titre: t('Couleur', 'Color'),
       valeur: (b) => b.couleur,
-      aide: "Couleur des prises. Metadonnee d'affichage : elle n'entre dans aucun calcul.",
+      aide: t(
+        "Couleur des prises. Métadonnée d'affichage : elle n'entre dans aucun calcul.",
+        "Hold color. Display metadata only: it plays no part in any calculation."
+      ),
     },
     {
       cle: 'officielle',
-      titre: 'Affichee',
+      titre: t('Affichée', 'Displayed'),
       valeur: (b) => b.cotationOfficielle,
       tri: (b) => b.indexOfficiel,
-      aide: "La cotation annoncee par l'ouvreur. C'est elle que le site met a l'epreuve, pas elle qui sert de reference.",
+      aide: t(
+        "La cotation annoncée par l'ouvreur. C'est elle que le site met à l'épreuve, pas elle qui sert de référence.",
+        "The grade announced by the route setter. It's the one the site tests, not the one used as ground truth."
+      ),
     },
     {
       cle: 'calculee',
-      titre: 'Calculee',
+      titre: t('Calculée', 'Calculated'),
       valeur: (b) => b.cotationCalculee,
       tri: (b) => b.indexCalcule,
-      aide: "La cotation deduite des reussites et des echecs par la formule active, sans regarder l'etiquette autrement que comme point de depart.",
+      aide: t(
+        "La cotation déduite des réussites et des échecs par la formule active, sans regarder l'étiquette autrement que comme point de départ.",
+        "The grade inferred from sends and failed attempts by the active formula, treating the tag only as a starting point, not as ground truth."
+      ),
     },
     ...colonnesFormules.map((c) => ({
       cle: `cote-${c.formule.id}`,
-      titre: simplifie ? 'Cote' : c.formule.labelCourt ?? c.formule.label,
+      titre: simplifie ? t('Cote', 'Rating') : bilingue(c.formule.labelCourt ?? c.formule.label, c.formule.labelCourtEn ?? c.formule.labelEn, langue),
       num: true,
       aide: simplifie
-        ? 'Cote du bloc. Divisez par 1000 pour la lire en crans V : 4500 = V4,5.'
-        : `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 4500 = V4,5. ` +
-          (c.formule.id === resultat.formuleId
-            ? "C'est la formule active : c'est elle qui donne la cotation calculee et l'ecart."
-            : "Quand deux formules s'ecartent nettement sur un bloc, c'est que ce bloc est mal connu."),
+        ? t(
+            'Cote du bloc. Divisez par 1000 pour la lire en crans V : 4500 = V4,5.',
+            'The boulder\'s rating. Divide by 1000 to read it in V grades: 4500 = V4.5.'
+          )
+        : t(
+            `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 4500 = V4,5. ` +
+              (c.formule.id === resultat.formuleId
+                ? "C'est la formule active : c'est elle qui donne la cotation calculée et l'écart."
+                : "Quand deux formules s'écartent nettement sur un bloc, c'est que ce bloc est mal connu."),
+            `The boulder's rating according to the "${bilingue(c.formule.label, c.formule.labelEn, langue)}" formula. Divide by 1000 to read it in V grades: 4500 = V4.5. ` +
+              (c.formule.id === resultat.formuleId
+                ? "It's the active formula: it's the one driving the calculated grade and the gap."
+                : "When two formulas disagree sharply on a boulder, that boulder is poorly documented.")
+          ),
       valeur: (b: LigneBloc) => c.parBloc.get(b.id)?.rating ?? Number.NaN,
       rendu: (b: LigneBloc) => {
         const ligne = c.parBloc.get(b.id)
@@ -155,10 +190,12 @@ export function VueBlocs({
     })),
     {
       cle: 'ecart',
-      titre: 'Ecart',
+      titre: t('Écart', 'Gap'),
       num: true,
-      aide:
-        "Cotation calculee moins cotation affichee, en crans V. Positif : le bloc resiste plus que son etiquette ne le laisse croire. Negatif : il est plus facile qu'annonce.",
+      aide: t(
+        "Cotation calculée moins cotation affichée, en crans V. Positif : le bloc résiste plus que son étiquette ne le laisse croire. Négatif : il est plus facile qu'annoncé.",
+        'Calculated grade minus displayed grade, in V grades. Positive: the boulder resists more than its tag suggests. Negative: it is easier than announced.'
+      ),
       valeur: (b) => b.ecart,
       tri: (b) => b.ecart,
       rendu: (b) => <Ecart valeur={b.ecart} />,
@@ -167,10 +204,12 @@ export function VueBlocs({
       ? [
           {
             cle: 'avis',
-            titre: 'Verdict',
+            titre: t('Verdict', 'Verdict'),
             num: true,
-            aide:
-              "Ce que disent les formules qui votent. \"accord\" : aucune ne conteste l'ouvreur — ce n'est pas une absence de donnees, un bloc n'est liste que si toutes savent le juger. \"a verifier\" : une seule conteste. \"confirme\" : toutes contestent, et sur cette liste la precision mesuree est de 100 %.",
+            aide: t(
+              "Ce que disent les formules qui votent. \"accord\" : aucune ne conteste l'ouvreur — ce n'est pas une absence de données, un bloc n'est listé que si toutes savent le juger. \"à vérifier\" : une seule conteste. \"confirmé\" : toutes contestent, et sur cette liste la précision mesurée est de 100 %.",
+              "What the voting formulas say. \"agrees\": none contests the setter — this isn't a lack of data, a boulder is only listed if every formula can judge it. \"flagged\": one formula contests it. \"confirmed\": all of them contest it, and on that list the measured precision is 100%."
+            ),
             valeur: (b: LigneBloc) => avisParBloc.get(b.id) ?? 0,
             rendu: (b: LigneBloc) => {
               const n = avisParBloc.get(b.id) ?? 0
@@ -178,37 +217,44 @@ export function VueBlocs({
               // aucune ne s'abstient : zero voix veut dire qu'elles confirment
               // toutes l'ouvreur. On l'ecrit, plutot que de laisser un tiret que
               // l'on lirait comme "pas de donnees".
-              if (n === 0) return <span className="discret">accord</span>
+              if (n === 0) return <span className="discret">{t('accord', 'agrees')}</span>
               // Les deux formules d'accord contre l'ouvreur : sur ce
               // sous-ensemble, la precision mesuree est de 100 %.
-              if (n >= nbFormules) return <span className="puce alerte">confirme</span>
-              return <span className="puce">a verifier</span>
+              if (n >= nbFormules) return <span className="puce alerte">{t('confirmé', 'confirmed')}</span>
+              return <span className="puce">{t('à vérifier', 'flagged')}</span>
             },
           },
         ]
       : []),
     {
       cle: 'matchs',
-      titre: 'Duels utiles',
+      titre: t('Duels utiles', 'Useful duels'),
       num: true,
-      aide:
-        "Nombre de grimpeurs dont l'affrontement avec ce bloc a compte. Les issues jouees d'avance — un grimpeur deux crans en dessous qui echoue — sont exclues : elles n'apprennent rien.",
+      aide: t(
+        "Nombre de grimpeurs dont l'affrontement avec ce bloc a compté. Les issues jouées d'avance — un grimpeur deux crans en dessous qui échoue — sont exclues : elles n'apprennent rien.",
+        "Number of climbers whose matchup with this boulder counted. Foregone outcomes — a climber two grades below who fails — are excluded: they teach nothing."
+      ),
       valeur: (b) => b.matchs,
     },
     {
       cle: 'taux',
-      titre: 'Envoye par',
+      titre: t('Envoyé par', 'Sent by'),
       num: true,
-      aide: 'Part des grimpeurs comptes qui ont fini par envoyer ce bloc, en un nombre quelconque de seances.',
+      aide: t(
+        'Part des grimpeurs comptés qui ont fini par envoyer ce bloc, en un nombre quelconque de séances.',
+        'Share of counted climbers who eventually sent this boulder, over any number of sessions.'
+      ),
       valeur: (b) => b.tauxReussite,
       rendu: (b) => pourcent(b.tauxReussite),
     },
     {
       cle: 'incertitude',
-      titre: 'Incertitude',
+      titre: t('Incertitude', 'Uncertainty'),
       num: true,
-      aide:
-        "Ecart-type de la cote, produit par Glicko. Comptez environ deux fois cette valeur pour la marge a 95 % : a plus ou moins 300, la cote est connue a un demi-cran pres.",
+      aide: t(
+        "Écart-type de la cote, produit par Glicko. Comptez environ deux fois cette valeur pour la marge à 95 % : à plus ou moins 300, la cote est connue à un demi-cran près.",
+        'Standard deviation of the rating, produced by Glicko. Count roughly twice this value for the 95% margin: at plus or minus 300, the rating is known to within half a grade.'
+      ),
       valeur: (b) => incertitudeParBloc.get(b.id) ?? Number.NaN,
       rendu: (b) => {
         const rd = incertitudeParBloc.get(b.id)
@@ -224,17 +270,20 @@ export function VueBlocs({
           <select value={gym} onChange={(e) => setGym(e.currentTarget.value)} style={{ width: 240 }}>
             {gyms.map((g) => (
               <option key={g} value={g}>
-                {g === 'tous' ? 'Toutes les salles' : g}
+                {g === 'tous' ? t('Toutes les salles', 'All gyms') : g}
               </option>
             ))}
           </select>
         )}
         <button className="bouton" aria-pressed={seulsDesaccords} onClick={() => setSeulsDesaccords((v) => !v)}>
-          Desaccords seulement
+          {t('Désaccords seulement', 'Discrepancies only')}
         </button>
         {nbFormules > 1 && (
           <span className="discret" style={{ fontSize: 12 }}>
-            {nombre(confirmes.length)} confirmes par les {nbFormules} formules
+            {t(
+              `${nombre(confirmes.length)} confirmés par les ${nbFormules} formules`,
+              `${nombre(confirmes.length)} confirmed by all ${nbFormules} formulas`
+            )}
           </span>
         )}
         <span className="espace" />
@@ -267,40 +316,63 @@ export function VueBlocs({
             )
           }
         >
-          Exporter en CSV
+          {t('Exporter en CSV', 'Export as CSV')}
         </button>
       </div>
 
       <div className="grille tuiles">
         <Tuile
           heros
-          etiquette="Blocs en desaccord avec leur cotation"
+          etiquette={t('Blocs en désaccord avec leur cotation', 'Boulders disagreeing with their grade')}
           valeur={nombre(sousCotes.length + surCotes.length)}
           note={
             nbFormules > 1
-              ? `sur ${nombre(audites.length)} blocs exploitables, signales par au moins une des ${nbFormules} formules — dont ${nombre(confirmes.length)} par les deux`
-              : `sur ${nombre(audites.length)} blocs exploitables — au moins ${nombre(SEUIL_DESACCORD, 2)} cran V d'ecart`
+              ? t(
+                  `sur ${nombre(audites.length)} blocs exploitables, signalés par au moins une des ${nbFormules} formules — dont ${nombre(confirmes.length)} par les deux`,
+                  `out of ${nombre(audites.length)} ratable boulders, flagged by at least one of the ${nbFormules} formulas — ${nombre(confirmes.length)} of them by both`
+                )
+              : t(
+                  `sur ${nombre(audites.length)} blocs exploitables — au moins ${nombre(SEUIL_DESACCORD, 2)} cran V d'écart`,
+                  `out of ${nombre(audites.length)} ratable boulders — at least ${nombre(SEUIL_DESACCORD, 2)} V grade of gap`
+                )
           }
         />
-        <Tuile etiquette="Sous-cotes" valeur={nombre(sousCotes.length)} note="plus durs que ce qui est affiche" />
-        <Tuile etiquette="Sur-cotes" valeur={nombre(surCotes.length)} note="plus faciles que ce qui est affiche" />
-        <Tuile etiquette="Ecart median" valeur={nombre(ecartMedianAbs, 2)} unite="cran V" note="en valeur absolue" />
+        <Tuile
+          etiquette={t('Sous-cotés', 'Underrated')}
+          valeur={nombre(sousCotes.length)}
+          note={t('plus durs que ce qui est affiché', 'harder than displayed')}
+        />
+        <Tuile
+          etiquette={t('Sur-cotés', 'Overrated')}
+          valeur={nombre(surCotes.length)}
+          note={t('plus faciles que ce qui est affiché', 'easier than displayed')}
+        />
+        <Tuile
+          etiquette={t('Écart médian', 'Median gap')}
+          valeur={nombre(ecartMedianAbs, 2)}
+          unite={t('cran V', 'V grade')}
+          note={t('en valeur absolue', 'absolute value')}
+        />
       </div>
 
       {isoles.length > 0 && (
-        <Carte titre="Salles isolees">
+        <Carte titre={t('Salles isolées', 'Isolated gyms')}>
           <p className="sous-titre">
-            {isoles.map((g) => g.gym).join(', ')} n'{isoles.length > 1 ? 'ont' : 'a'} aucun grimpeur en commun avec les
-            autres salles. Leurs cotes sont coherentes entre elles, mais rien ne permet de les comparer a celles des
-            autres salles : l'echelle de chaque salle isolee flotte librement.
+            {t(
+              `${isoles.map((g) => g.gym).join(', ')} n'${isoles.length > 1 ? 'ont' : 'a'} aucun grimpeur en commun avec les autres salles. Leurs cotes sont cohérentes entre elles, mais rien ne permet de les comparer à celles des autres salles : l'échelle de chaque salle isolée flotte librement.`,
+              `${isoles.map((g) => g.gym).join(', ')} ${isoles.length > 1 ? 'have' : 'has'} no climber in common with the other gyms. Their ratings are internally consistent, but nothing lets us compare them to the other gyms: each isolated gym's scale floats freely.`
+            )}
           </p>
         </Carte>
       )}
 
       <div className="grille deux" style={{ marginTop: 16 }}>
         <Carte
-          titre="Cotation calculee contre cotation affichee"
-          sousTitre="Chaque point est un bloc. Sur la diagonale, le calcul confirme l'ouvreur. Les points sont legerement decales horizontalement pour ne pas se superposer."
+          titre={t('Cotation calculée contre cotation affichée', 'Calculated grade vs. displayed grade')}
+          sousTitre={t(
+            "Chaque point est un bloc. Sur la diagonale, le calcul confirme l'ouvreur. Les points sont légèrement décalés horizontalement pour ne pas se superposer.",
+            "Each point is a boulder. On the diagonal, the calculation confirms the setter. Points are slightly offset horizontally so they don't overlap."
+          )}
           actions={<BasculeVue tableau={tableauNuage} setTableau={setTableauNuage} />}
         >
           {tableauNuage ? (
@@ -333,20 +405,29 @@ export function VueBlocs({
         </Carte>
 
         <Carte
-          titre="Distribution des ecarts"
-          sousTitre="Une salle qui cote juste concentre ses blocs autour de zero, avec des queues courtes."
+          titre={t('Distribution des écarts', 'Distribution of gaps')}
+          sousTitre={t(
+            'Une salle qui cote juste concentre ses blocs autour de zéro, avec des queues courtes.',
+            'A gym with accurate grades has its boulders clustered around zero, with short tails.'
+          )}
           actions={<BasculeVue tableau={tableauHisto} setTableau={setTableauHisto} />}
         >
-          {tableauHisto ? <TableauClasses ecarts={ecarts} /> : <Histogramme valeurs={ecarts} uniteX="cran V" />}
+          {tableauHisto ? <TableauClasses ecarts={ecarts} /> : <Histogramme valeurs={ecarts} uniteX={t('cran V', 'V grade')} />}
           <p className="param-aide" style={{ marginTop: 8 }}>
-            Un ecart positif signifie que le bloc resiste davantage que ne le laisse croire sa cotation.
+            {t(
+              'Un écart positif signifie que le bloc résiste davantage que ne le laisse croire sa cotation.',
+              'A positive gap means the boulder resists more than its grade suggests.'
+            )}
           </p>
         </Carte>
       </div>
 
       <Carte
-        titre="Tous les blocs exploitables"
-        sousTitre="Blocs ayant assez de duels utiles pour etre juges. Un bloc ouvert la semaine derniere n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touche. Le verdict resume l'avis des formules qui votent : accord avec l'ouvreur, a verifier si l'une le conteste, confirme si toutes le contestent. Les cotes de chaque formule sont affichees a cote : quand elles s'ecartent nettement, c'est que le bloc est mal connu."
+        titre={t('Tous les blocs exploitables', 'All ratable boulders')}
+        sousTitre={t(
+          "Blocs ayant assez de duels utiles pour être jugés. Un bloc ouvert la semaine dernière n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touché. Le verdict résume l'avis des formules qui votent : accord avec l'ouvreur, à vérifier si l'une le conteste, confirmé si toutes le contestent. Les cotes de chaque formule sont affichées à côté : quand elles s'écartent nettement, c'est que le bloc est mal connu.",
+          "Boulders with enough useful duels to be judged. A boulder set last week isn't in yet, nor is one that only much stronger or much weaker climbers have touched. The verdict summarizes what the voting formulas say: agrees with the setter, flagged if one contests it, confirmed if all contest it. Each formula's rating is shown alongside: when they diverge sharply, the boulder is poorly documented."
+        )}
       >
         <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} />
       </Carte>
@@ -377,6 +458,7 @@ function Ecart({ valeur }: { valeur: number }) {
 }
 
 function TableauClasses({ ecarts }: { ecarts: number[] }) {
+  const { t } = useLangue()
   const pas = 0.5
   const classes = new Map<number, number>()
   for (const e of ecarts) {
@@ -390,16 +472,16 @@ function TableauClasses({ ecarts }: { ecarts: number[] }) {
       colonnes={[
         {
           cle: 'classe',
-          titre: 'Ecart (crans V)',
+          titre: t('Écart (crans V)', 'Gap (V grades)'),
           principal: true,
           valeur: (l) => l.debut,
           tri: (l) => l.debut,
-          rendu: (l) => `${signe(l.debut, 1)} a ${signe(l.debut + pas, 1)}`,
+          rendu: (l) => `${signe(l.debut, 1)} ${t('à', 'to')} ${signe(l.debut + pas, 1)}`,
         },
-        { cle: 'n', titre: 'Blocs', num: true, valeur: (l) => l.n },
+        { cle: 'n', titre: t('Blocs', 'Boulders'), num: true, valeur: (l) => l.n },
         {
           cle: 'part',
-          titre: 'Part',
+          titre: t('Part', 'Share'),
           num: true,
           valeur: (l) => l.n / ecarts.length,
           rendu: (l) => pourcent(l.n / ecarts.length, 1),

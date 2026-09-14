@@ -166,10 +166,14 @@ export function diagnosticDuels(a: Affrontements): Diagnostic {
   const gagnes = a.duels.filter((d) => d.gagne).length
   return {
     label: 'Affrontements',
+    labelEn: 'Matchups',
     valeur: a.duels.length,
     aide:
-      `${a.lignes} lignes d'historique repliees en ${a.duels.length} duels, un par couple grimpeur-bloc. ` +
-      `${gagnes} sont gagnes par le grimpeur. Toutes les lignes restent visibles dans l'ecran Donnees.`,
+      `${a.lignes} lignes d'historique repliées en ${a.duels.length} duels, un par couple grimpeur-bloc. ` +
+      `${gagnes} sont gagnés par le grimpeur. Toutes les lignes restent visibles dans l'écran Données.`,
+    aideEn:
+      `${a.lignes} history rows folded into ${a.duels.length} duels, one per climber-boulder pair. ` +
+      `${gagnes} are won by the climber. All rows remain visible in the Data screen.`,
   }
 }
 
@@ -207,16 +211,21 @@ export class Evaluateur {
     return [
       {
         label: 'Score de Brier',
+        labelEn: 'Brier score',
         valeur: this.brier,
         basMieux: true,
         aide:
-          "Erreur quadratique moyenne des probabilites predites. 0 = parfait, 0,25 = aussi bon qu'un pile ou face. Mesure en echantillon : elle compare des formules entre elles, elle ne valide pas une prediction sur du neuf.",
+          "Erreur quadratique moyenne des probabilités prédites. 0 = parfait, 0,25 = aussi bon qu'un pile ou face. Mesure en échantillon : elle compare des formules entre elles, elle ne valide pas une prédiction sur du neuf.",
+        aideEn:
+          "Mean squared error of the predicted probabilities. 0 = perfect, 0.25 = as good as a coin flip. In-sample measure: it compares formulas against each other, it does not validate a prediction on new data.",
       },
       {
-        label: 'Predictions correctes',
+        label: 'Prédictions correctes',
+        labelEn: 'Correct predictions',
         valeur: this.exactitude * 100,
         unite: '%',
-        aide: "Part des duels ou le camp donne favori l'a effectivement emporte.",
+        aide: "Part des duels où le camp donné favori l'a effectivement emporté.",
+        aideEn: 'Share of duels where the side favored actually won.',
       },
     ]
   }
@@ -472,18 +481,24 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
     diagnostics: [
       ...evaluateur.diagnostics(),
       {
-        label: 'Duels ecartes',
+        label: 'Duels écartés',
+        labelEn: 'Excluded duels',
         valeur: negliges,
         aide:
-          "Resultats attendus entre adversaires trop eloignes, ecartes du calcul : ils n'apprennent rien et poussent la cote toujours dans le meme sens. Regle par 'Ecart au-dela duquel un resultat attendu est ignore'.",
+          "Résultats attendus entre adversaires trop éloignés, écartés du calcul : ils n'apprennent rien et poussent la cote toujours dans le même sens. Réglé par 'Écart au-delà duquel un résultat attendu est ignoré'.",
+        aideEn:
+          "Expected results between opponents too far apart, excluded from the calculation: they teach nothing and push the rating the same way every time. Controlled by 'Gap beyond which an expected result is ignored'.",
       },
       {
-        label: 'Deplacement final',
+        label: 'Déplacement final',
+        labelEn: 'Final movement',
         valeur: convergence[convergence.length - 1] ?? 0,
         unite: 'pts',
         basMieux: true,
         aide:
-          "Correction moyenne appliquee par duel a la derniere passe. Elle ne tombe pas a zero — chaque resultat corrige encore un peu — mais elle doit se stabiliser : c'est la courbe de convergence qui doit s'aplatir, pas ce chiffre qui doit s'annuler.",
+          "Correction moyenne appliquée par duel à la dernière passe. Elle ne tombe pas à zéro — chaque résultat corrige encore un peu — mais elle doit se stabiliser : c'est la courbe de convergence qui doit s'aplatir, pas ce chiffre qui doit s'annuler.",
+        aideEn:
+          "Average correction applied per duel on the last pass. It does not fall to zero — every result still corrects a little — but it should stabilize: it's the convergence curve that should flatten, not this number that should reach zero.",
       },
     ],
   }

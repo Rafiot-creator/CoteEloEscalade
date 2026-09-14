@@ -1,5 +1,6 @@
 import { COTATIONS } from '../../core/cotations'
 import { nombre, signe } from '../format'
+import { useLangue } from '../langue'
 import { Cadre, Enveloppe, MARGE, echelleLin, graduations, useInfobulle } from './base'
 
 export interface PointNuage {
@@ -42,11 +43,12 @@ function decalage(cle: string): number {
 
 export function Nuage({ points, hauteur = 340 }: { points: PointNuage[]; hauteur?: number }) {
   const { montrer, cacher, noeud } = useInfobulle()
+  const { t } = useLangue()
 
   return (
     <Enveloppe>
       {(largeur) => {
-        if (!points.length) return <p className="vide">Aucun bloc a afficher.</p>
+        if (!points.length) return <p className="vide">{t('Aucun bloc à afficher.', 'No boulders to show.')}</p>
 
         const xs = points.map((p) => p.x)
         const ys = points.map((p) => p.y)
@@ -61,7 +63,7 @@ export function Nuage({ points, hauteur = 340 }: { points: PointNuage[]; hauteur
 
         return (
           <>
-            <svg width={largeur} height={hauteur} role="img" aria-label="Cotation calculee comparee a la cotation affichee">
+            <svg width={largeur} height={hauteur} role="img" aria-label={t('Cotation calculée comparée à la cotation affichée', 'Calculated grade compared to displayed grade')}>
               <Cadre
                 largeur={largeur}
                 hauteur={hauteur}
@@ -69,9 +71,9 @@ export function Nuage({ points, hauteur = 340 }: { points: PointNuage[]; hauteur
                 y={y}
                 ticksX={ticks}
                 x={x}
-                formatY={(t) => COTATIONS[t] ?? ''}
-                formatX={(t) => COTATIONS[t] ?? ''}
-                titreY="calculee"
+                formatY={(v) => COTATIONS[v] ?? ''}
+                formatX={(v) => COTATIONS[v] ?? ''}
+                titreY={t('calculée', 'calc.')}
               />
 
               {/* Reference : sur cette ligne, le calcul confirme la cotation. */}
@@ -100,11 +102,11 @@ export function Nuage({ points, hauteur = 340 }: { points: PointNuage[]; hauteur
                         montrer(e, {
                           titre: p.nom,
                           lignes: [
-                            ['Ou', p.lieu],
-                            ['Cotation affichee', p.cotationOfficielle],
-                            ['Cotation calculee', p.cotationCalculee],
-                            ['Ecart', `${signe(p.ecart)} cran V`],
-                            ['Matchs comptes', nombre(p.matchs)],
+                            [t('Où', 'Where'), p.lieu],
+                            [t('Cotation affichée', 'Displayed grade'), p.cotationOfficielle],
+                            [t('Cotation calculée', 'Calculated grade'), p.cotationCalculee],
+                            [t('Écart', 'Gap'), `${signe(p.ecart)} ${t('cran V', 'V grade')}`],
+                            [t('Matchs comptés', 'Counted matches'), nombre(p.matchs)],
                           ],
                         })
                       }
@@ -124,21 +126,22 @@ export function Nuage({ points, hauteur = 340 }: { points: PointNuage[]; hauteur
 }
 
 function EchelleDivergente() {
+  const { t } = useLangue()
   const pas = [-2, -1, 0, 1, 2]
   return (
     <div className="legende" style={{ marginTop: 6, alignItems: 'center' }}>
-      <span className="discret">Plus facile qu'affiche</span>
+      <span className="discret">{t("Plus facile qu'affiché", 'Easier than displayed')}</span>
       <span style={{ display: 'inline-flex', gap: 2 }}>
         {pas.map((e) => (
           <i
             key={e}
             className="pastille"
             style={{ background: couleurEcart(e), width: 22, height: 9, borderRadius: 2 }}
-            title={`${signe(e)} cran V`}
+            title={`${signe(e)} ${t('cran V', 'V grade')}`}
           />
         ))}
       </span>
-      <span className="discret">Plus dur</span>
+      <span className="discret">{t('Plus dur', 'Harder')}</span>
     </div>
   )
 }

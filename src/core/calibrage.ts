@@ -13,55 +13,66 @@ import type { ParamSpec, Params } from './formulas/types'
 export const PARAMS_CALIBRAGE: ParamSpec[] = [
   {
     nom: 'mode',
-    label: 'Methode',
+    label: 'Méthode',
+    labelEn: 'Method',
     type: 'choix',
     defaut: 'ancre',
     options: [
-      { valeur: 'ancre', label: 'Echelle fixe (1000 points par cran V)' },
-      { valeur: 'auto', label: 'Regression sur les cotations affichees' },
+      { valeur: 'ancre', label: 'Échelle fixe (1000 points par cran V)', labelEn: 'Fixed scale (1000 points per V grade)' },
+      { valeur: 'auto', label: 'Régression sur les cotations affichées', labelEn: 'Regression on displayed grades' },
     ],
     aide:
-      "Echelle fixe : la conversion est celle de la convention maison, cote / 1000 = cran V. Regression : on cherche a la place l'echelle qui colle le mieux aux cotations affichees. Comparer les deux est instructif — si la regression trouve nettement moins de 1000 points par cran, c'est que les crans de la salle sont plus resserres que la convention ne le suppose.",
+      "Échelle fixe : la conversion est celle de la convention maison, cote / 1000 = cran V. Régression : on cherche à la place l'échelle qui colle le mieux aux cotations affichées. Comparer les deux est instructif — si la régression trouve nettement moins de 1000 points par cran, c'est que les crans de la salle sont plus resserrés que la convention ne le suppose.",
+    aideEn:
+      "Fixed scale: the conversion follows the house convention, rating / 1000 = V grade. Regression: instead, finds the scale that best fits the displayed grades. Comparing the two is instructive — if regression finds noticeably fewer than 1000 points per grade, this gym's grades are more tightly packed than the convention assumes.",
   },
   {
     nom: 'minMatchs',
     label: 'Duels minimum',
+    labelEn: 'Minimum duels',
     type: 'nombre',
     defaut: 8,
     min: 1,
     max: 50,
     pas: 1,
-    aide: "Un bloc affronte par deux personnes ne calibre rien. En dessous de ce seuil, le bloc est calcule mais exclu de la regression et marque peu fiable. Les blocs fraichement ouverts sont souvent dans ce cas.",
+    aide: "Un bloc affronté par deux personnes ne calibre rien. En dessous de ce seuil, le bloc est calculé mais exclu de la régression et marqué peu fiable. Les blocs fraîchement ouverts sont souvent dans ce cas.",
+    aideEn: "A boulder faced by two people calibrates nothing. Below this threshold, the boulder is still calculated but excluded from the regression and marked unreliable. Freshly set boulders are often in this case.",
   },
   {
     nom: 'cotationAncre',
-    label: 'Cotation de reference',
+    label: 'Cotation de référence',
+    labelEn: 'Reference grade',
     type: 'choix',
     defaut: 'V1',
     options: COTATIONS.map((c) => ({ valeur: c, label: c })),
-    aide: "Avec la cote de reference, fixe le point d'ancrage : par defaut V1 vaut 1000. Sans effet en mode regression.",
+    aide: "Avec la cote de référence, fixe le point d'ancrage : par défaut V1 vaut 1000. Sans effet en mode régression.",
+    aideEn: "Together with the reference rating, sets the anchor point: by default V1 equals 1000. No effect in regression mode.",
   },
   {
     nom: 'ratingAncre',
-    label: 'Cote de reference',
+    label: 'Cote de référence',
+    labelEn: 'Reference rating',
     type: 'nombre',
     defaut: 1000,
     min: 0,
     max: 12000,
     pas: 100,
     unite: 'pts',
-    aide: 'La cote Elo qui vaut exactement la cotation de reference. Sans effet en mode regression.',
+    aide: 'La cote Elo qui vaut exactement la cotation de référence. Sans effet en mode régression.',
+    aideEn: 'The Elo rating that is worth exactly the reference grade. No effect in regression mode.',
   },
   {
     nom: 'ptsParCran',
     label: 'Points par cran V',
+    labelEn: 'Points per V grade',
     type: 'nombre',
     defaut: 1000,
     min: 100,
     max: 3000,
     pas: 50,
     unite: 'pts',
-    aide: "Ecart de cote entre deux crans V consecutifs. Sans effet en mode regression.",
+    aide: "Écart de cote entre deux crans V consécutifs. Sans effet en mode régression.",
+    aideEn: 'Rating gap between two consecutive V grades. No effect in regression mode.',
   },
 ]
 
@@ -75,6 +86,8 @@ export interface Calibrage {
   mode: 'auto' | 'ancre'
   /** Renseigne quand la regression a echoue et qu'on est retombe sur l'ancrage. */
   avertissement?: string
+  /** Variante anglaise de `avertissement`. */
+  avertissementEn?: string
 }
 
 export interface PointCalibrage {
@@ -82,7 +95,7 @@ export interface PointCalibrage {
   indexOfficiel: number
 }
 
-function ancrage(params: Params, motif?: string): Calibrage {
+function ancrage(params: Params, motif?: string, motifEn?: string): Calibrage {
   const pts = Math.max(1, params.ptsParCran as number)
   const idx = COTATIONS.indexOf(params.cotationAncre as string)
   const indexAncre = idx >= 0 ? idx : 4
@@ -94,6 +107,7 @@ function ancrage(params: Params, motif?: string): Calibrage {
     nBlocs: 0,
     mode: 'ancre',
     avertissement: motif,
+    avertissementEn: motifEn,
   }
 }
 
@@ -101,7 +115,11 @@ function ancrage(params: Params, motif?: string): Calibrage {
 export function calibrer(points: PointCalibrage[], params: Params): Calibrage {
   if (params.mode !== 'auto') return ancrage(params)
   if (points.length < 3) {
-    return ancrage(params, 'Trop peu de blocs exploitables pour une regression : ancrage manuel applique.')
+    return ancrage(
+      params,
+      'Trop peu de blocs exploitables pour une régression : ancrage manuel appliqué.',
+      'Too few ratable boulders for a regression: manual anchoring applied.'
+    )
   }
 
   const n = points.length
@@ -120,7 +138,8 @@ export function calibrer(points: PointCalibrage[], params: Params): Calibrage {
   if (sxx === 0 || sxy <= 0) {
     return ancrage(
       params,
-      "Les cotes ne sont pas correlees positivement aux cotations : ancrage manuel applique. Verifier le nombre de passes et le volume de donnees."
+      "Les cotes ne sont pas corrélées positivement aux cotations : ancrage manuel appliqué. Vérifier le nombre de passes et le volume de données.",
+      'Ratings are not positively correlated with grades: manual anchoring applied. Check the number of passes and the volume of data.'
     )
   }
 

@@ -1,4 +1,5 @@
 import { nombre, signe } from '../format'
+import { useLangue } from '../langue'
 import { Cadre, Enveloppe, MARGE, echelleLin, graduations, useInfobulle } from './base'
 
 /** Espace en couleur de fond entre deux barres voisines. */
@@ -13,7 +14,7 @@ export function Histogramme({
   valeurs,
   largeurClasse = 0.5,
   hauteur = 220,
-  uniteX = 'cran',
+  uniteX,
   couleur = 'var(--serie-1)',
 }: {
   valeurs: number[]
@@ -23,11 +24,13 @@ export function Histogramme({
   couleur?: string
 }) {
   const { montrer, cacher, noeud } = useInfobulle()
+  const { t } = useLangue()
+  const unite = uniteX ?? t('cran', 'grade')
 
   return (
     <Enveloppe>
       {(largeur) => {
-        if (!valeurs.length) return <p className="vide">Aucune donnee.</p>
+        if (!valeurs.length) return <p className="vide">{t('Aucune donnée.', 'No data.')}</p>
 
         const min = Math.floor(Math.min(...valeurs) / largeurClasse) * largeurClasse
         const max = Math.ceil(Math.max(...valeurs) / largeurClasse) * largeurClasse
@@ -45,7 +48,7 @@ export function Histogramme({
 
         return (
           <>
-            <svg width={largeur} height={hauteur} role="img" aria-label="Distribution">
+            <svg width={largeur} height={hauteur} role="img" aria-label={t('Distribution', 'Distribution')}>
               <Cadre
                 largeur={largeur}
                 hauteur={hauteur}
@@ -53,9 +56,9 @@ export function Histogramme({
                 y={y}
                 ticksX={graduations(min, max, 6)}
                 x={x}
-                formatY={(t) => nombre(t)}
-                formatX={(t) => signe(t, Math.abs(t) < 1 ? 1 : 0)}
-                titreY="voies"
+                formatY={(v) => nombre(v)}
+                formatX={(v) => signe(v, Math.abs(v) < 1 ? 1 : 0)}
+                titreY={t('voies', 'routes')}
               />
 
               {classes.map((n, i) => {
@@ -77,8 +80,11 @@ export function Histogramme({
                       fill="transparent"
                       onMouseMove={(e) =>
                         montrer(e, {
-                          titre: `${signe(min + i * largeurClasse, 1)} a ${signe(min + (i + 1) * largeurClasse, 1)} ${uniteX}`,
-                          lignes: [['Voies', nombre(n)]],
+                          titre: t(
+                            `${signe(min + i * largeurClasse, 1)} à ${signe(min + (i + 1) * largeurClasse, 1)} ${unite}`,
+                            `${signe(min + i * largeurClasse, 1)} to ${signe(min + (i + 1) * largeurClasse, 1)} ${unite}`
+                          ),
+                          lignes: [[t('Voies', 'Routes'), nombre(n)]],
                         })
                       }
                       onMouseLeave={cacher}

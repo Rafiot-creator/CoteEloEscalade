@@ -13,6 +13,8 @@ import type { FichierBrut } from '../types'
 export interface SourceProvider {
   id: string
   label: string
+  /** Variante anglaise de `label`. */
+  labelEn?: string
   charger(): Promise<FichierBrut[]>
 }
 
@@ -30,6 +32,7 @@ const modules = import.meta.glob('/data/*.csv', {
 export const sourceRepo: SourceProvider = {
   id: 'repo',
   label: 'Fichiers du depot',
+  labelEn: 'Repository files',
   async charger() {
     return Object.entries(modules)
       .map(([chemin, contenu]) => ({

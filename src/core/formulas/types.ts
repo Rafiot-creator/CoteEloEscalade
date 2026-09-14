@@ -12,9 +12,15 @@ import type { Dataset } from '../types'
 export interface ParamBase {
   nom: string
   label: string
+  /** Variante anglaise de `label`, pour la bascule de langue de l'interface. */
+  labelEn?: string
   aide?: string
+  /** Variante anglaise de `aide`. */
+  aideEn?: string
   /** Titre de section dans le panneau de reglages. */
   groupe?: string
+  /** Variante anglaise de `groupe`. */
+  groupeEn?: string
 }
 
 export interface ParamNombre extends ParamBase {
@@ -24,6 +30,8 @@ export interface ParamNombre extends ParamBase {
   max: number
   pas: number
   unite?: string
+  /** Variante anglaise de `unite`. */
+  uniteEn?: string
 }
 
 export interface ParamBooleen extends ParamBase {
@@ -34,7 +42,7 @@ export interface ParamBooleen extends ParamBase {
 export interface ParamChoix extends ParamBase {
   type: 'choix'
   defaut: string
-  options: { valeur: string; label: string }[]
+  options: { valeur: string; label: string; labelEn?: string }[]
 }
 
 export type ParamSpec = ParamNombre | ParamBooleen | ParamChoix
@@ -58,11 +66,15 @@ export interface PointHistorique {
 
 export interface Diagnostic {
   label: string
+  /** Variante anglaise de `label`. */
+  labelEn?: string
   valeur: number
   unite?: string
   /** `true` = un chiffre plus bas est meilleur (erreur, ecart...). */
   basMieux?: boolean
   aide?: string
+  /** Variante anglaise de `aide`. */
+  aideEn?: string
 }
 
 export interface SortieFormule {
@@ -78,8 +90,12 @@ export interface SortieFormule {
 export interface Formule<P extends Params = Params> {
   id: string
   label: string
+  /** Variante anglaise de `label`. */
+  labelEn?: string
   /** Nom tenant dans un en-tete de colonne. A defaut, `label` est utilise. */
   labelCourt?: string
+  /** Variante anglaise de `labelCourt`. */
+  labelCourtEn?: string
   /**
    * Ecart, en crans, a partir duquel *cette* formule contredit l'ouvreur.
    *
@@ -99,6 +115,8 @@ export interface Formule<P extends Params = Params> {
   avisIndependant?: boolean
   /** Une phrase : ce que la formule suppose, et pour qui elle est faite. */
   description: string
+  /** Variante anglaise de `description`. */
+  descriptionEn?: string
   params: ParamSpec[]
   calculer(dataset: Dataset, params: P): SortieFormule
 }

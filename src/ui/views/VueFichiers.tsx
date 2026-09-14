@@ -4,6 +4,7 @@ import { SOURCES } from '../../core/sources'
 import type { Dataset } from '../../core/types'
 import { Carte, Tuile } from '../components/base'
 import { nombre, octets } from '../format'
+import { bilingue, useLangue } from '../langue'
 
 /**
  * Ce que le site sait de ses propres fichiers : contenu, volume, et surtout
@@ -11,6 +12,7 @@ import { nombre, octets } from '../format'
  * donnee qu'on retrouve trois semaines plus tard sous forme de resultat faux.
  */
 export function VueFichiers({ dataset }: { dataset: Dataset }) {
+  const { langue, t } = useLangue()
   const [selection, setSelection] = useState(dataset.fichiers[0]?.chemin ?? '')
   const fichier = dataset.fichiers.find((f) => f.chemin === selection) ?? dataset.fichiers[0]
   const apercu = useMemo(() => (fichier ? apercuCsv(fichier, 150) : null), [fichier])
@@ -21,35 +23,48 @@ export function VueFichiers({ dataset }: { dataset: Dataset }) {
   return (
     <div className="large">
       <div className="grille tuiles">
-        <Tuile etiquette="Fichiers charges" valeur={nombre(dataset.fichiers.length)} note={SOURCES.map((s) => s.label).join(', ')} />
-        <Tuile etiquette="Grimpeurs" valeur={nombre(dataset.grimpeurs.length)} />
-        <Tuile etiquette="Blocs" valeur={nombre(dataset.blocs.length)} />
-        <Tuile etiquette="Lignes d'ascension" valeur={nombre(dataset.ascensions.length)} />
         <Tuile
-          etiquette="Anomalies"
+          etiquette={t('Fichiers chargés', 'Loaded files')}
+          valeur={nombre(dataset.fichiers.length)}
+          note={SOURCES.map((s) => bilingue(s.label, s.labelEn, langue)).join(', ')}
+        />
+        <Tuile etiquette={t('Grimpeurs', 'Climbers')} valeur={nombre(dataset.grimpeurs.length)} />
+        <Tuile etiquette={t('Blocs', 'Boulders')} valeur={nombre(dataset.blocs.length)} />
+        <Tuile etiquette={t("Lignes d'ascension", 'Ascent rows')} valeur={nombre(dataset.ascensions.length)} />
+        <Tuile
+          etiquette={t('Anomalies', 'Anomalies')}
           valeur={nombre(anomalies.length)}
-          note={erreurs.length ? `${nombre(erreurs.length)} bloquantes` : 'aucune erreur'}
+          note={erreurs.length ? t(`${nombre(erreurs.length)} bloquantes`, `${nombre(erreurs.length)} blocking`) : t('aucune erreur', 'no errors')}
         />
       </div>
 
       <div className="grille deux" style={{ marginTop: 16 }}>
         <Carte
-          titre="Fichiers du depot"
-          sousTitre="Importes a la compilation : leur contenu fait partie du bundle, aucun appel reseau au chargement."
+          titre={t('Fichiers du dépôt', 'Repository files')}
+          sousTitre={t(
+            'Importés à la compilation : leur contenu fait partie du bundle, aucun appel réseau au chargement.',
+            'Imported at build time: their content is part of the bundle, no network call on load.'
+          )}
         >
           <div className="table-enveloppe">
             <table className="donnees">
               <thead>
                 <tr>
-                  <th title="Chemin du fichier dans le depot.">Chemin</th>
-                  <th className="num" title="Poids du contenu, tel qu'il est embarque dans le bundle.">
-                    Taille
+                  <th title={t('Chemin du fichier dans le dépôt.', 'Path of the file in the repository.')}>{t('Chemin', 'Path')}</th>
+                  <th className="num" title={t('Poids du contenu, tel qu\'il est embarqué dans le bundle.', 'Size of the content, as embedded in the bundle.')}>
+                    {t('Taille', 'Size')}
                   </th>
-                  <th className="num" title="Lignes trouvees dans le fichier, en-tete exclue.">
-                    Lignes lues
+                  <th className="num" title={t("Lignes trouvées dans le fichier, en-tête exclue.", 'Rows found in the file, header excluded.')}>
+                    {t('Lignes lues', 'Rows read')}
                   </th>
-                  <th className="num" title="Lignes ayant passe la validation. L'ecart avec les lignes lues est detaille dans le controle de validite.">
-                    Retenues
+                  <th
+                    className="num"
+                    title={t(
+                      "Lignes ayant passé la validation. L'écart avec les lignes lues est détaillé dans le contrôle de validité.",
+                      'Rows that passed validation. The gap with rows read is detailed in the validity check.'
+                    )}
+                  >
+                    {t('Retenues', 'Kept')}
                   </th>
                 </tr>
               </thead>
@@ -69,7 +84,7 @@ export function VueFichiers({ dataset }: { dataset: Dataset }) {
                       <td className="num">{lues === undefined ? '—' : nombre(lues)}</td>
                       <td className="num">
                         {gardees === undefined ? (
-                          <span className="discret">non utilise</span>
+                          <span className="discret">{t('non utilisé', 'not used')}</span>
                         ) : (
                           nombre(gardees)
                         )}
@@ -81,19 +96,24 @@ export function VueFichiers({ dataset }: { dataset: Dataset }) {
             </table>
           </div>
           <p className="param-aide" style={{ marginTop: 10 }}>
-            Ajouter un fichier : le deposer dans <span className="mono">data/</span>, declarer son schema dans{' '}
-            <span className="mono">src/core/loaders/schemas.ts</span>, l'assembler dans{' '}
-            <span className="mono">dataset.ts</span>. L'import utilisateur (glisser-deposer) se brancherait comme une
-            seconde source dans <span className="mono">src/core/sources/</span>, sans toucher au reste.
+            {t('Ajouter un fichier : le déposer dans', 'To add a file: drop it in')} <span className="mono">data/</span>
+            {t(', déclarer son schéma dans', ', declare its schema in')} <span className="mono">src/core/loaders/schemas.ts</span>
+            {t(", l'assembler dans", ', assemble it in')} <span className="mono">dataset.ts</span>
+            {t(
+              ". L'import utilisateur (glisser-déposer) se brancherait comme une seconde source dans",
+              '. User import (drag and drop) would plug in as a second source in'
+            )}{' '}
+            <span className="mono">src/core/sources/</span>
+            {t(', sans toucher au reste.', ', without touching the rest.')}
           </p>
         </Carte>
 
         <Carte
-          titre="Controle de validite"
-          sousTitre="Lignes ecartees et incoherences relevees au chargement."
+          titre={t('Contrôle de validité', 'Validity check')}
+          sousTitre={t('Lignes écartées et incohérences relevées au chargement.', 'Rows discarded and inconsistencies found on load.')}
         >
           {anomalies.length === 0 ? (
-            <p className="vide">Aucune anomalie : les trois fichiers sont conformes a leur schema.</p>
+            <p className="vide">{t('Aucune anomalie : les trois fichiers sont conformes à leur schéma.', 'No anomalies: all three files conform to their schema.')}</p>
           ) : (
             <div style={{ maxHeight: 320, overflow: 'auto' }}>
               {anomalies.map((a, i) => (
@@ -117,7 +137,10 @@ export function VueFichiers({ dataset }: { dataset: Dataset }) {
       {fichier && apercu && (
         <Carte
           titre={fichier.nom}
-          sousTitre={`Contenu brut, tel que lu — ${nombre(apercu.lignes.length)} premieres lignes.`}
+          sousTitre={t(
+            `Contenu brut, tel que lu — ${nombre(apercu.lignes.length)} premières lignes.`,
+            `Raw content, as read — first ${nombre(apercu.lignes.length)} rows.`
+          )}
         >
           <div className="table-enveloppe" style={{ maxHeight: 420, overflow: 'auto' }}>
             <table className="donnees">

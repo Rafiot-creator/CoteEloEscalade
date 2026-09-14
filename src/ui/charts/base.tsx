@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useLangue } from '../langue'
 
 /**
  * Briques de graphique. Pas de librairie : les graphes du site sont peu
@@ -144,13 +145,14 @@ export function Cadre({
 
 /** Bascule graphique / tableau : tout graphe a son equivalent lisible. */
 export function BasculeVue({ tableau, setTableau }: { tableau: boolean; setTableau: (v: boolean) => void }) {
+  const { t } = useLangue()
   return (
     <div style={{ display: 'flex', gap: 2 }}>
       <button className="bouton" aria-pressed={!tableau} onClick={() => setTableau(false)}>
-        Graphe
+        {t('Graphe', 'Chart')}
       </button>
       <button className="bouton" aria-pressed={tableau} onClick={() => setTableau(true)}>
-        Tableau
+        {t('Tableau', 'Table')}
       </button>
     </div>
   )

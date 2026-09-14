@@ -72,8 +72,10 @@ function melanger(a: Map<string, EtatRating>, b: Map<string, EtatRating>, poids:
 
 const formule: Formule = {
   id: 'melange',
-  label: 'Melange Elo + Glicko',
-  labelCourt: 'Melange',
+  label: 'Mélange Elo + Glicko',
+  labelEn: 'Blend Elo + Glicko',
+  labelCourt: 'Mélange',
+  labelCourtEn: 'Blend',
   // Calibre comme les autres sur le monde temoin, a taux de fausses alertes
   // comparable (cf. desaccords.test.ts).
   seuilDesaccord: 0.75,
@@ -81,30 +83,38 @@ const formule: Formule = {
   // jeu livre, elle ne signale aucun bloc qu'elles ne signalent deja.
   avisIndependant: false,
   description:
-    "La moyenne des deux autres. Elles ne se trompant pas de la meme facon, leur moyenne fait moins de grosses erreurs que chacune prise seule. Les deux tournent avec leurs reglages par defaut.",
+    "La moyenne des deux autres. Elles ne se trompant pas de la même façon, leur moyenne fait moins de grosses erreurs que chacune prise seule. Les deux tournent avec leurs réglages par défaut.",
+  descriptionEn:
+    "The average of the other two. Since they don't make mistakes the same way, their average makes fewer big errors than either taken alone. Both run with their default settings.",
   params: [
     {
       nom: 'poidsGlicko',
       label: 'Poids de Glicko',
+      labelEn: 'Glicko weight',
       type: 'nombre',
       defaut: 0.5,
       min: 0,
       max: 1,
       pas: 0.05,
-      groupe: 'Melange',
-      aide: "A 0 on retrouve l'Elo, a 1 Glicko. La moitie est le choix par defaut : l'optimum mesure est vers 0,4, mais il est estime sur une verite terrain simulee et le retenir serait du surajustement — la moyenne simple en capte deja l'essentiel.",
+      groupe: 'Mélange',
+      groupeEn: 'Blend',
+      aide: "À 0 on retrouve l'Elo, à 1 Glicko. La moitié est le choix par défaut : l'optimum mesuré est vers 0,4, mais il est estimé sur une vérité terrain simulée et le retenir serait du surajustement — la moyenne simple en capte déjà l'essentiel.",
+      aideEn: "At 0 you get Elo, at 1 Glicko. Half is the default choice: the measured optimum is around 0.4, but it's estimated on a simulated ground truth and adopting it would be overfitting — the simple average already captures the essential gain.",
     },
     {
       nom: 'echelle',
-      label: 'Echelle',
+      label: 'Échelle',
+      labelEn: 'Scale',
       type: 'nombre',
       defaut: ECHELLE_REFERENCE,
       min: 200,
       max: 2000,
       pas: 50,
       unite: 'pts',
-      groupe: 'Melange',
-      aide: "Sert uniquement a evaluer la qualite predictive du melange ; les cotes, elles, viennent des deux formules sous-jacentes.",
+      groupe: 'Mélange',
+      groupeEn: 'Blend',
+      aide: "Sert uniquement à évaluer la qualité prédictive du mélange ; les cotes, elles, viennent des deux formules sous-jacentes.",
+      aideEn: "Used only to evaluate the blend's predictive quality; the ratings themselves come from the two underlying formulas.",
     },
   ],
 
@@ -155,12 +165,14 @@ const formule: Formule = {
       diagnostics: [
         ...evaluateur.diagnostics(),
         {
-          label: 'Ecart entre les deux formules',
+          label: 'Écart entre les deux formules',
+          labelEn: 'Gap between the two formulas',
           valeur: ecartMoyen(elo.blocs, gli.blocs),
           unite: 'pts',
           basMieux: true,
           aide:
-            "Distance moyenne entre la cote Elo et la cote Glicko d'un meme bloc. Elle mesure ce que le melange peut apporter : deux formules d'accord partout n'auraient rien a se dire.",
+            "Distance moyenne entre la cote Elo et la cote Glicko d'un même bloc. Elle mesure ce que le mélange peut apporter : deux formules d'accord partout n'auraient rien à se dire.",
+          aideEn: "Average distance between the Elo rating and the Glicko rating of the same boulder. It measures what the blend can add: two formulas agreeing everywhere would have nothing to add to each other.",
         },
       ],
     }

@@ -8,6 +8,7 @@ import { COULEURS_SERIES, Courbes, type Serie } from '../charts/Courbes'
 import { Carte, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { dateCourte, nombre, pourcent } from '../format'
+import { bilingue, useLangue } from '../langue'
 import { echantillonner } from '../etat'
 
 /** Au-dela, les teintes ne se distinguent plus de facon fiable. */
@@ -23,6 +24,7 @@ export function VueGrimpeurs({
   /** Vue visiteur : une seule colonne de cote (le melange), appelee simplement "Cote". */
   simplifie?: boolean
 }) {
+  const { langue, t } = useLangue()
   // Les colonnes de salle n'ont d'interet que si la communaute en frequente
   // plusieurs : sur une salle unique elles repetent la meme valeur partout.
   const plusieursSalles = resultat.resume.gyms.length > 1
@@ -86,15 +88,18 @@ export function VueGrimpeurs({
       cle: 'rang',
       titre: '#',
       num: true,
-      aide: 'Rang au classement, par cote decroissante.',
+      aide: t('Rang au classement, par cote décroissante.', 'Rank in the leaderboard, by decreasing rating.'),
       valeur: (g) => classement.indexOf(g) + 1,
       tri: (g) => classement.indexOf(g),
     },
     {
       cle: 'nom',
-      titre: 'Grimpeur',
+      titre: t('Grimpeur', 'Climber'),
       principal: true,
-      aide: "Une pastille de couleur signale les grimpeurs traces dans la courbe de progression.",
+      aide: t(
+        'Une pastille de couleur signale les grimpeurs tracés dans la courbe de progression.',
+        'A colored dot marks climbers plotted in the progression chart.'
+      ),
       valeur: (g) => g.nom,
       rendu: (g) => {
         const i = choisis.indexOf(g.id)
@@ -108,10 +113,10 @@ export function VueGrimpeurs({
     },
     ...(plusieursSalles
       ? [
-          { cle: 'gym', titre: 'Salle', valeur: (g: LigneGrimpeur) => g.gymPrincipal },
+          { cle: 'gym', titre: t('Salle', 'Gym'), valeur: (g: LigneGrimpeur) => g.gymPrincipal },
           {
             cle: 'salles',
-            titre: 'Salles',
+            titre: t('Salles', 'Gyms'),
             num: true,
             valeur: (g: LigneGrimpeur) => g.gyms.length,
             rendu: (g: LigneGrimpeur) =>
@@ -121,20 +126,28 @@ export function VueGrimpeurs({
       : []),
     {
       cle: 'niveau',
-      titre: 'Niveau calcule',
-      aide:
-        "La cotation que ce grimpeur envoie une fois sur deux : sa cote traduite en crans V. La fraction entre parentheses evite d'arrondir un V5,4 en V5 tout court.",
+      titre: t('Niveau calculé', 'Calculated level'),
+      aide: t(
+        "La cotation que ce grimpeur envoie une fois sur deux : sa cote traduite en crans V. La fraction entre parenthèses évite d'arrondir un V5,4 en V5 tout court.",
+        "The grade this climber sends every other time: their rating translated into V grades. The fraction in parentheses avoids rounding a V5.4 down to a plain V5."
+      ),
       valeur: (g) => g.cotationNiveau,
       tri: (g) => g.indexNiveau,
-      rendu: (g) => formaterIndex(g.indexNiveau),
+      rendu: (g) => formaterIndex(g.indexNiveau, langue),
     },
     ...colonnesFormules.map((c) => ({
       cle: `cote-${c.formule.id}`,
-      titre: simplifie ? 'Cote' : c.formule.labelCourt ?? c.formule.label,
+      titre: simplifie ? t('Cote', 'Rating') : bilingue(c.formule.labelCourt ?? c.formule.label, c.formule.labelCourtEn ?? c.formule.labelEn, langue),
       num: true,
       aide: simplifie
-        ? "Cote du grimpeur. Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur cote 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix."
-        : `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur cote 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
+        ? t(
+            "Cote du grimpeur. Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.",
+            "The climber's rating. Divide by 1000 to read it in V grades: 5300 = V5.3. A climber rated 1000 points above a boulder sends it nine times out of ten."
+          )
+        : t(
+            `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
+            `The climber's rating according to the "${bilingue(c.formule.label, c.formule.labelEn, langue)}" formula. Divide by 1000 to read it in V grades: 5300 = V5.3. A climber rated 1000 points above a boulder sends it nine times out of ten.`
+          ),
       valeur: (g: LigneGrimpeur) => c.parGrimpeur.get(g.id)?.rating ?? Number.NaN,
       rendu: (g: LigneGrimpeur) => {
         const ligne = c.parGrimpeur.get(g.id)
@@ -145,36 +158,45 @@ export function VueGrimpeurs({
     })),
     {
       cle: 'meilleure',
-      titre: 'Plus dur envoye',
-      aide:
-        "La cotation *affichee* la plus dure qu'il ait reellement envoyee. Elle depasse souvent le niveau calcule, qui vise la cotation reussie une fois sur deux et non le record.",
+      titre: t('Plus dur envoyé', 'Hardest sent'),
+      aide: t(
+        "La cotation *affichée* la plus dure qu'il ait réellement envoyée. Elle dépasse souvent le niveau calculé, qui vise la cotation réussie une fois sur deux et non le record.",
+        "The hardest *displayed* grade they actually sent. It often exceeds the calculated level, which targets the grade sent half the time, not their personal record."
+      ),
       valeur: (g) => g.meilleureCotation,
     },
     {
       cle: 'matchs',
-      titre: 'Duels utiles',
+      titre: t('Duels utiles', 'Useful duels'),
       num: true,
-      aide:
-        "Nombre de blocs qu'il a affrontes et dont l'issue a compte. Les blocs largement hors de sa portee, dans un sens comme dans l'autre, n'y figurent pas.",
+      aide: t(
+        "Nombre de blocs qu'il a affrontés et dont l'issue a compté. Les blocs largement hors de sa portée, dans un sens comme dans l'autre, n'y figurent pas.",
+        "Number of boulders they faced whose outcome counted. Boulders far out of their reach either way are excluded."
+      ),
       valeur: (g) => g.matchs,
     },
     {
       cle: 'taux',
-      titre: 'Duels gagnes',
+      titre: t('Duels gagnés', 'Duels won'),
       num: true,
-      aide:
-        "Part de ces blocs qu'il a fini par envoyer. Un taux eleve signale surtout quelqu'un qui choisit des blocs a sa portee, pas necessairement un bon grimpeur.",
+      aide: t(
+        "Part de ces blocs qu'il a fini par envoyer. Un taux élevé signale surtout quelqu'un qui choisit des blocs à sa portée, pas nécessairement un bon grimpeur.",
+        "Share of those boulders they eventually sent. A high rate mostly signals someone who picks boulders within reach, not necessarily a strong climber."
+      ),
       valeur: (g) => g.tauxReussite,
       rendu: (g) => pourcent(g.tauxReussite),
     },
     {
       cle: 'suivi',
-      titre: 'Courbe',
-      aide: `Ajoute ou retire ce grimpeur de la courbe de progression, ${MAX_SERIES} au maximum.`,
+      titre: t('Courbe', 'Chart'),
+      aide: t(
+        `Ajoute ou retire ce grimpeur de la courbe de progression, ${MAX_SERIES} au maximum.`,
+        `Adds or removes this climber from the progression chart, ${MAX_SERIES} at most.`
+      ),
       valeur: (g) => (choisis.includes(g.id) ? 'oui' : 'non'),
       rendu: (g) => (
         <button className="bouton discret" aria-pressed={choisis.includes(g.id)} onClick={() => basculer(g.id)}>
-          {choisis.includes(g.id) ? 'Retirer' : 'Suivre'}
+          {choisis.includes(g.id) ? t('Retirer', 'Remove') : t('Suivre', 'Track')}
         </button>
       ),
     },
@@ -186,39 +208,49 @@ export function VueGrimpeurs({
   return (
     <div className="large">
       <div className="grille tuiles">
-        <Tuile etiquette="Grimpeurs classes" valeur={nombre(classement.length)} note="au moins un affrontement" />
         <Tuile
-          etiquette="Meilleur niveau"
-          valeur={meilleur ? formaterIndex(meilleur.indexNiveau) : '—'}
+          etiquette={t('Grimpeurs classés', 'Ranked climbers')}
+          valeur={nombre(classement.length)}
+          note={t('au moins un affrontement', 'at least one duel')}
+        />
+        <Tuile
+          etiquette={t('Meilleur niveau', 'Best level')}
+          valeur={meilleur ? formaterIndex(meilleur.indexNiveau, langue) : '—'}
           note={meilleur?.nom}
         />
         <Tuile
-          etiquette="Niveau median"
-          valeur={median ? formaterIndex(median.indexNiveau) : '—'}
-          note="la moitie du groupe est au-dessus"
+          etiquette={t('Niveau médian', 'Median level')}
+          valeur={median ? formaterIndex(median.indexNiveau, langue) : '—'}
+          note={t('la moitié du groupe est au-dessus', 'half the group is above')}
         />
         <Tuile
-          etiquette="Duels par grimpeur"
+          etiquette={t('Duels par grimpeur', 'Duels per climber')}
           valeur={nombre(classement.reduce((s, g) => s + g.matchs, 0) / (classement.length || 1))}
-          note="en moyenne"
+          note={t('en moyenne', 'on average')}
         />
       </div>
 
       <Carte
-        titre="Progression"
-        sousTitre={`Niveau estime au fil du temps, ${MAX_SERIES} grimpeurs au maximum. Choisir qui suivre dans le tableau ci-dessous.`}
+        titre={t('Progression', 'Progression')}
+        sousTitre={t(
+          `Niveau estimé au fil du temps, ${MAX_SERIES} grimpeurs au maximum. Choisir qui suivre dans le tableau ci-dessous.`,
+          `Estimated level over time, ${MAX_SERIES} climbers at most. Choose who to track in the table below.`
+        )}
         actions={<BasculeVue tableau={tableau} setTableau={setTableau} />}
       >
         {tableau ? (
           <TableauProgression series={series} />
         ) : (
-          <Courbes series={series} formatY={(v) => formaterIndex(v).split(' ')[0]} />
+          <Courbes series={series} formatY={(v) => formaterIndex(v, langue).split(' ')[0]} />
         )}
       </Carte>
 
       <Carte
-        titre="Classement"
-        sousTitre="Le niveau calcule est la cotation V que le grimpeur envoie une fois sur deux. Les cotes des deux formules sont affichees cote a cote ; celle en gras est la formule active."
+        titre={t('Classement', 'Leaderboard')}
+        sousTitre={t(
+          "Le niveau calculé est la cotation V que le grimpeur envoie une fois sur deux. Les cotes des deux formules sont affichées côte à côte ; celle en gras est la formule active.",
+          "The calculated level is the V grade the climber sends half the time. Both formulas' ratings are shown side by side; the one in bold is the active formula."
+        )}
       >
         <Tableau lignes={classement} colonnes={colonnes} cleLigne={(g) => g.id} triInitial={{ cle: 'rang', sens: 1 }} />
       </Carte>
@@ -227,19 +259,20 @@ export function VueGrimpeurs({
 }
 
 function TableauProgression({ series }: { series: Serie[] }) {
+  const { langue, t } = useLangue()
   const lignes = series.flatMap((s) => s.points.map((p) => ({ nom: s.label, ...p })))
   return (
     <Tableau
       lignes={lignes}
       colonnes={[
-        { cle: 'nom', titre: 'Grimpeur', principal: true, valeur: (l) => l.nom },
-        { cle: 'date', titre: 'Date', valeur: (l) => dateCourte(l.t), tri: (l) => l.t },
-        { cle: 'niveau', titre: 'Niveau', valeur: (l) => formaterIndex(l.v), tri: (l) => l.v },
+        { cle: 'nom', titre: t('Grimpeur', 'Climber'), principal: true, valeur: (l) => l.nom },
+        { cle: 'date', titre: t('Date', 'Date'), valeur: (l) => dateCourte(l.t), tri: (l) => l.t },
+        { cle: 'niveau', titre: t('Niveau', 'Level'), valeur: (l) => formaterIndex(l.v, langue), tri: (l) => l.v },
       ]}
       cleLigne={(l) => `${l.nom}-${l.t}`}
       triInitial={{ cle: 'date', sens: 1 }}
       pageTaille={20}
-      videMessage="Selectionner au moins un grimpeur."
+      videMessage={t('Sélectionner au moins un grimpeur.', 'Select at least one climber.')}
     />
   )
 }

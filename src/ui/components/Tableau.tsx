@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useInfobulle } from '../charts/base'
 import { nombre } from '../format'
+import { useLangue } from '../langue'
 
 export interface Colonne<T> {
   cle: string
@@ -45,11 +46,12 @@ export function Tableau<T>({
   cleLigne,
   triInitial,
   pageTaille = 50,
-  videMessage = 'Aucune ligne.',
+  videMessage,
 }: Props<T>) {
   const [tri, setTri] = useState(triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 })
   const [limite, setLimite] = useState(pageTaille)
   const { montrer, cacher, noeud } = useInfobulle()
+  const { langue, t } = useLangue()
 
   const triees = useMemo(() => {
     const col = colonnes.find((c) => c.cle === tri.cle)
@@ -59,11 +61,11 @@ export function Tableau<T>({
       const va = cle(a)
       const vb = cle(b)
       if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * tri.sens
-      return String(va).localeCompare(String(vb), 'fr') * tri.sens
+      return String(va).localeCompare(String(vb), langue === 'fr' ? 'fr' : 'en') * tri.sens
     })
-  }, [lignes, colonnes, tri])
+  }, [lignes, colonnes, tri, langue])
 
-  if (!lignes.length) return <p className="vide">{videMessage}</p>
+  if (!lignes.length) return <p className="vide">{videMessage ?? t('Aucune ligne.', 'No rows.')}</p>
 
   const visibles = triees.slice(0, limite)
 
@@ -81,7 +83,7 @@ export function Tableau<T>({
                     setTri((t) => (t.cle === c.cle ? { cle: c.cle, sens: (t.sens * -1) as 1 | -1 } : { cle: c.cle, sens: c.num ? -1 : 1 }))
                   }
                   onMouseMove={(e) =>
-                    c.aide && montrer(e, { titre: c.titre, texte: c.aide, lignes: [['', 'Cliquer pour trier']] })
+                    c.aide && montrer(e, { titre: c.titre, texte: c.aide, lignes: [['', t('Cliquer pour trier', 'Click to sort')]] })
                   }
                   onMouseLeave={cacher}
                 >
@@ -113,16 +115,16 @@ export function Tableau<T>({
       {noeud}
       <div className="pagination">
         <span>
-          {nombre(visibles.length)} sur {nombre(lignes.length)} lignes
+          {t(`${nombre(visibles.length)} sur ${nombre(lignes.length)} lignes`, `${nombre(visibles.length)} of ${nombre(lignes.length)} rows`)}
         </span>
         {limite < lignes.length && (
           <button className="bouton" onClick={() => setLimite((l) => l + pageTaille * 4)}>
-            Afficher plus
+            {t('Afficher plus', 'Show more')}
           </button>
         )}
         {limite > pageTaille && (
           <button className="bouton discret" onClick={() => setLimite(pageTaille)}>
-            Replier
+            {t('Replier', 'Collapse')}
           </button>
         )}
       </div>

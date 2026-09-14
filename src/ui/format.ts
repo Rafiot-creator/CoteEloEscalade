@@ -1,19 +1,42 @@
 /** Formatage : un seul endroit, pour que tous les chiffres du site se ressemblent. */
 
-const nf = (min: number, max: number) =>
-  new Intl.NumberFormat('fr-FR', { minimumFractionDigits: min, maximumFractionDigits: max })
+export type Langue = 'fr' | 'en'
 
-const entier = nf(0, 0)
-const un = nf(1, 1)
-const deux = nf(2, 2)
+/**
+ * Langue courante, modifiee par `LangueProvider` (voir `langue.tsx`).
+ *
+ * Ces fonctions sont des utilitaires purs appeles pendant le rendu, pas des
+ * composants : elles ne peuvent pas lire le contexte React directement. Un
+ * etat de module suffit ici, puisqu'il n'y a qu'une langue active a la fois
+ * et que tout composant qui affiche un nombre est de toute facon reaffiche
+ * quand la langue change (il consomme `useLangue` plus haut dans l'arbre).
+ */
+let langueCourante: Langue = 'fr'
 
-export const nombre = (v: number, decimales = 0): string =>
-  !Number.isFinite(v) ? '—' : decimales === 0 ? entier.format(v) : decimales === 1 ? un.format(v) : deux.format(v)
+export function definirLangueFormat(l: Langue): void {
+  langueCourante = l
+}
 
-export const pourcent = (v: number, decimales = 0): string =>
-  !Number.isFinite(v) ? '—' : `${nombre(v * 100, decimales)} %`
+const creerFormatteurs = (locale: string) => ({
+  0: new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
+  1: new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+  2: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+})
 
-/** Ecart signe en crans : '+1,4' / '−0,6' / '0'. */
+const formatteurs = { fr: creerFormatteurs('fr-FR'), en: creerFormatteurs('en-US') }
+
+export const nombre = (v: number, decimales = 0): string => {
+  if (!Number.isFinite(v)) return '—'
+  const f = formatteurs[langueCourante]
+  return decimales === 0 ? f[0].format(v) : decimales === 1 ? f[1].format(v) : f[2].format(v)
+}
+
+export const pourcent = (v: number, decimales = 0): string => {
+  if (!Number.isFinite(v)) return '—'
+  return langueCourante === 'fr' ? `${nombre(v * 100, decimales)} %` : `${nombre(v * 100, decimales)}%`
+}
+
+/** Ecart signe en crans : '+1,4' / '−0,6' / '0' ('+1.4' / '−0.6' / '0' en anglais). */
 export function signe(v: number, decimales = 1): string {
   if (!Number.isFinite(v)) return '—'
   if (Math.abs(v) < 0.05) return '0'
@@ -21,17 +44,20 @@ export function signe(v: number, decimales = 1): string {
 }
 
 export function octets(n: number): string {
-  if (n < 1024) return `${n} o`
-  if (n < 1024 * 1024) return `${nombre(n / 1024, 1)} ko`
-  return `${nombre(n / (1024 * 1024), 1)} Mo`
+  const unites = langueCourante === 'fr' ? ['o', 'ko', 'Mo'] : ['B', 'KB', 'MB']
+  if (n < 1024) return `${n} ${unites[0]}`
+  if (n < 1024 * 1024) return `${nombre(n / 1024, 1)} ${unites[1]}`
+  return `${nombre(n / (1024 * 1024), 1)} ${unites[2]}`
 }
 
 export function dateCourte(t: number): string {
-  return new Date(t).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })
+  const locale = langueCourante === 'fr' ? 'fr-FR' : 'en-US'
+  return new Date(t).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: '2-digit' })
 }
 
 export function mois(t: number): string {
-  return new Date(t).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })
+  const locale = langueCourante === 'fr' ? 'fr-FR' : 'en-US'
+  return new Date(t).toLocaleDateString(locale, { month: 'short', year: '2-digit' })
 }
 
 /** Telecharge un contenu genere cote client. */

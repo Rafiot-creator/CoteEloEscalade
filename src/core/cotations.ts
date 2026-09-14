@@ -51,13 +51,14 @@ export function cotationDIndex(index: number): Cotation {
  * On garde la fraction visible plutot que de la masquer par un arrondi : c'est
  * elle qui dit si un bloc est "un V5 gentil" ou "un V5 costaud".
  */
-export function formaterIndex(index: number): string {
+export function formaterIndex(index: number, langue: 'fr' | 'en' = 'fr'): string {
   if (!Number.isFinite(index)) return '—'
   const base = Math.round(index)
   const reste = index - base
   const cot = cotationDIndex(base)
   if (Math.abs(reste) < 0.05) return cot
-  return `${cot} (${reste > 0 ? '+' : '−'}${Math.abs(reste).toFixed(1).replace('.', ',')})`
+  const decimale = Math.abs(reste).toFixed(1)
+  return `${cot} (${reste > 0 ? '+' : '−'}${langue === 'fr' ? decimale.replace('.', ',') : decimale})`
 }
 
 /** Nombre de crans entre deux cotations, signe. */

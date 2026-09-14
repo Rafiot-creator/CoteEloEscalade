@@ -3,6 +3,7 @@ import type { Diagnostic } from '../../core/formulas/types'
 import type { Resultat } from '../../core/pipeline'
 import { MiniCourbe } from '../charts/Courbes'
 import { Carte, PanneauParams, Tuile } from '../components/base'
+import { bilingue, useLangue } from '../langue'
 import { nombre, pourcent, signe } from '../format'
 import type { Atelier } from '../etat'
 
@@ -13,6 +14,7 @@ import type { Atelier } from '../etat'
  * formule choisie : cet ecran ne connait aucune formule en particulier.
  */
 export function VueFormules({ atelier }: { atelier: Atelier }) {
+  const { langue, t } = useLangue()
   const { formule, formules, params, paramsCalibrage, resultat, reference } = atelier
   if (!resultat) return null
 
@@ -20,11 +22,11 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
     <div className="large">
       <div className="grille atelier">
         <div>
-          <Carte titre="Formule" sousTitre={formule.description}>
+          <Carte titre={t('Formule', 'Formula')} sousTitre={bilingue(formule.description, formule.descriptionEn, langue)}>
             <select value={formule.id} onChange={(e) => atelier.choisirFormule(e.currentTarget.value)}>
               {formules.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.label}
+                  {bilingue(f.label, f.labelEn, langue)}
                 </option>
               ))}
             </select>
@@ -34,8 +36,11 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
           </Carte>
 
           <Carte
-            titre="Calibrage"
-            sousTitre="Conversion de la cote Elo, unite interne au modele, vers l'echelle V."
+            titre={t('Calibrage', 'Calibration')}
+            sousTitre={t(
+              "Conversion de la cote Elo, unité interne au modèle, vers l'échelle V.",
+              'Conversion from the Elo rating (the model\'s internal unit) to the V scale.'
+            )}
           >
             <PanneauParams specs={PARAMS_CALIBRAGE} valeurs={paramsCalibrage} onChange={atelier.setParamCalibrage} />
           </Carte>
@@ -43,14 +48,14 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
           <Carte>
             <div className="barre-outils" style={{ margin: 0 }}>
               <button className="bouton" onClick={atelier.reinitialiser}>
-                Valeurs par defaut
+                {t('Valeurs par défaut', 'Default values')}
               </button>
               <button className="bouton" onClick={atelier.memoriser}>
-                Memoriser ce reglage
+                {t('Mémoriser ce réglage', 'Remember this setting')}
               </button>
               {reference && (
                 <button className="bouton discret" onClick={atelier.oublier}>
-                  Oublier
+                  {t('Oublier', 'Forget')}
                 </button>
               )}
             </div>
@@ -59,8 +64,11 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
 
         <div>
           <Carte
-            titre="Qualite du calcul"
-            sousTitre={`${resultat.formuleLabel} — ${nombre(resultat.dureeMs)} ms — ${nombre(resultat.resume.duelsComptes)} duels comptes sur ${nombre(resultat.resume.duels)} affrontements.`}
+            titre={t('Qualité du calcul', 'Calculation quality')}
+            sousTitre={t(
+              `${resultat.formuleLabel} — ${nombre(resultat.dureeMs)} ms — ${nombre(resultat.resume.duelsComptes)} duels comptés sur ${nombre(resultat.resume.duels)} affrontements.`,
+              `${bilingue(resultat.formuleLabel, formules.find((f) => f.id === resultat.formuleId)?.labelEn, langue)} — ${nombre(resultat.dureeMs)} ms — ${nombre(resultat.resume.duelsComptes)} counted duels out of ${nombre(resultat.resume.duels)} matchups.`
+            )}
           >
             <div className="grille tuiles">
               {resultat.diagnostics.map((d) => (
@@ -74,54 +82,62 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
           </Carte>
 
           <Carte
-            titre="Convergence"
-            sousTitre="Correction moyenne appliquee a chaque passe. La courbe doit s'aplatir : si elle ne descend pas, augmenter le nombre de passes."
+            titre={t('Convergence', 'Convergence')}
+            sousTitre={t(
+              "Correction moyenne appliquée à chaque passe. La courbe doit s'aplatir : si elle ne descend pas, augmenter le nombre de passes.",
+              'Average correction applied at each pass. The curve should flatten out: if it does not go down, increase the number of passes.'
+            )}
           >
             <MiniCourbe valeurs={resultat.convergence} />
             <div className="legende" style={{ marginTop: 4 }}>
               <span className="discret">
-                passe 1 : {nombre(resultat.convergence[0] ?? 0, 2)} pts · derniere passe :{' '}
-                {nombre(resultat.convergence[resultat.convergence.length - 1] ?? 0, 2)} pts
+                {t(
+                  `passe 1 : ${nombre(resultat.convergence[0] ?? 0, 2)} pts · dernière passe : ${nombre(resultat.convergence[resultat.convergence.length - 1] ?? 0, 2)} pts`,
+                  `pass 1: ${nombre(resultat.convergence[0] ?? 0, 2)} pts · last pass: ${nombre(resultat.convergence[resultat.convergence.length - 1] ?? 0, 2)} pts`
+                )}
               </span>
             </div>
           </Carte>
 
-          <Carte titre="Echelle obtenue" sousTitre="Ce que vaut un cran V, dans l'unite du modele.">
+          <Carte titre={t('Échelle obtenue', 'Resulting scale')} sousTitre={t('Ce que vaut un cran V, dans l\'unité du modèle.', 'What one V grade is worth, in the model\'s unit.')}>
             <div className="grille tuiles">
               <Tuile
-                etiquette="Points par cran V"
+                etiquette={t('Points par cran V', 'Points per V grade')}
                 valeur={nombre(pointsParCran(resultat.calibrage))}
                 unite="pts"
-                note={resultat.calibrage.mode === 'auto' ? 'deduit des donnees' : 'fixe manuellement'}
+                note={resultat.calibrage.mode === 'auto' ? t('déduit des données', 'derived from the data') : t('fixé manuellement', 'set manually')}
               />
               {resultat.calibrage.mode === 'auto' ? (
                 <Tuile
-                  etiquette="Ajustement (r²)"
+                  etiquette={t('Ajustement (r²)', 'Fit (r²)')}
                   valeur={nombre(resultat.calibrage.r2, 2)}
-                  note={`regression sur ${nombre(resultat.calibrage.nBlocs)} blocs`}
+                  note={t(`régression sur ${nombre(resultat.calibrage.nBlocs)} blocs`, `regression on ${nombre(resultat.calibrage.nBlocs)} boulders`)}
                 />
               ) : (
                 <Tuile
-                  etiquette="Methode"
-                  valeur="Echelle fixe"
-                  note="Passer en mode regression pour voir combien de points separent reellement deux crans dans vos donnees."
+                  etiquette={t('Méthode', 'Method')}
+                  valeur={t('Échelle fixe', 'Fixed scale')}
+                  note={t(
+                    'Passer en mode régression pour voir combien de points séparent réellement deux crans dans vos données.',
+                    'Switch to regression mode to see how many points actually separate two grades in your data.'
+                  )}
                 />
               )}
               <Tuile
-                etiquette="Blocs exploitables"
+                etiquette={t('Blocs exploitables', 'Ratable boulders')}
                 valeur={nombre(resultat.resume.blocsAudites)}
-                note={`sur ${nombre(resultat.resume.blocsTotal)}`}
+                note={t(`sur ${nombre(resultat.resume.blocsTotal)}`, `out of ${nombre(resultat.resume.blocsTotal)}`)}
               />
               <Tuile
-                etiquette="Ecart median"
+                etiquette={t('Écart médian', 'Median gap')}
                 valeur={nombre(resultat.resume.ecartMedianAbs, 2)}
-                unite="cran V"
-                note="calcul contre cotation affichee"
+                unite={t('cran V', 'V grade')}
+                note={t('calcul contre cotation affichée', 'calculated vs. displayed grade')}
               />
             </div>
             {resultat.calibrage.avertissement && (
               <p className="param-aide" style={{ color: 'var(--critique)', marginTop: 10 }}>
-                {resultat.calibrage.avertissement}
+                {bilingue(resultat.calibrage.avertissement, resultat.calibrage.avertissementEn, langue)}
               </p>
             )}
           </Carte>
@@ -134,19 +150,20 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
 }
 
 function TuileDiagnostic({ d, precedent }: { d: Diagnostic; precedent?: Diagnostic }) {
+  const { langue, t } = useLangue()
   const delta = precedent ? d.valeur - precedent.valeur : null
   const mieux = delta === null || Math.abs(delta) < 1e-9 ? null : d.basMieux ? delta < 0 : delta > 0
   return (
     <Tuile
-      etiquette={d.label}
+      etiquette={bilingue(d.label, d.labelEn, langue)}
       valeur={nombre(d.valeur, d.valeur < 10 ? 3 : 0)}
       unite={d.unite}
       note={
         delta === null ? (
-          d.aide
+          bilingue(d.aide, d.aideEn, langue)
         ) : (
           <span style={{ color: mieux === null ? undefined : mieux ? 'var(--bon)' : 'var(--critique)' }}>
-            {signe(delta, 3)} vs reglage memorise
+            {t(`${signe(delta, 3)} vs réglage mémorisé`, `${signe(delta, 3)} vs remembered setting`)}
           </span>
         )
       }
@@ -160,6 +177,7 @@ function TuileDiagnostic({ d, precedent }: { d: Diagnostic; precedent?: Diagnost
  * facon honnete de juger si un parametre "change quelque chose".
  */
 function Comparaison({ courant, reference }: { courant: Resultat; reference: { resultat: Resultat; etiquette: string } }) {
+  const { t } = useLangue()
   const parId = new Map(reference.resultat.blocs.map((b) => [b.id, b]))
   const divergences = courant.blocs
     .filter((b) => b.fiable)
@@ -174,31 +192,34 @@ function Comparaison({ courant, reference }: { courant: Resultat; reference: { r
 
   return (
     <Carte
-      titre="Comparaison avec le reglage memorise"
-      sousTitre={`${reference.etiquette} → ${courant.formuleLabel}. Blocs dont la cotation calculee bouge le plus.`}
+      titre={t('Comparaison avec le réglage mémorisé', 'Comparison with the remembered setting')}
+      sousTitre={t(
+        `${reference.etiquette} → ${courant.formuleLabel}. Blocs dont la cotation calculée bouge le plus.`,
+        `${reference.etiquette} → ${courant.formuleLabel}. Boulders whose calculated grade moves the most.`
+      )}
     >
       <div className="grille tuiles" style={{ marginBottom: 12 }}>
-        <Tuile etiquette="Deplacement moyen" valeur={nombre(deplacementMoyen, 2)} unite="cran V" />
+        <Tuile etiquette={t('Déplacement moyen', 'Average shift')} valeur={nombre(deplacementMoyen, 2)} unite={t('cran V', 'V grade')} />
         <Tuile
-          etiquette="Blocs deplaces d'un cran ou plus"
+          etiquette={t("Blocs déplacés d'un cran ou plus", 'Boulders shifted a grade or more')}
           valeur={nombre(divergences.filter((d) => Math.abs(d.delta) >= 1).length)}
-          note={`sur ${nombre(divergences.length)}`}
+          note={t(`sur ${nombre(divergences.length)}`, `out of ${nombre(divergences.length)}`)}
         />
         <Tuile
-          etiquette="Desaccords avec l'ouvreur"
+          etiquette={t("Désaccords avec l'ouvreur", 'Disagreements with the setter')}
           valeur={nombre(courant.resume.desaccords)}
-          note={`etait ${nombre(reference.resultat.resume.desaccords)}`}
+          note={t(`était ${nombre(reference.resultat.resume.desaccords)}`, `was ${nombre(reference.resultat.resume.desaccords)}`)}
         />
       </div>
       <div className="table-enveloppe">
         <table className="donnees">
           <thead>
             <tr>
-              <th>Bloc</th>
-              <th>Affichee</th>
-              <th>Memorise</th>
-              <th>Courant</th>
-              <th className="num">Deplacement</th>
+              <th>{t('Bloc', 'Boulder')}</th>
+              <th>{t('Affichée', 'Displayed')}</th>
+              <th>{t('Mémorisé', 'Remembered')}</th>
+              <th>{t('Courant', 'Current')}</th>
+              <th className="num">{t('Déplacement', 'Shift')}</th>
             </tr>
           </thead>
           <tbody>
@@ -214,10 +235,12 @@ function Comparaison({ courant, reference }: { courant: Resultat; reference: { r
           </tbody>
         </table>
       </div>
-      {!divergences.length && <p className="vide">Rien a comparer.</p>}
+      {!divergences.length && <p className="vide">{t('Rien à comparer.', 'Nothing to compare.')}</p>}
       <p className="param-aide" style={{ marginTop: 8 }}>
-        Taux de reussite global : {pourcent(courant.resume.tauxReussiteGlobal, 1)} — inchange, c'est une propriete des
-        donnees, pas du reglage.
+        {t(
+          `Taux de réussite global : ${pourcent(courant.resume.tauxReussiteGlobal, 1)} — inchangé, c'est une propriété des données, pas du réglage.`,
+          `Overall success rate: ${pourcent(courant.resume.tauxReussiteGlobal, 1)} — unchanged, it's a property of the data, not of the setting.`
+        )}
       </p>
     </Carte>
   )
