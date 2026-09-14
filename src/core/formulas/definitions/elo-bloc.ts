@@ -76,7 +76,7 @@ const formule: Formule = {
       max: 600,
       pas: 10,
       groupe: 'Base',
-      aide: "Amplitude de la correction après un duel. Il se lit dans l'unité de l'échelle : à K = 30, une victoire totalement inattendue déplace la cote de 30 points, soit trois centièmes de cran V. Trop haut, les cotes sautent ; trop bas, elles n'apprennent rien.",
+      aide: "Amplitude de la correction après un duel. Il se lit dans l'unité de l'échelle : à K = 30, une victoire totalement inattendue déplace la cote de 30 points, soit trois centièmes de cote V. Trop haut, les cotes sautent ; trop bas, elles n'apprennent rien.",
       aideEn: "Size of the correction after a duel, in the scale's own unit: at K = 30, a completely unexpected win shifts the rating by 30 points, i.e. three hundredths of a V grade. Too high and ratings jump around; too low and they learn nothing.",
     },
     {
@@ -135,7 +135,7 @@ const formule: Formule = {
       unite: 'pts',
       groupe: 'Règle de comptage',
       groupeEn: 'Counting rule',
-      aide: "Un grimpeur situé très au-dessous d'un bloc qui échoue, ou très au-dessus qui réussit, ne nous apprend rien — le modèle le prédisait déjà. Pire, ces résultats poussent la cote toujours dans le même sens : un bloc que seuls des grimpeurs bien plus faibles tentent ne reçoit que des échecs et dérive vers le haut sans contrepartie. À 2000 points, soit deux crans V, on les écarte. 0 = tout compte.",
+      aide: "Un grimpeur situé très au-dessous d'un bloc qui échoue, ou très au-dessus qui réussit, ne nous apprend rien — le modèle le prédisait déjà. Pire, ces résultats poussent la cote toujours dans le même sens : un bloc que seuls des grimpeurs bien plus faibles tentent ne reçoit que des échecs et dérive vers le haut sans contrepartie. À 2000 points, soit deux cotes V, on les écarte. 0 = tout compte.",
       aideEn: "A climber far below a boulder who fails, or far above one who succeeds, teaches us nothing — the model already predicted it. Worse, these results always push the rating the same way: a boulder only much weaker climbers attempt receives only failures and drifts upward with nothing to balance it. At 2000 points, i.e. two V grades, they are excluded. 0 = everything counts.",
     },
     {
@@ -211,7 +211,7 @@ const formule: Formule = {
     },
     {
       nom: 'ptsParCran',
-      label: 'Points par cran V',
+      label: 'Points par cote V',
       labelEn: 'Points per V grade',
       type: 'nombre',
       defaut: 1000,
@@ -221,7 +221,7 @@ const formule: Formule = {
       unite: 'pts',
       groupe: 'A priori',
       groupeEn: 'Prior',
-      aide: "Valeur d'un cran V sur l'échelle. À 1000, un V1 démarre à 1000 et un V7 à 7000 — et comme l'échelle vaut aussi 1000, un cran d'écart vaut exactement dix chances contre une. Sans effet si l'amorce est uniforme.",
+      aide: "Valeur d'une cote V sur l'échelle. À 1000, un V1 démarre à 1000 et un V7 à 7000 — et comme l'échelle vaut aussi 1000, une cote d'écart vaut exactement dix chances contre une. Sans effet si l'amorce est uniforme.",
       aideEn: "Value of one V grade on the scale. At 1000, a V1 starts at 1000 and a V7 at 7000 — and since the scale is also 1000, one grade of gap is worth exactly ten-to-one odds. No effect if seeding is uniform.",
     },
   ],

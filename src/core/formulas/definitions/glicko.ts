@@ -95,7 +95,7 @@ const formule: Formule = {
    */
   seuilDesaccord: 0.75,
   description:
-    "Mêmes affrontements, sans pondération du style, mais chaque cote porte son incertitude. Les blocs peu répétés — ceux qui viennent d'être ouverts — sont signalés comme tels au lieu d'être cotés avec un faux aplomb. Ses cotes sont un peu plus étalées que la convention des 1000 points par cran : passer le calibrage en mode régression les remet à l'échelle.",
+    "Mêmes affrontements, sans pondération du style, mais chaque cote porte son incertitude. Les blocs peu répétés — ceux qui viennent d'être ouverts — sont signalés comme tels au lieu d'être cotés avec un faux aplomb. Ses cotes sont un peu plus étalées que la convention des 1000 points par cote : passer le calibrage en mode régression les remet à l'échelle.",
   descriptionEn:
     "Same matchups, without style weighting, but every rating carries its own uncertainty. Boulders with few repeats — the ones that just got set — are flagged as such instead of being rated with false confidence. Its ratings are a bit more spread out than the 1000-points-per-grade convention: switching calibration to regression mode rescales them.",
   params: [
@@ -241,7 +241,7 @@ const formule: Formule = {
     },
     {
       nom: 'ptsParCran',
-      label: 'Points par cran V',
+      label: 'Points par cote V',
       labelEn: 'Points per V grade',
       type: 'nombre',
       defaut: 1000,

@@ -128,7 +128,7 @@ export function VueGrimpeurs({
       cle: 'niveau',
       titre: t('Niveau calculé', 'Calculated level'),
       aide: t(
-        "La cotation que ce grimpeur envoie une fois sur deux : sa cote traduite en crans V. La fraction entre parenthèses évite d'arrondir un V5,4 en V5 tout court.",
+        "La cotation que ce grimpeur envoie une fois sur deux : sa cote traduite en cotes V. La fraction entre parenthèses évite d'arrondir un V5,4 en V5 tout court.",
         "The grade this climber sends every other time: their rating translated into V grades. The fraction in parentheses avoids rounding a V5.4 down to a plain V5."
       ),
       valeur: (g) => g.cotationNiveau,
@@ -141,11 +141,11 @@ export function VueGrimpeurs({
       num: true,
       aide: simplifie
         ? t(
-            "Cote du grimpeur. Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.",
+            "Cote du grimpeur. Divisez par 1000 pour la lire en cotes V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.",
             "The climber's rating. Divide by 1000 to read it in V grades: 5300 = V5.3. A climber rated 1000 points above a boulder sends it nine times out of ten."
           )
         : t(
-            `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
+            `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en cotes V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
             `The climber's rating according to the "${bilingue(c.formule.label, c.formule.labelEn, langue)}" formula. Divide by 1000 to read it in V grades: 5300 = V5.3. A climber rated 1000 points above a boulder sends it nine times out of ten.`
           ),
       valeur: (g: LigneGrimpeur) => c.parGrimpeur.get(g.id)?.rating ?? Number.NaN,

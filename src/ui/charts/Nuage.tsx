@@ -105,7 +105,7 @@ export function Nuage({ points, hauteur = 340 }: { points: PointNuage[]; hauteur
                             [t('Où', 'Where'), p.lieu],
                             [t('Cotation affichée', 'Displayed grade'), p.cotationOfficielle],
                             [t('Cotation calculée', 'Calculated grade'), p.cotationCalculee],
-                            [t('Écart', 'Gap'), `${signe(p.ecart)} ${t('cran V', 'V grade')}`],
+                            [t('Écart', 'Gap'), `${signe(p.ecart)} ${t('cote V', 'V grade')}`],
                             [t('Matchs comptés', 'Counted matches'), nombre(p.matchs)],
                           ],
                         })
@@ -137,7 +137,7 @@ function EchelleDivergente() {
             key={e}
             className="pastille"
             style={{ background: couleurEcart(e), width: 22, height: 9, borderRadius: 2 }}
-            title={`${signe(e)} ${t('cran V', 'V grade')}`}
+            title={`${signe(e)} ${t('cote V', 'V grade')}`}
           />
         ))}
       </span>

@@ -166,11 +166,11 @@ export function VueBlocs({
       num: true,
       aide: simplifie
         ? t(
-            'Cote du bloc. Divisez par 1000 pour la lire en crans V : 4500 = V4,5.',
+            'Cote du bloc. Divisez par 1000 pour la lire en cotes V : 4500 = V4,5.',
             'The boulder\'s rating. Divide by 1000 to read it in V grades: 4500 = V4.5.'
           )
         : t(
-            `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 4500 = V4,5. ` +
+            `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en cotes V : 4500 = V4,5. ` +
               (c.formule.id === resultat.formuleId
                 ? "C'est la formule active : c'est elle qui donne la cotation calculée et l'écart."
                 : "Quand deux formules s'écartent nettement sur un bloc, c'est que ce bloc est mal connu."),
@@ -193,7 +193,7 @@ export function VueBlocs({
       titre: t('Écart', 'Gap'),
       num: true,
       aide: t(
-        "Cotation calculée moins cotation affichée, en crans V. Positif : le bloc résiste plus que son étiquette ne le laisse croire. Négatif : il est plus facile qu'annoncé.",
+        "Cotation calculée moins cotation affichée, en cotes V. Positif : le bloc résiste plus que son étiquette ne le laisse croire. Négatif : il est plus facile qu'annoncé.",
         'Calculated grade minus displayed grade, in V grades. Positive: the boulder resists more than its tag suggests. Negative: it is easier than announced.'
       ),
       valeur: (b) => b.ecart,
@@ -231,7 +231,7 @@ export function VueBlocs({
       titre: t('Duels utiles', 'Useful duels'),
       num: true,
       aide: t(
-        "Nombre de grimpeurs dont l'affrontement avec ce bloc a compté. Les issues jouées d'avance — un grimpeur deux crans en dessous qui échoue — sont exclues : elles n'apprennent rien.",
+        "Nombre de grimpeurs dont l'affrontement avec ce bloc a compté. Les issues jouées d'avance — un grimpeur deux cotes en dessous qui échoue — sont exclues : elles n'apprennent rien.",
         "Number of climbers whose matchup with this boulder counted. Foregone outcomes — a climber two grades below who fails — are excluded: they teach nothing."
       ),
       valeur: (b) => b.matchs,
@@ -252,7 +252,7 @@ export function VueBlocs({
       titre: t('Incertitude', 'Uncertainty'),
       num: true,
       aide: t(
-        "Écart-type de la cote, produit par Glicko. Comptez environ deux fois cette valeur pour la marge à 95 % : à plus ou moins 300, la cote est connue à un demi-cran près.",
+        "Écart-type de la cote, produit par Glicko. Comptez environ deux fois cette valeur pour la marge à 95 % : à plus ou moins 300, la cote est connue à une demi-cote près.",
         'Standard deviation of the rating, produced by Glicko. Count roughly twice this value for the 95% margin: at plus or minus 300, the rating is known to within half a grade.'
       ),
       valeur: (b) => incertitudeParBloc.get(b.id) ?? Number.NaN,
@@ -332,7 +332,7 @@ export function VueBlocs({
                   `out of ${nombre(audites.length)} ratable boulders, flagged by at least one of the ${nbFormules} formulas — ${nombre(confirmes.length)} of them by both`
                 )
               : t(
-                  `sur ${nombre(audites.length)} blocs exploitables — au moins ${nombre(SEUIL_DESACCORD, 2)} cran V d'écart`,
+                  `sur ${nombre(audites.length)} blocs exploitables — au moins ${nombre(SEUIL_DESACCORD, 2)} cote V d'écart`,
                   `out of ${nombre(audites.length)} ratable boulders — at least ${nombre(SEUIL_DESACCORD, 2)} V grade of gap`
                 )
           }
@@ -350,7 +350,7 @@ export function VueBlocs({
         <Tuile
           etiquette={t('Écart médian', 'Median gap')}
           valeur={nombre(ecartMedianAbs, 2)}
-          unite={t('cran V', 'V grade')}
+          unite={t('cote V', 'V grade')}
           note={t('en valeur absolue', 'absolute value')}
         />
       </div>
@@ -412,7 +412,7 @@ export function VueBlocs({
           )}
           actions={<BasculeVue tableau={tableauHisto} setTableau={setTableauHisto} />}
         >
-          {tableauHisto ? <TableauClasses ecarts={ecarts} /> : <Histogramme valeurs={ecarts} uniteX={t('cran V', 'V grade')} />}
+          {tableauHisto ? <TableauClasses ecarts={ecarts} /> : <Histogramme valeurs={ecarts} uniteX={t('cote V', 'V grade')} />}
           <p className="param-aide" style={{ marginTop: 8 }}>
             {t(
               'Un écart positif signifie que le bloc résiste davantage que ne le laisse croire sa cotation.',
@@ -472,7 +472,7 @@ function TableauClasses({ ecarts }: { ecarts: number[] }) {
       colonnes={[
         {
           cle: 'classe',
-          titre: t('Écart (crans V)', 'Gap (V grades)'),
+          titre: t('Écart (cotes V)', 'Gap (V grades)'),
           principal: true,
           valeur: (l) => l.debut,
           tri: (l) => l.debut,

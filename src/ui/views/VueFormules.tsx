@@ -99,10 +99,10 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
             </div>
           </Carte>
 
-          <Carte titre={t('Échelle obtenue', 'Resulting scale')} sousTitre={t('Ce que vaut un cran V, dans l\'unité du modèle.', 'What one V grade is worth, in the model\'s unit.')}>
+          <Carte titre={t('Échelle obtenue', 'Resulting scale')} sousTitre={t('Ce que vaut une cote V, dans l\'unité du modèle.', 'What one V grade is worth, in the model\'s unit.')}>
             <div className="grille tuiles">
               <Tuile
-                etiquette={t('Points par cran V', 'Points per V grade')}
+                etiquette={t('Points par cote V', 'Points per V grade')}
                 valeur={nombre(pointsParCran(resultat.calibrage))}
                 unite="pts"
                 note={resultat.calibrage.mode === 'auto' ? t('déduit des données', 'derived from the data') : t('fixé manuellement', 'set manually')}
@@ -118,7 +118,7 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
                   etiquette={t('Méthode', 'Method')}
                   valeur={t('Échelle fixe', 'Fixed scale')}
                   note={t(
-                    'Passer en mode régression pour voir combien de points séparent réellement deux crans dans vos données.',
+                    'Passer en mode régression pour voir combien de points séparent réellement deux cotes dans vos données.',
                     'Switch to regression mode to see how many points actually separate two grades in your data.'
                   )}
                 />
@@ -131,7 +131,7 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
               <Tuile
                 etiquette={t('Écart médian', 'Median gap')}
                 valeur={nombre(resultat.resume.ecartMedianAbs, 2)}
-                unite={t('cran V', 'V grade')}
+                unite={t('cote V', 'V grade')}
                 note={t('calcul contre cotation affichée', 'calculated vs. displayed grade')}
               />
             </div>
@@ -199,9 +199,9 @@ function Comparaison({ courant, reference }: { courant: Resultat; reference: { r
       )}
     >
       <div className="grille tuiles" style={{ marginBottom: 12 }}>
-        <Tuile etiquette={t('Déplacement moyen', 'Average shift')} valeur={nombre(deplacementMoyen, 2)} unite={t('cran V', 'V grade')} />
+        <Tuile etiquette={t('Déplacement moyen', 'Average shift')} valeur={nombre(deplacementMoyen, 2)} unite={t('cote V', 'V grade')} />
         <Tuile
-          etiquette={t("Blocs déplacés d'un cran ou plus", 'Boulders shifted a grade or more')}
+          etiquette={t("Blocs déplacés d'une cote ou plus", 'Boulders shifted a grade or more')}
           valeur={nombre(divergences.filter((d) => Math.abs(d.delta) >= 1).length)}
           note={t(`sur ${nombre(divergences.length)}`, `out of ${nombre(divergences.length)}`)}
         />

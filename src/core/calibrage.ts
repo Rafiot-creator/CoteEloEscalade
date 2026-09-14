@@ -18,11 +18,11 @@ export const PARAMS_CALIBRAGE: ParamSpec[] = [
     type: 'choix',
     defaut: 'ancre',
     options: [
-      { valeur: 'ancre', label: 'Échelle fixe (1000 points par cran V)', labelEn: 'Fixed scale (1000 points per V grade)' },
+      { valeur: 'ancre', label: 'Échelle fixe (1000 points par cote V)', labelEn: 'Fixed scale (1000 points per V grade)' },
       { valeur: 'auto', label: 'Régression sur les cotations affichées', labelEn: 'Regression on displayed grades' },
     ],
     aide:
-      "Échelle fixe : la conversion est celle de la convention maison, cote / 1000 = cran V. Régression : on cherche à la place l'échelle qui colle le mieux aux cotations affichées. Comparer les deux est instructif — si la régression trouve nettement moins de 1000 points par cran, c'est que les crans de la salle sont plus resserrés que la convention ne le suppose.",
+      "Échelle fixe : la conversion est celle de la convention maison, cote / 1000 = cote V. Régression : on cherche à la place l'échelle qui colle le mieux aux cotations affichées. Comparer les deux est instructif — si la régression trouve nettement moins de 1000 points par cote, c'est que les cotes de la salle sont plus resserrées que la convention ne le suppose.",
     aideEn:
       "Fixed scale: the conversion follows the house convention, rating / 1000 = V grade. Regression: instead, finds the scale that best fits the displayed grades. Comparing the two is instructive — if regression finds noticeably fewer than 1000 points per grade, this gym's grades are more tightly packed than the convention assumes.",
   },
@@ -63,7 +63,7 @@ export const PARAMS_CALIBRAGE: ParamSpec[] = [
   },
   {
     nom: 'ptsParCran',
-    label: 'Points par cran V',
+    label: 'Points par cote V',
     labelEn: 'Points per V grade',
     type: 'nombre',
     defaut: 1000,
@@ -71,7 +71,7 @@ export const PARAMS_CALIBRAGE: ParamSpec[] = [
     max: 3000,
     pas: 50,
     unite: 'pts',
-    aide: "Écart de cote entre deux crans V consécutifs. Sans effet en mode régression.",
+    aide: "Écart de cote entre deux cotes V consécutives. Sans effet en mode régression.",
     aideEn: 'Rating gap between two consecutive V grades. No effect in regression mode.',
   },
 ]
