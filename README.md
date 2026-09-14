@@ -706,6 +706,30 @@ que les données restent factices ; le jour où de vraies données personnelles 
 il faudra un vrai compte côté serveur (voir « Quand vous ajouterez une deuxième salle » et la
 note sur les données personnelles plus haut).
 
+## Site bilingue (français / anglais)
+
+Un bouton **FR/EN** dans l'en-tête bascule toute l'interface — titres, boutons, en-têtes de
+colonnes, jusqu'aux bulles d'aide détaillées de l'écran Formules — ainsi que le format des
+nombres et des dates (virgule française contre point anglais, « cote V » contre « V grade »).
+Comme le thème clair/sombre, ce choix n'est pas mémorisé : le site repart en français à
+chaque chargement.
+
+**Limite assumée** : les messages de contrôle de qualité des données (CSV mal formé,
+identifiant en double...), affichés dans l'écran Fichiers, restent en français uniquement.
+Ils sont générés loin dans le chargement des fichiers et n'apparaissent jamais sur le jeu de
+démonstration actuel (zéro anomalie) ; les traduire aurait demandé de faire transiter la
+langue jusque dans le cœur de calcul, pour un bénéfice nul aujourd'hui.
+
+L'implémentation vit dans `src/ui/langue.tsx` (contexte + hook `useLangue`, un simple
+`t(fr, en)` colocalisé avec chaque texte plutôt qu'un fichier de traductions centralisé) et
+`src/ui/format.ts` (nombres, pourcentages, dates sensibles à la langue courante). Les
+formules et le calibrage (`src/core/`) portent un champ optionnel `*En` à côté de chaque
+label ou aide français, lu par le petit helper `bilingue()`.
+
+**Note de vocabulaire** : l'interface dit désormais « cote V » là où elle disait « cran V »
+(un cran de la cotation V — voir plus bas). Ce document, lui, garde encore l'ancien terme
+dans ses explications ; à harmoniser si l'écart devient gênant.
+
 ## Plusieurs centres d'escalade (à venir)
 
 L'en-tête propose un menu déroulant pour choisir un centre — en plus du jeu de démonstration,
@@ -792,3 +816,12 @@ fait accompli.
   prévisualiser la vue visiteur sans perdre son déverrouillage.
 - Ajout du menu déroulant de centres d'escalade décrit plus haut (visuel seulement pour
   l'instant, aucun centre autre que la démo n'a de données).
+- Simplification de la vue visiteur : une seule colonne « Cote » (celle du mélange) au lieu
+  d'une colonne par formule, sur les écrans Blocs et Grimpeurs.
+- Correction des accents français dans toute l'interface (ils manquaient partout), et ajout
+  d'une version anglaise complète du site avec bascule FR/EN — voir « Site bilingue » plus
+  haut.
+- Correction de l'axe « voies » de l'histogramme des écarts, qui aurait dû dire « blocs »
+  depuis le pivot escalade de voies → bloc en salle (voir DECISIONS.md § 1).
+- Renommage du terme français « cran V » en « cote V » dans toute l'interface et les
+  définitions de formules (la version anglaise garde « V grade »).

@@ -49,10 +49,21 @@ Détail complet dans le README, section « Journal des sessions ». En résumé 
 - Menu déroulant de centres d'escalade ajouté dans l'en-tête (`src/App.tsx`) : Bloc Shop
   Chabanel/Hochelaga/Mile-End, Le Mouv', Rose Bloc 1/2, en plus de la démo. Purement visuel
   pour l'instant — aucun centre autre que la démo n'a de données, un message l'indique.
+- Vue visiteur simplifiée sur Blocs/Grimpeurs : une seule colonne « Cote » (mélange) au lieu
+  d'une par formule.
+- Accents français corrigés partout dans le site (ils manquaient depuis le début), et version
+  anglaise complète ajoutée avec bascule FR/EN (`src/ui/langue.tsx`, `src/ui/format.ts`) — voir
+  README § « Site bilingue ». Limite assumée : les messages de validation des données (écran
+  Fichiers) restent en français uniquement.
+- Corrections de vocabulaire : axe « voies » → « blocs » dans l'histogramme des écarts (reste
+  du pivot escalade de voies → bloc, cf. `DECISIONS.md` § 1) ; « cran V » → « cote V » en
+  français dans toute l'interface (l'anglais garde « V grade »). Le README, lui, garde encore
+  « cran V » dans ses explications — pas encore harmonisé.
 - Références au dépôt/URL de l'ami (EricPrieur) corrigées dans README et ici.
 
 ## Prochaine étape
 
-Rien de décidé pour la prochaine session — à définir avec Raphael. Pistes en attente,
-au choix : brancher de vraies données sur un des centres du menu, ou une des pistes ouvertes
-listées dans `DECISIONS.md` (§ 7).
+Rien de décidé pour la prochaine session — à définir avec Raphael. Pistes en attente, au
+choix : brancher de vraies données sur un des centres du menu, harmoniser le vocabulaire
+« cran V »/« cote V » dans le README, ou une des pistes ouvertes listées dans `DECISIONS.md`
+(§ 7).
