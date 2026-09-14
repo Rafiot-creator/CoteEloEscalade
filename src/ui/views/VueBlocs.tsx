@@ -16,10 +16,13 @@ import { nombre, pourcent, signe, telecharger } from '../format'
 export function VueBlocs({
   resultat,
   resultats,
+  simplifie = false,
 }: {
   resultat: Resultat
   /** Toutes les formules, pour afficher leurs cotes cote a cote. */
   resultats: Map<string, Resultat>
+  /** Vue visiteur : une seule colonne de cote (le melange), appelee simplement "Cote". */
+  simplifie?: boolean
 }) {
   const [gym, setGym] = useState('tous')
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
@@ -46,6 +49,9 @@ export function VueBlocs({
       parBloc: new Map((resultats.get(f.id)?.blocs ?? []).map((b) => [b.id, b])),
     })).filter((c) => c.parBloc.size > 0)
   }, [resultats])
+
+  // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
+  const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
 
   /**
    * Combien de formules signalent ce bloc ?
@@ -128,15 +134,16 @@ export function VueBlocs({
       tri: (b) => b.indexCalcule,
       aide: "La cotation deduite des reussites et des echecs par la formule active, sans regarder l'etiquette autrement que comme point de depart.",
     },
-    ...cotesParFormule.map((c) => ({
+    ...colonnesFormules.map((c) => ({
       cle: `cote-${c.formule.id}`,
-      titre: c.formule.labelCourt ?? c.formule.label,
+      titre: simplifie ? 'Cote' : c.formule.labelCourt ?? c.formule.label,
       num: true,
-      aide:
-        `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 4500 = V4,5. ` +
-        (c.formule.id === resultat.formuleId
-          ? "C'est la formule active : c'est elle qui donne la cotation calculee et l'ecart."
-          : "Quand deux formules s'ecartent nettement sur un bloc, c'est que ce bloc est mal connu."),
+      aide: simplifie
+        ? 'Cote du bloc. Divisez par 1000 pour la lire en crans V : 4500 = V4,5.'
+        : `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 4500 = V4,5. ` +
+          (c.formule.id === resultat.formuleId
+            ? "C'est la formule active : c'est elle qui donne la cotation calculee et l'ecart."
+            : "Quand deux formules s'ecartent nettement sur un bloc, c'est que ce bloc est mal connu."),
       valeur: (b: LigneBloc) => c.parBloc.get(b.id)?.rating ?? Number.NaN,
       rendu: (b: LigneBloc) => {
         const ligne = c.parBloc.get(b.id)
@@ -246,8 +253,8 @@ export function VueBlocs({
                   cotation_affichee: b.cotationOfficielle,
                   cotation_calculee: b.cotationCalculee,
                   ...Object.fromEntries(
-                    cotesParFormule.map((c) => [
-                      `cote_${c.formule.id.replace(/-/g, '_')}`,
+                    colonnesFormules.map((c) => [
+                      simplifie ? 'cote' : `cote_${c.formule.id.replace(/-/g, '_')}`,
                       Math.round(c.parBloc.get(b.id)?.rating ?? Number.NaN),
                     ])
                   ),

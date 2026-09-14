@@ -16,9 +16,12 @@ const MAX_SERIES = 4
 export function VueGrimpeurs({
   resultat,
   resultats,
+  simplifie = false,
 }: {
   resultat: Resultat
   resultats: Map<string, Resultat>
+  /** Vue visiteur : une seule colonne de cote (le melange), appelee simplement "Cote". */
+  simplifie?: boolean
 }) {
   // Les colonnes de salle n'ont d'interet que si la communaute en frequente
   // plusieurs : sur une salle unique elles repetent la meme valeur partout.
@@ -32,6 +35,9 @@ export function VueGrimpeurs({
       parGrimpeur: new Map((resultats.get(f.id)?.grimpeurs ?? []).map((g) => [g.id, g])),
     })).filter((c) => c.parGrimpeur.size > 0)
   }, [resultats])
+
+  // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
+  const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
 
   const classement = useMemo(
     () => [...resultat.grimpeurs].filter((g) => g.matchs > 0).sort((a, b) => b.rating - a.rating),
@@ -122,12 +128,13 @@ export function VueGrimpeurs({
       tri: (g) => g.indexNiveau,
       rendu: (g) => formaterIndex(g.indexNiveau),
     },
-    ...cotesParFormule.map((c) => ({
+    ...colonnesFormules.map((c) => ({
       cle: `cote-${c.formule.id}`,
-      titre: c.formule.labelCourt ?? c.formule.label,
+      titre: simplifie ? 'Cote' : c.formule.labelCourt ?? c.formule.label,
       num: true,
-      aide:
-        `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur cote 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
+      aide: simplifie
+        ? "Cote du grimpeur. Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur cote 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix."
+        : `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en crans V : 5300 = V5,3. Un grimpeur cote 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
       valeur: (g: LigneGrimpeur) => c.parGrimpeur.get(g.id)?.rating ?? Number.NaN,
       rendu: (g: LigneGrimpeur) => {
         const ligne = c.parGrimpeur.get(g.id)
