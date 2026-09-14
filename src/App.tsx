@@ -20,14 +20,16 @@ type OngletId = (typeof ONGLETS)[number]['id']
 export function App() {
   const atelier = useAtelier()
   const accesComplet = useAccesComplet()
-  const onglets = ONGLETS.filter((o) => accesComplet || !o.reserve)
+  const [apercuVisiteur, setApercuVisiteur] = useState(false)
+  const vueComplete = accesComplet && !apercuVisiteur
+  const onglets = ONGLETS.filter((o) => vueComplete || !o.reserve)
   const [onglet, setOnglet] = useState<OngletId>('blocs')
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
 
   useEffect(() => {
     const courant = ONGLETS.find((o) => o.id === onglet)
-    if (courant?.reserve && !accesComplet) setOnglet('blocs')
-  }, [accesComplet, onglet])
+    if (courant?.reserve && !vueComplete) setOnglet('blocs')
+  }, [vueComplete, onglet])
 
   useEffect(() => {
     const racine = document.documentElement
@@ -58,6 +60,14 @@ export function App() {
           >
             {theme === 'auto' ? 'Auto' : theme === 'clair' ? 'Clair' : 'Sombre'}
           </button>
+          {accesComplet && (
+            <button
+              title="Voir l'interface telle qu'un visiteur sans acces complet la voit, sans perdre ton deverrouillage"
+              onClick={() => setApercuVisiteur((v) => !v)}
+            >
+              {apercuVisiteur ? 'Vue visiteur' : 'Vue complete'}
+            </button>
+          )}
         </nav>
       </header>
 
