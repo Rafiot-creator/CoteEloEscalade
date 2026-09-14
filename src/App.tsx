@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useAccesComplet } from './ui/acces'
 import { useAtelier } from './ui/etat'
 import { VueDonnees } from './ui/views/VueDonnees'
 import { VueFichiers } from './ui/views/VueFichiers'
@@ -7,19 +8,26 @@ import { VueGrimpeurs } from './ui/views/VueGrimpeurs'
 import { VueBlocs } from './ui/views/VueBlocs'
 
 const ONGLETS = [
-  { id: 'blocs', label: 'Blocs' },
-  { id: 'grimpeurs', label: 'Grimpeurs' },
-  { id: 'formules', label: 'Formules' },
-  { id: 'donnees', label: 'Donnees' },
-  { id: 'fichiers', label: 'Fichiers' },
+  { id: 'blocs', label: 'Blocs', reserve: false },
+  { id: 'grimpeurs', label: 'Grimpeurs', reserve: false },
+  { id: 'formules', label: 'Formules', reserve: true },
+  { id: 'donnees', label: 'Donnees', reserve: true },
+  { id: 'fichiers', label: 'Fichiers', reserve: true },
 ] as const
 
 type OngletId = (typeof ONGLETS)[number]['id']
 
 export function App() {
   const atelier = useAtelier()
+  const accesComplet = useAccesComplet()
+  const onglets = ONGLETS.filter((o) => accesComplet || !o.reserve)
   const [onglet, setOnglet] = useState<OngletId>('blocs')
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
+
+  useEffect(() => {
+    const courant = ONGLETS.find((o) => o.id === onglet)
+    if (courant?.reserve && !accesComplet) setOnglet('blocs')
+  }, [accesComplet, onglet])
 
   useEffect(() => {
     const racine = document.documentElement
@@ -35,7 +43,7 @@ export function App() {
           <small>cotation des blocs calculee a partir des reussites et des echecs</small>
         </div>
         <nav className="nav">
-          {ONGLETS.map((o) => (
+          {onglets.map((o) => (
             <button
               key={o.id}
               aria-current={onglet === o.id ? 'page' : undefined}

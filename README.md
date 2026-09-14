@@ -723,13 +723,13 @@ fichiers. GitHub Pages suffit, et le dépôt contient déjà tout ce qu'il faut.
 
 **Les trois étapes à faire une seule fois :**
 
-Le dépôt est déjà branché sur <https://github.com/EricPrieur/CoteEloEscalade>. Il ne reste
-qu'une chose à faire une seule fois, dans l'interface GitHub : **Settings → Pages → Source :
-GitHub Actions**. Rien d'autre à régler.
+Ce dépôt est <https://github.com/Rafiot-creator/CoteEloEscalade>. Il ne reste qu'une chose à
+faire une seule fois, dans l'interface GitHub : **Settings → Pages → Source : GitHub Actions**.
+Rien d'autre à régler.
 
 Chaque poussée sur `main` déclenche alors le déploiement ; l'avancement se suit dans l'onglet
 **Actions**, et le site est servi sur
-<https://ericprieur.github.io/CoteEloEscalade/>.
+<https://rafiot-creator.github.io/CoteEloEscalade/>.
 
 Ensuite, publier une correction ou de nouvelles données revient à `git push` : le site se
 reconstruit tout seul.
