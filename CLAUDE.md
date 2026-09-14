@@ -18,8 +18,9 @@ rejetées). Ne pas ré-expliquer ce qui y est déjà écrit.**
 - Le README pointait par erreur vers le déploiement GitHub Pages de l'ami
   (`EricPrieur/CoteEloEscalade`) ; corrigé le 2026-09-14 pour pointer vers
   `Rafiot-creator/CoteEloEscalade` / `https://rafiot-creator.github.io/CoteEloEscalade/`.
-  Reste à vérifier si GitHub Pages est bien activé (Settings → Pages → Source : GitHub Actions)
-  sur ce dépôt-ci — pas fait automatiquement par une copie de fichiers.
+  GitHub Pages est bien activé sur ce dépôt (confirmé par Raphael le 2026-09-14) ; le
+  déploiement automatique (`.github/workflows/deploy.yml`) fonctionne, vérifié via l'API
+  GitHub Actions après chaque push de la session.
 
 ## Environnement (machine Windows de Raphael)
 
@@ -38,11 +39,20 @@ npm run build           # site statique dans dist/
 npm run data:generate   # régénère le jeu de données de démonstration
 ```
 
-## État au 2026-09-13
+## État au 2026-09-14
 
-Reprise du projet après une pause. Environnement remis en place et vérifié fonctionnel.
-Aucune tâche de code n'a encore été démarrée dans cette nouvelle série de sessions.
+Détail complet dans le README, section « Journal des sessions ». En résumé :
+
+- Accès à deux niveaux ajouté : visiteurs limités aux écrans Blocs/Grimpeurs par défaut,
+  accès complet (5 écrans) déverrouillé par une URL secrète mémorisée en `localStorage`
+  (`src/ui/acces.ts`), avec un bouton pour prévisualiser la vue visiteur sans se reverrouiller.
+- Menu déroulant de centres d'escalade ajouté dans l'en-tête (`src/App.tsx`) : Bloc Shop
+  Chabanel/Hochelaga/Mile-End, Le Mouv', Rose Bloc 1/2, en plus de la démo. Purement visuel
+  pour l'instant — aucun centre autre que la démo n'a de données, un message l'indique.
+- Références au dépôt/URL de l'ami (EricPrieur) corrigées dans README et ici.
 
 ## Prochaine étape
 
-À définir à la prochaine session — rien de spécifique décidé pour l'instant.
+Rien de décidé pour la prochaine session — à définir avec Raphael. Pistes en attente,
+au choix : brancher de vraies données sur un des centres du menu, ou une des pistes ouvertes
+listées dans `DECISIONS.md` (§ 7).
