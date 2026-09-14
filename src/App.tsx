@@ -17,6 +17,19 @@ const ONGLETS = [
 
 type OngletId = (typeof ONGLETS)[number]['id']
 
+// En ordre alphabetique par nom de centre ; le jeu de demonstration est a part.
+const CENTRES = [
+  { id: 'demo', label: 'Demo (jeu de test)' },
+  { id: 'bloc-shop-chabanel', label: 'Bloc Shop Chabanel' },
+  { id: 'bloc-shop-hochelaga', label: 'Bloc Shop Hochelaga' },
+  { id: 'bloc-shop-mile-end', label: 'Bloc Shop Mile-End' },
+  { id: 'le-mouv', label: "Le Mouv'" },
+  { id: 'rose-bloc-1', label: 'Rose Bloc 1' },
+  { id: 'rose-bloc-2', label: 'Rose Bloc 2' },
+] as const
+
+type CentreId = (typeof CENTRES)[number]['id']
+
 export function App() {
   const atelier = useAtelier()
   const accesComplet = useAccesComplet()
@@ -25,6 +38,8 @@ export function App() {
   const onglets = ONGLETS.filter((o) => vueComplete || !o.reserve)
   const [onglet, setOnglet] = useState<OngletId>('blocs')
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
+  const [centreId, setCentreId] = useState<CentreId>('demo')
+  const centre = CENTRES.find((c) => c.id === centreId) ?? CENTRES[0]
 
   useEffect(() => {
     const courant = ONGLETS.find((o) => o.id === onglet)
@@ -45,6 +60,17 @@ export function App() {
           <small>cotation des blocs calculee a partir des reussites et des echecs</small>
         </div>
         <nav className="nav">
+          <select
+            value={centreId}
+            onChange={(e) => setCentreId(e.currentTarget.value as CentreId)}
+            title="Centre d'escalade"
+          >
+            {CENTRES.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.label}
+              </option>
+            ))}
+          </select>
           {onglets.map((o) => (
             <button
               key={o.id}
@@ -72,7 +98,19 @@ export function App() {
       </header>
 
       <main className="contenu">
-        {atelier.erreur && (
+        {centre.id !== 'demo' && (
+          <div className="large">
+            <div className="carte">
+              <h2>Pas encore de donnees pour {centre.label}</h2>
+              <p className="sous-titre">
+                Ce centre n'a pas encore de jeu de donnees connecte. Choisissez « Demo (jeu de
+                test) » dans le menu pour voir le site fonctionner sur le jeu de demonstration.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {centre.id === 'demo' && atelier.erreur && (
           <div className="large">
             <div className="carte" style={{ borderColor: 'var(--critique)' }}>
               <h2>Le chargement a echoue</h2>
@@ -81,9 +119,9 @@ export function App() {
           </div>
         )}
 
-        {atelier.chargement && <p className="vide">Chargement des fichiers...</p>}
+        {centre.id === 'demo' && atelier.chargement && <p className="vide">Chargement des fichiers...</p>}
 
-        {atelier.dataset && atelier.resultat && (
+        {centre.id === 'demo' && atelier.dataset && atelier.resultat && (
           <>
             {onglet === 'blocs' && <VueBlocs resultat={atelier.resultat} resultats={atelier.resultats} />}
             {onglet === 'grimpeurs' && <VueGrimpeurs resultat={atelier.resultat} resultats={atelier.resultats} />}
