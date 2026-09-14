@@ -64,6 +64,7 @@ export function App() {
             value={centreId}
             onChange={(e) => setCentreId(e.currentTarget.value as CentreId)}
             title="Centre d'escalade"
+            style={{ width: 190 }}
           >
             {CENTRES.map((c) => (
               <option key={c.id} value={c.id}>
