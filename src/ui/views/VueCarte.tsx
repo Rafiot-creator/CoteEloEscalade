@@ -187,6 +187,11 @@ export function VueCarte({
           placeholder={t('votre nom', 'your name')}
           style={{ width: 220 }}
         />
+        {grimpeurChoisi && (
+          <button className="bouton discret" onClick={() => choisirGrimpeur('')}>
+            {t('Effacer', 'Clear')}
+          </button>
+        )}
         {grimpeurs && grimpeurs.length > 0 && (
           <datalist id="carte-grimpeurs-connus">
             {grimpeurs.map((nom) => (
