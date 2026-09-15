@@ -125,7 +125,12 @@ function Contenu() {
 
       <main className="contenu">
         {onglet === 'carte' && (
-          <VueCarte centreId={centreId} accesComplet={vueComplete} resultatMelange={atelier.resultats.get('melange')} />
+          <VueCarte
+            centreId={centreId}
+            accesComplet={vueComplete}
+            resultatMelange={atelier.resultats.get('melange')}
+            grimpeurs={centreId === 'demo' ? atelier.dataset?.grimpeurs.map((g) => g.nom) : undefined}
+          />
         )}
 
         {onglet !== 'carte' && centre.id !== 'demo' && (

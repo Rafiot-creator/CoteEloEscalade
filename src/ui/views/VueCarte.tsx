@@ -7,7 +7,7 @@ import { useInfobulle } from '../charts/base'
 import { Carte, Tuile } from '../components/base'
 import { nombre, telecharger } from '../format'
 import { useLangue } from '../langue'
-import { suiviLocal } from '../suivi'
+import { definirGrimpeurChoisi, lireGrimpeurChoisi, suiviLocal } from '../suivi'
 
 /**
  * Couleur des prises, du mauve au rouge (ordre du spectre visible), puis
@@ -52,6 +52,7 @@ export function VueCarte({
   centreId,
   accesComplet,
   resultatMelange,
+  grimpeurs,
 }: {
   centreId: string
   accesComplet: boolean
@@ -62,10 +63,13 @@ export function VueCarte({
    * affichee, comme aujourd'hui.
    */
   resultatMelange?: Resultat | null
+  /** Noms suggeres pour "quel grimpeur ?" (roster connu, ex. le centre demo). */
+  grimpeurs?: string[]
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
   const [selection, setSelection] = useState<string | null>(null)
+  const [grimpeurChoisi, setGrimpeurChoisi] = useState('')
   const [suivi, setSuivi] = useState<Record<string, boolean>>({})
   const zoneRef = useRef<HTMLDivElement>(null)
   const editionRef = useRef<HTMLDivElement>(null)
@@ -85,11 +89,19 @@ export function VueCarte({
     chargerCarte(centreId).then((c) => {
       if (vivant) setCarte(c)
     })
-    setSuivi(suiviLocal.lire(centreId))
+    const nom = lireGrimpeurChoisi(centreId)
+    setGrimpeurChoisi(nom)
+    setSuivi(suiviLocal.lire(centreId, nom))
     return () => {
       vivant = false
     }
   }, [centreId])
+
+  const choisirGrimpeur = (nom: string) => {
+    setGrimpeurChoisi(nom)
+    definirGrimpeurChoisi(centreId, nom)
+    setSuivi(suiviLocal.lire(centreId, nom))
+  }
 
   const blocSelectionne = useMemo(
     () => carte?.blocs.find((b) => b.id === selection) ?? null,
@@ -131,7 +143,7 @@ export function VueCarte({
 
   const basculerEnvoye = (id: string) => {
     const valeur = !suivi[id]
-    suiviLocal.definir(centreId, id, valeur)
+    suiviLocal.definir(centreId, grimpeurChoisi, id, valeur)
     setSuivi({ ...suivi, [id]: valeur })
   }
 
@@ -162,11 +174,37 @@ export function VueCarte({
 
   return (
     <div className="large">
+      <div className="barre-outils" style={{ marginBottom: 12 }}>
+        <label htmlFor="carte-grimpeur" className="discret" style={{ fontSize: 13 }}>
+          {t('Carte de :', "Map for:")}
+        </label>
+        <input
+          id="carte-grimpeur"
+          type="text"
+          list="carte-grimpeurs-connus"
+          value={grimpeurChoisi}
+          onChange={(e) => choisirGrimpeur(e.currentTarget.value)}
+          placeholder={t('votre nom', 'your name')}
+          style={{ width: 220 }}
+        />
+        {grimpeurs && grimpeurs.length > 0 && (
+          <datalist id="carte-grimpeurs-connus">
+            {grimpeurs.map((nom) => (
+              <option key={nom} value={nom} />
+            ))}
+          </datalist>
+        )}
+      </div>
+
       <div className="grille tuiles">
         <Tuile etiquette={t('Blocs sur la carte', 'Boulders on the map')} valeur={String(carte.blocs.length)} />
-        {!accesComplet && carte.blocs.length > 0 && (
+        {carte.blocs.length > 0 && (
           <Tuile
-            etiquette={t('Envoyés par vous', 'Sent by you')}
+            etiquette={
+              grimpeurChoisi
+                ? t(`Envoyés par ${grimpeurChoisi}`, `Sent by ${grimpeurChoisi}`)
+                : t('Envoyés', 'Sent')
+            }
             valeur={String(envoyes)}
             note={t('sur cet appareil', 'on this device')}
           />
