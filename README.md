@@ -746,7 +746,12 @@ clair ou foncé choisi pour rester lisible sur chaque fond.
 
 **Taille des pastilles.** Leur rayon (`RAYON` dans `VueCarte.tsx`) suit la largeur réelle de la
 carte selon une échelle continue plutôt qu'un seuil fixe : `RAYON = largeur × 1,8 %`, borné
-entre 8 et 20 px. La raison de l'échelle continue plutôt qu'un simple « plus petit sous X px » :
+entre 5 et 20 px (le plancher était à 8 avant un deuxième retour de Raphaël sur téléphone —
+8 px annulait justement l'échelle proportionnelle sur les cartes les plus étroites, la où elle
+compte le plus ; le seul repère fiable reste l'essai réel sur l'appareil, pas une valeur choisie
+au jugé). La police de la cotation affichée garde son propre plancher (7 px), indépendant de
+`RAYON`, pour rester lisible même à 5. La raison de l'échelle continue plutôt qu'un simple
+« plus petit sous X px » :
 les positions des blocs (`x`/`y`, des fractions 0–1 de la largeur de la carte) rétrécissent
 avec la carte, donc l'espacement entre pastilles rétrécit dans la même proportion — un rayon
 qui ne baisse pas dans cette même proportion reste relativement trop gros (et donc chevauche
@@ -837,9 +842,12 @@ entre les trois). Deux conditions doivent être réunies pour que ça marche :
   insensible à la casse et aux espaces).
 
 Si l'une des deux manque, les trois boutons restent visibles mais désactivés (grisés), avec un
-titre expliquant pourquoi. C'est délibéré : on ne veut pas qu'un envoi tapé sous un nom inventé
-se retrouve silencieusement associé à personne, ni qu'un centre sans données se mette à
-halluciner un classement.
+titre expliquant pourquoi — et, depuis le retour de Raphaël comme quoi ça semblait ne « rien
+faire » au tap, la même explication redite en texte visible sous les boutons
+(`.carte-popup-raison`) : un `title` ne s'affiche jamais au toucher (pas de survol sur tactile),
+un bouton grisé qu'on ne remarque pas comme tel semble alors juste ignorer le tap. C'est
+délibéré : on ne veut pas qu'un envoi tapé sous un nom inventé se retrouve silencieusement
+associé à personne, ni qu'un centre sans données se mette à halluciner un classement.
 
 Ces ascensions ajoutées sont persistées dans `localStorage` (`src/ui/ascensionsLocales.ts`,
 même principe que `suiviLocal` — une interface `AscensionLocaleProvider` en vue d'un futur
@@ -1103,3 +1111,19 @@ fait accompli.
     `matchMedia('(hover: hover)')` est vrai ; sur tactile, seul le clic pilote l'affichage. Ajout
     de `touch-action: manipulation` sur la pastille et les boutons du popup en prévention d'un
     délai/double-tap de zoom. Voir « Sur écran tactile, pas de survol du tout ».
+- Troisième retour de Raphaël, toujours sur téléphone : encore trop gros, et les boutons
+  répondent visuellement (l'appui se voit) mais sans effet sur le statut affiché. Deux
+  correctifs distincts :
+  - le plancher de `RAYON` (8 px) était plus haut que ce que l'échelle proportionnelle demandait
+    déjà sur une carte de téléphone (~5–6 px), donc c'est le plancher — pas le ratio — qui
+    gardait les pastilles trop grosses là où ça comptait. Abaissé à 5. Voir « Taille des
+    pastilles ».
+  - pour l'absence d'effet : `title` (l'explication d'un bouton désactivé) ne s'affiche jamais
+    au toucher, donc un bouton grisé qu'on ne remarque pas comme tel semblait simplement ignorer
+    le tap. Ajouté le même texte en visible sous les boutons quand ils sont désactivés — voir
+    « Enregistrer un envoi comme une vraie ascension ». Autre explication possible pour un bouton
+    bel et bien actif : cliquer un bouton qui n'améliore pas le meilleur statut déjà retenu (par
+    ex. échec sur un bloc déjà flashé dans le fichier) ne change rien à l'affichage, c'est le
+    comportement voulu (cf. « un envoi déjà confirmé par le fichier n'est pas “effaçable” »
+    plus haut) mais ça peut se confondre avec un bug si on ne teste que sur des blocs déjà
+    envoyés.

@@ -120,8 +120,12 @@ export function VueCarte({
   // entre pastilles retrecit dans la meme proportion. Un simple "plus petit
   // sous 420px" gardait des pastilles proportionnellement plus grosses (donc
   // plus serrees) que sur bureau. 20px a ~1150px de large (repere bureau) ->
-  // ~1,7 % de la largeur ; on garde ce ratio, borne pour rester utilisable.
-  const RAYON = Math.round(Math.max(8, Math.min(20, largeurCarte * 0.018)))
+  // ~1,8 % de la largeur ; on garde ce ratio. Plancher a 5 (pas 8, retour de
+  // Raphael sur telephone : un plancher trop haut annule l'echelle
+  // proportionnelle justement sur les cartes les plus etroites, la ou elle
+  // compte le plus) — la legende (V-grade) reste lisible via son propre
+  // minimum de police, decouple de RAYON.
+  const RAYON = Math.round(Math.max(5, Math.min(20, largeurCarte * 0.018)))
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -511,6 +515,12 @@ export function VueCarte({
                           ✕
                         </button>
                       </div>
+                      {!actionsActives && (
+                        // `title` ne s'affiche jamais au toucher (pas de survol sur
+                        // tactile) : sans ce texte visible, les boutons desactives
+                        // semblent juste ne pas repondre au tap.
+                        <p className="carte-popup-raison">{raisonInactif}</p>
+                      )}
                     </div>
                     )
                   })()}

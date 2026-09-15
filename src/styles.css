@@ -382,6 +382,7 @@ table.donnees td.principal { font-weight: 500; }
 .carte-popup-actions button.echec { background: var(--critique); }
 .carte-popup-actions button:not(:disabled):hover { filter: brightness(1.1); }
 .carte-popup-actions button:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(50%); }
+.carte-popup-raison { margin: 6px 0 0; font-size: 11px; color: var(--encre-3); }
 
 svg text { font-family: var(--sans); }
 .axe-texte { fill: var(--encre-3); font-size: 10.5px; }
