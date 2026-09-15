@@ -19,6 +19,8 @@ export interface AscensionLocaleProvider {
   id: string
   lire(): Ascension[]
   ajouter(ascension: Ascension): void
+  /** Remplace la liste entiere : sert a annuler un envoi mal clique. */
+  ecrire(ascensions: Ascension[]): void
 }
 
 const CLE = 'cee-ascensions-locales'
@@ -36,11 +38,14 @@ export const ascensionsLocales: AscensionLocaleProvider = {
   ajouter(ascension) {
     const actuel = ascensionsLocales.lire()
     actuel.push(ascension)
+    ascensionsLocales.ecrire(actuel)
+  },
+  ecrire(ascensions) {
     try {
-      localStorage.setItem(CLE, JSON.stringify(actuel))
+      localStorage.setItem(CLE, JSON.stringify(ascensions))
     } catch {
-      // Navigation privee ou stockage plein : l'ajout ne persiste pas au-dela
-      // de cette visite, ce qui est un echec sans consequence.
+      // Navigation privee ou stockage plein : l'ecriture ne persiste pas
+      // au-dela de cette visite, ce qui est un echec sans consequence.
     }
   },
 }

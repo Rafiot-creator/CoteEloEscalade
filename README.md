@@ -770,14 +770,26 @@ d'accès.
 Le popup s'ouvre (`setSurvole(id)`), il ne bascule pas : un clic suit presque toujours un
 survol qui a déjà ouvert le même popup, un bascule le refermerait aussitôt.
 
-**Le popup ne se ferme pas en quittant la pastille au survol.** Entre la pastille (un cercle
-de 40 px) et le popup (décalé de quelques pixels pour ne pas le recouvrir) se trouve une bande
-de fond de carte qui n'appartient ni à l'un ni à l'autre : la traverser en ligne droite pour
-atteindre les boutons faisait perdre le survol et refermait le popup avant d'avoir pu cliquer
-— exactement le bug que Raphaël a signalé (« les boutons disparaissent dès que la souris
-quitte la pastille »). Il n'y a donc pas de gestionnaire `onMouseLeave` sur le bloc : le popup
-reste ouvert jusqu'à survoler un autre bloc (qui prend sa place) ou cliquer le fond de la
-carte.
+**Le popup se ferme en quittant la pastille _et_ le popup, pas avant.** La pastille (un
+cercle) et le popup portent chacun un `onMouseEnter`/`onMouseLeave` qui pilote `survole` ; le
+popup doit donc rester un survol continu de l'un des deux pour ne pas se fermer. Le piège :
+si le popup est décalé de quelques pixels de la pastille pour ne pas la recouvrir, la bande de
+fond de carte entre les deux n'appartient ni à l'un ni à l'autre, et la traverser (même en
+ligne droite, pire en diagonale vers des boutons plus bas que la pastille) fait perdre le
+survol un instant — assez pour fermer le popup avant d'avoir pu cliquer. Fix : le popup est
+collé contre la pastille, sans écart (`left: ancreX + RAYON - 2`, un chevauchement de 2 px
+plutôt qu'un écart, contre les arrondis de sous-pixel) et partage le même point haut
+(`ancreY - RAYON`) — dès que le curseur dépasse le bord de la pastille, il est dans le popup,
+quel que soit `y` tant qu'il reste dans sa hauteur, donc jamais dans un angle mort en diagonale.
+
+Ce dernier point a fait l'objet d'un aller-retour : un premier correctif avait simplement
+retiré `onMouseLeave` (le popup ne se refermait alors plus jamais tout seul), ce qui cachait le
+vrai problème (l'écart) sans le résoudre, et créait le défaut inverse signalé ensuite par
+Raphaël — un popup qui reste ouvert indéfiniment tant qu'on ne clique pas ailleurs. Un « pont »
+invisible entre pastille et popup a aussi été essayé et abandonné : limité à la hauteur de la
+pastille, il laissait un angle mort en diagonale vers les boutons (plus bas), et sur une carte
+dense il pouvait chevaucher une pastille voisine et lui voler le survol. Coller les deux
+directement règle les deux problèmes sans configuration supplémentaire.
 
 ### Enregistrer un envoi comme une vraie ascension
 
@@ -813,6 +825,17 @@ ou raté un bloc le voit donc annoté dès l'arrivée sur la Carte, sans avoir �
 que ce soit. L'ancien suivi `localStorage` (`suivi.ts`) reste utilisé en complément uniquement
 pour les cas non connectés (nom non reconnu, centre sans dataset) — un repère purement visuel,
 comme avant, qui ne distingue pas flash/réussi/échec.
+
+**Corriger un clic.** Un mauvais bouton cliqué par erreur (ou un vrai changement — un
+grimpeur qui rate, puis revient plus tard et flashe le même bloc) ne doit pas rester coincé.
+Sous les trois boutons, un lien « Annuler mon dernier envoi (…) » apparaît dès qu'il existe un
+envoi ajouté *depuis la Carte* pour ce couple bloc/grimpeur (`Atelier.envoiLocalActuel`) ; le
+cliquer retire cet envoi (`Atelier.annulerDernierEnvoi`) et rien d'autre. Ça ne touche jamais
+aux ascensions du fichier CSV, immuables : seuls les envois tapés sur la Carte peuvent être
+annulés, un par un, en partant du plus récent pour ce bloc. Un vrai changement dans le temps
+(échec puis flash, par exemple) n'a lui besoin d'aucune annulation : `envoisConnus` retient
+déjà le meilleur statut sur l'ensemble des ascensions, donc cliquer le bon bouton la fois
+suivante suffit à corriger l'affichage.
 
 ### Cartes disponibles aujourd'hui
 
@@ -997,3 +1020,17 @@ fait accompli.
   jamais avec un déplacement continu, donc jamais repéré. Retiré `onMouseLeave` : le popup
   reste ouvert jusqu'à survoler un autre bloc ou cliquer le fond de la carte. Revérifié cette
   fois avec un déplacement de souris en plusieurs étapes, dans les deux vues.
+- Correction du correctif précédent, sur retour de Raphaël : retirer `onMouseLeave` empêchait
+  le popup de se fermer même en quittant complètement pastille et popup. Cause racine enfin
+  réglée : l'écart entre pastille et popup, pas `onMouseLeave` lui-même. Le popup est
+  maintenant collé contre la pastille (`onMouseLeave` restauré) — voir « Pastilles, survol et
+  popup » pour le detail et les deux approches essayées avant (pont invisible, suppression du
+  `onMouseLeave`) et pourquoi elles ne suffisaient pas. Testé avec un déplacement en diagonale
+  vers les boutons (le cas qui avait fait échouer le tout premier correctif) : le popup reste
+  ouvert jusqu'aux boutons, et se ferme bien en s'éloignant complètement.
+- Ajout d'un lien « Annuler mon dernier envoi » sous les boutons flash/réussi/échec, visible
+  dès qu'il y a un envoi ajouté depuis la Carte pour ce bloc/grimpeur
+  (`Atelier.envoiLocalActuel` / `annulerDernierEnvoi`, § « Enregistrer un envoi comme une vraie
+  ascension », sous-section « Corriger un clic ») : corrige un clic malencontreux sans toucher
+  aux ascensions du fichier CSV. Un vrai changement de statut dans le temps (échec puis flash)
+  n'a pas besoin de cette annulation, `envoisConnus` retenant déjà le meilleur statut connu.

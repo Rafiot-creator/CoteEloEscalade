@@ -49,6 +49,19 @@ export interface Atelier {
    * echec), et un flash l'emporte sur une reussite en plusieurs essais.
    */
   envoisConnus: (grimpeurNom: string) => Map<string, StatutEnvoi>
+  /**
+   * Le type du dernier envoi ajoute *depuis la Carte* (pas du fichier) pour
+   * ce couple bloc/grimpeur, ou `null` s'il n'y en a pas — sert a savoir si
+   * `annulerDernierEnvoi` a quelque chose a annuler.
+   */
+  envoiLocalActuel: (blocId: string, grimpeurNom: string) => TypeEnvoi | null
+  /**
+   * Retire le dernier envoi ajoute depuis la Carte pour ce couple
+   * bloc/grimpeur (pas les ascensions du fichier, immuables) : corrige un
+   * clic malencontreux sans toucher a l'historique reel. Renvoie `false`
+   * s'il n'y avait rien a annuler.
+   */
+  annulerDernierEnvoi: (blocId: string, grimpeurNom: string) => boolean
 
   formules: Formule[]
   formule: Formule
@@ -135,6 +148,48 @@ export function useAtelier(): Atelier {
     [datasetBase]
   )
 
+  const trouverGrimpeur = useCallback(
+    (grimpeurNom: string) => {
+      const nom = grimpeurNom.trim().toLowerCase()
+      return nom ? datasetBase?.grimpeurs.find((g) => g.nom.trim().toLowerCase() === nom) : undefined
+    },
+    [datasetBase]
+  )
+
+  const dernierIndexLocal = (grimpeurId: string, blocId: string): number => {
+    for (let i = ascensionsAjoutees.length - 1; i >= 0; i--) {
+      const a = ascensionsAjoutees[i]
+      if (a.grimpeurId === grimpeurId && a.blocId === blocId) return i
+    }
+    return -1
+  }
+
+  const envoiLocalActuel = useCallback(
+    (blocId: string, grimpeurNom: string): TypeEnvoi | null => {
+      const grimpeur = trouverGrimpeur(grimpeurNom)
+      if (!grimpeur) return null
+      const idx = dernierIndexLocal(grimpeur.id, blocId)
+      if (idx === -1) return null
+      const a = ascensionsAjoutees[idx]
+      return a.resultat === 'echec' ? 'echec' : a.essais === 1 ? 'flash' : 'reussi'
+    },
+    [ascensionsAjoutees, trouverGrimpeur]
+  )
+
+  const annulerDernierEnvoi = useCallback(
+    (blocId: string, grimpeurNom: string): boolean => {
+      const grimpeur = trouverGrimpeur(grimpeurNom)
+      if (!grimpeur) return false
+      const idx = dernierIndexLocal(grimpeur.id, blocId)
+      if (idx === -1) return false
+      const suivant = [...ascensionsAjoutees.slice(0, idx), ...ascensionsAjoutees.slice(idx + 1)]
+      ascensionsLocales.ecrire(suivant)
+      setAscensionsAjoutees(suivant)
+      return true
+    },
+    [ascensionsAjoutees, trouverGrimpeur]
+  )
+
   const envoisConnus = useCallback(
     (grimpeurNom: string): Map<string, StatutEnvoi> => {
       const nom = grimpeurNom.trim().toLowerCase()
@@ -197,6 +252,8 @@ export function useAtelier(): Atelier {
     erreur,
     enregistrerAscension,
     envoisConnus,
+    envoiLocalActuel,
+    annulerDernierEnvoi,
     formules: FORMULES,
     formule,
     choisirFormule: setFormuleId,

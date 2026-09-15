@@ -55,6 +55,8 @@ export function VueCarte({
   grimpeurs,
   enregistrerAscension,
   envoisConnus,
+  envoiLocalActuel,
+  annulerDernierEnvoi,
 }: {
   centreId: string
   accesComplet: boolean
@@ -75,6 +77,10 @@ export function VueCarte({
   enregistrerAscension?: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
   /** Blocs deja envoyes par un grimpeur nomme, d'apres l'ensemble du dataset. */
   envoisConnus?: (grimpeurNom: string) => Map<string, StatutEnvoi>
+  /** Type du dernier envoi ajoute depuis la Carte pour ce bloc/grimpeur, s'il y en a un a annuler. */
+  envoiLocalActuel?: (blocId: string, grimpeurNom: string) => TypeEnvoi | null
+  /** Retire ce dernier envoi ajoute depuis la Carte (pas les ascensions du fichier). */
+  annulerDernierEnvoi?: (blocId: string, grimpeurNom: string) => boolean
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
@@ -331,6 +337,7 @@ export function VueCarte({
             return carte.blocs.map((b) => {
               const statut = envoisReels.get(b.id)
               const fait = statut === 'flash' || statut === 'reussi' || !!suivi[b.id]
+              const envoiLocal = envoiLocalActuel?.(b.id, grimpeurChoisi) ?? null
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
               const ancreX = (zoneRect?.left ?? 0) + b.x * (zoneRect?.width ?? 0)
@@ -340,6 +347,7 @@ export function VueCarte({
                   key={b.id}
                   style={{ position: 'absolute', left: `${b.x * 100}%`, top: `${b.y * 100}%` }}
                   onMouseEnter={() => setSurvole(b.id)}
+                  onMouseLeave={() => setSurvole((s) => (s === b.id ? null : s))}
                 >
                   <div
                     onMouseDown={debuterGlisse(b.id)}
@@ -388,14 +396,27 @@ export function VueCarte({
                     )}
                   </div>
 
-                  {survole === b.id && (
+                  {survole === b.id && (() => {
+                    // Colle le popup contre la pastille (aucun ecart, meme un
+                    // leger chevauchement) plutot que de le decaler de
+                    // quelques pixels : le moindre ecart cree une zone de fond
+                    // de carte qui n'appartient ni a l'un ni a l'autre, et la
+                    // traverser en diagonale pour atteindre les boutons (plus
+                    // bas que la pastille) fermerait le popup avant d'y
+                    // arriver, meme avec un pont limite a la hauteur de la
+                    // pastille. Popup et pastille partagent le meme point haut
+                    // (`ancreY - RAYON`) : des que x depasse le bord de la
+                    // pastille, on est dans le popup, quel que soit y tant
+                    // qu'on reste dans sa hauteur.
+                    const popupLeft = Math.min(ancreX + RAYON - 2, window.innerWidth - 200)
+                    return (
                     // `position: fixed` (plutot que relatif a la carte) pour echapper
                     // au `overflow: hidden` de la zone de carte : sinon un bloc pres
                     // d'un bord afficherait un popup coupe.
                     <div
                       className="carte-popup"
                       style={{
-                        left: Math.min(ancreX + RAYON + 8, window.innerWidth - 200),
+                        left: popupLeft,
                         top: Math.max(8, ancreY - RAYON),
                       }}
                     >
@@ -459,8 +480,23 @@ export function VueCarte({
                           ✕
                         </button>
                       </div>
+                      {envoiLocal && (
+                        <button
+                          className="bouton discret carte-popup-annuler"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            annulerDernierEnvoi?.(b.id, grimpeurChoisi)
+                          }}
+                        >
+                          {t(
+                            `Annuler mon dernier envoi (${envoiLocal === 'flash' ? 'flash' : envoiLocal === 'reussi' ? 'réussi' : 'échec'})`,
+                            `Undo my last log (${envoiLocal === 'flash' ? 'flash' : envoiLocal === 'reussi' ? 'sent' : 'fail'})`
+                          )}
+                        </button>
+                      )}
                     </div>
-                  )}
+                    )
+                  })()}
                 </div>
               )
             })
