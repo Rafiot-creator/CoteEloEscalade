@@ -14,25 +14,32 @@ import { suiviLocal } from '../suivi'
  * noir et blanc ajoutes aux extremes. C'est la couleur reelle choisie par
  * l'ouvreur — elle ne depend pas de la cotation.
  *
- * Teintes fluo plutot que la palette "data" du site (trop sourde pour des
- * prises d'escalade) : des couleurs fixes, independantes du theme clair/
- * sombre, puisqu'il s'agit d'un attribut physique du bloc. Le vert et le
- * jaune fluo sont trop clairs pour du texte blanc lisible : leur cotation
- * passe en noir, comme sur fond blanc.
+ * Tons "metal" (amethyste, acier, emeraude, or, cuivre, rubis, gunmetal,
+ * argent) plutot que des teintes plates : un reflet lustre commun
+ * (BRILLANT) se superpose a la couleur de base de chaque pastille pour
+ * l'effet lisse. Couleurs fixes, independantes du theme clair/sombre,
+ * puisqu'il s'agit d'un attribut physique du bloc.
  */
+const BRILLANT = 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.75), rgba(255,255,255,0) 58%)'
+
 const PALETTE_COULEURS = [
-  { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#9d00ff', texte: '#fff' },
-  { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: '#0080ff', texte: '#fff' },
-  { id: 'vert', fr: 'Vert', en: 'Green', fond: '#00e676', texte: '#111' },
-  { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#eaff00', texte: '#111' },
-  { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#ff5500', texte: '#fff' },
-  { id: 'rouge', fr: 'Rouge', en: 'Red', fond: '#ff1744', texte: '#fff' },
-  { id: 'noir', fr: 'Noir', en: 'Black', fond: '#18181b', texte: '#fff' },
-  { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#f5f5f2', texte: '#111' },
+  { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#6a3093', texte: '#fff' },
+  { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: '#1f4e8c', texte: '#fff' },
+  { id: 'vert', fr: 'Vert', en: 'Green', fond: '#197850', texte: '#fff' },
+  { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#b8860b', texte: '#fff' },
+  { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#a15c2e', texte: '#fff' },
+  { id: 'rouge', fr: 'Rouge', en: 'Red', fond: '#8c1c24', texte: '#fff' },
+  { id: 'noir', fr: 'Noir', en: 'Black', fond: '#2b2b2f', texte: '#fff' },
+  { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#c9c9c9', texte: '#111' },
 ] as const
 
 function infoCouleur(id: string) {
   return PALETTE_COULEURS.find((c) => c.id === id) ?? PALETTE_COULEURS[1]
+}
+
+/** Couleur de base + reflet lustre, pour un rendu "metal" plutot que plat. */
+function fondMetal(id: string): string {
+  return `${BRILLANT}, ${infoCouleur(id).fond}`
 }
 
 function nouvelId(): string {
@@ -244,8 +251,8 @@ export function VueCarte({
                   marginLeft: -RAYON,
                   marginTop: -RAYON,
                   borderRadius: '50%',
-                  background: couleur.fond,
-                  boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35)`,
+                  background: fondMetal(b.couleur),
+                  boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -315,12 +322,13 @@ export function VueCarte({
                     borderRadius: '50%',
                     border: 'none',
                     padding: 0,
-                    background: c.fond,
+                    background: fondMetal(c.id),
                     cursor: 'pointer',
                     boxShadow:
-                      blocSelectionne.couleur === c.id
-                        ? '0 0 0 2px var(--encre), 0 0 0 4px var(--surface)'
-                        : '0 0 0 2px var(--bord-fort)',
+                      (blocSelectionne.couleur === c.id
+                        ? '0 0 0 2px var(--encre), 0 0 0 4px var(--surface), '
+                        : '0 0 0 2px var(--bord-fort), ') +
+                      'inset -2px -2px 4px rgba(0,0,0,0.4), inset 1px 1px 3px rgba(255,255,255,0.35)',
                   }}
                 />
               ))}
