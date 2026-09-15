@@ -1,0 +1,2957 @@
+{
+  "fond": "cartes/demo.svg",
+  "blocs": [
+    {
+      "id": "b0002",
+      "x": 0.0463,
+      "y": 0.0426,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0004",
+      "x": 0.0779,
+      "y": 0.8267,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0005",
+      "x": 0.0743,
+      "y": 0.8721,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0006",
+      "x": 0.9638,
+      "y": 0.7628,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0010",
+      "x": 0.2446,
+      "y": 0.1209,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0012",
+      "x": 0.0877,
+      "y": 0.8231,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0013",
+      "x": 0.4319,
+      "y": 0.8995,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0016",
+      "x": 0.8158,
+      "y": 0.0945,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Toit"
+    },
+    {
+      "id": "b0020",
+      "x": 0.0599,
+      "y": 0.7301,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Competition"
+    },
+    {
+      "id": "b0021",
+      "x": 0.1399,
+      "y": 0.948,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0022",
+      "x": 0.9249,
+      "y": 0.8936,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Arete"
+    },
+    {
+      "id": "b0026",
+      "x": 0.4678,
+      "y": 0.1363,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0030",
+      "x": 0.9563,
+      "y": 0.9636,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0032",
+      "x": 0.5892,
+      "y": 0.1306,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Toit"
+    },
+    {
+      "id": "b0033",
+      "x": 0.8637,
+      "y": 0.9278,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0034",
+      "x": 0.4109,
+      "y": 0.0869,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0044",
+      "x": 0.0715,
+      "y": 0.6123,
+      "cotation": "V6",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0045",
+      "x": 0.3357,
+      "y": 0.9336,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0046",
+      "x": 0.9087,
+      "y": 0.8426,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0047",
+      "x": 0.03,
+      "y": 0.1135,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Prow"
+    },
+    {
+      "id": "b0048",
+      "x": 0.9674,
+      "y": 0.0725,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0051",
+      "x": 0.5304,
+      "y": 0.9238,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0052",
+      "x": 0.3964,
+      "y": 0.1029,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0053",
+      "x": 0.9396,
+      "y": 0.4109,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0054",
+      "x": 0.0768,
+      "y": 0.7714,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0055",
+      "x": 0.2112,
+      "y": 0.8632,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0056",
+      "x": 0.9389,
+      "y": 0.792,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0057",
+      "x": 0.0339,
+      "y": 0.4508,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0058",
+      "x": 0.7172,
+      "y": 0.119,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0059",
+      "x": 0.8712,
+      "y": 0.9441,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0060",
+      "x": 0.4376,
+      "y": 0.0476,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0061",
+      "x": 0.922,
+      "y": 0.1185,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0062",
+      "x": 0.0939,
+      "y": 0.5488,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0063",
+      "x": 0.2969,
+      "y": 0.9239,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0064",
+      "x": 0.8981,
+      "y": 0.755,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Arete"
+    },
+    {
+      "id": "b0065",
+      "x": 0.0315,
+      "y": 0.3447,
+      "cotation": "V6",
+      "couleur": "noir",
+      "style": "Prow"
+    },
+    {
+      "id": "b0066",
+      "x": 0.9146,
+      "y": 0.0397,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Toit"
+    },
+    {
+      "id": "b0067",
+      "x": 0.6655,
+      "y": 0.9378,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0068",
+      "x": 0.0874,
+      "y": 0.1326,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0069",
+      "x": 0.9242,
+      "y": 0.2679,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0070",
+      "x": 0.1011,
+      "y": 0.7397,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Competition"
+    },
+    {
+      "id": "b0071",
+      "x": 0.0384,
+      "y": 0.8876,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0072",
+      "x": 0.952,
+      "y": 0.945,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Arete"
+    },
+    {
+      "id": "b0073",
+      "x": 0.0608,
+      "y": 0.2395,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Prow"
+    },
+    {
+      "id": "b0074",
+      "x": 0.677,
+      "y": 0.0573,
+      "cotation": "V5",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0075",
+      "x": 0.7878,
+      "y": 0.9101,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0076",
+      "x": 0.2194,
+      "y": 0.039,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0077",
+      "x": 0.961,
+      "y": 0.2277,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0078",
+      "x": 0.0362,
+      "y": 0.7179,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0079",
+      "x": 0.0738,
+      "y": 0.9418,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0080",
+      "x": 0.9631,
+      "y": 0.7347,
+      "cotation": "V2",
+      "couleur": "vert",
+      "style": "Arete"
+    },
+    {
+      "id": "b0081",
+      "x": 0.0586,
+      "y": 0.3924,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0082",
+      "x": 0.648,
+      "y": 0.0834,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0083",
+      "x": 0.7512,
+      "y": 0.9139,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0084",
+      "x": 0.0866,
+      "y": 0.0695,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0085",
+      "x": 0.9513,
+      "y": 0.1392,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0086",
+      "x": 0.0374,
+      "y": 0.6089,
+      "cotation": "V6",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0087",
+      "x": 0.1411,
+      "y": 0.959,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0088",
+      "x": 0.9192,
+      "y": 0.7976,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0089",
+      "x": 0.0575,
+      "y": 0.3038,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Prow"
+    },
+    {
+      "id": "b0090",
+      "x": 0.8134,
+      "y": 0.0756,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0091",
+      "x": 0.816,
+      "y": 0.9615,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0092",
+      "x": 0.3977,
+      "y": 0.0482,
+      "cotation": "V4",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0093",
+      "x": 0.9594,
+      "y": 0.1047,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0094",
+      "x": 0.0504,
+      "y": 0.5453,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0095",
+      "x": 0.1567,
+      "y": 0.9084,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0096",
+      "x": 0.9515,
+      "y": 0.7759,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0097",
+      "x": 0.0572,
+      "y": 0.0536,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Prow"
+    },
+    {
+      "id": "b0098",
+      "x": 0.697,
+      "y": 0.0953,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0099",
+      "x": 0.6072,
+      "y": 0.942,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0100",
+      "x": 0.245,
+      "y": 0.1479,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0101",
+      "x": 0.9637,
+      "y": 0.9612,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0102",
+      "x": 0.2185,
+      "y": 0.1062,
+      "cotation": "V2",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0103",
+      "x": 0.9357,
+      "y": 0.2336,
+      "cotation": "V4",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0104",
+      "x": 0.0291,
+      "y": 0.7922,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0105",
+      "x": 0.4284,
+      "y": 0.8628,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0106",
+      "x": 0.9546,
+      "y": 0.6765,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0107",
+      "x": 0.0889,
+      "y": 0.2843,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0108",
+      "x": 0.6256,
+      "y": 0.086,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0109",
+      "x": 0.6617,
+      "y": 0.8685,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0110",
+      "x": 0.435,
+      "y": 0.1258,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0111",
+      "x": 0.9608,
+      "y": 0.3452,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0112",
+      "x": 0.0953,
+      "y": 0.6418,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0113",
+      "x": 0.4279,
+      "y": 0.9565,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0114",
+      "x": 0.9511,
+      "y": 0.9561,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0115",
+      "x": 0.0362,
+      "y": 0.2356,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Prow"
+    },
+    {
+      "id": "b0116",
+      "x": 0.5852,
+      "y": 0.1108,
+      "cotation": "V7",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0117",
+      "x": 0.8263,
+      "y": 0.9127,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0118",
+      "x": 0.1088,
+      "y": 0.0637,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0119",
+      "x": 0.9336,
+      "y": 0.2646,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0120",
+      "x": 0.0478,
+      "y": 0.6298,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Competition"
+    },
+    {
+      "id": "b0121",
+      "x": 0.1082,
+      "y": 0.901,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0122",
+      "x": 0.904,
+      "y": 0.6573,
+      "cotation": "V4",
+      "couleur": "noir",
+      "style": "Arete"
+    },
+    {
+      "id": "b0123",
+      "x": 0.0765,
+      "y": 0.0993,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0124",
+      "x": 0.8292,
+      "y": 0.0489,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Toit"
+    },
+    {
+      "id": "b0125",
+      "x": 0.6008,
+      "y": 0.8959,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0126",
+      "x": 0.2992,
+      "y": 0.1168,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0127",
+      "x": 0.9541,
+      "y": 0.2481,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Devers"
+    },
+    {
+      "id": "b0128",
+      "x": 0.0757,
+      "y": 0.9209,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0129",
+      "x": 0.3908,
+      "y": 0.8641,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0130",
+      "x": 0.9613,
+      "y": 0.5917,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0131",
+      "x": 0.0508,
+      "y": 0.367,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0132",
+      "x": 0.97,
+      "y": 0.1063,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0133",
+      "x": 0.7008,
+      "y": 0.9552,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0134",
+      "x": 0.3095,
+      "y": 0.104,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0135",
+      "x": 0.9725,
+      "y": 0.3257,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0136",
+      "x": 0.0576,
+      "y": 0.9467,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0137",
+      "x": 0.0957,
+      "y": 0.8837,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0138",
+      "x": 0.971,
+      "y": 0.8677,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0139",
+      "x": 0.1027,
+      "y": 0.0643,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0140",
+      "x": 0.601,
+      "y": 0.0857,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0141",
+      "x": 0.9418,
+      "y": 0.9515,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0142",
+      "x": 0.4462,
+      "y": 0.0935,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0143",
+      "x": 0.9314,
+      "y": 0.3886,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0144",
+      "x": 0.0825,
+      "y": 0.6237,
+      "cotation": "V6",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0145",
+      "x": 0.3805,
+      "y": 0.8959,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0146",
+      "x": 0.9158,
+      "y": 0.8497,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0147",
+      "x": 0.09,
+      "y": 0.1899,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0148",
+      "x": 0.9016,
+      "y": 0.1175,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0149",
+      "x": 0.9484,
+      "y": 0.9072,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0150",
+      "x": 0.3355,
+      "y": 0.0754,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0151",
+      "x": 0.6741,
+      "y": 0.8604,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0152",
+      "x": 0.4534,
+      "y": 0.1204,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0153",
+      "x": 0.9046,
+      "y": 0.2087,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0154",
+      "x": 0.0653,
+      "y": 0.86,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0155",
+      "x": 0.3252,
+      "y": 0.8896,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0156",
+      "x": 0.9328,
+      "y": 0.7142,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0157",
+      "x": 0.0717,
+      "y": 0.2597,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0158",
+      "x": 0.7436,
+      "y": 0.0997,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0159",
+      "x": 0.9404,
+      "y": 0.9033,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0160",
+      "x": 0.3151,
+      "y": 0.0863,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0161",
+      "x": 0.9008,
+      "y": 0.3466,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0162",
+      "x": 0.0531,
+      "y": 0.5475,
+      "cotation": "V4",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0163",
+      "x": 0.2167,
+      "y": 0.8628,
+      "cotation": "V3",
+      "couleur": "jaune",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0164",
+      "x": 0.9695,
+      "y": 0.8274,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0165",
+      "x": 0.0606,
+      "y": 0.1279,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Prow"
+    },
+    {
+      "id": "b0166",
+      "x": 0.5251,
+      "y": 0.1189,
+      "cotation": "V6",
+      "couleur": "vert",
+      "style": "Toit"
+    },
+    {
+      "id": "b0167",
+      "x": 0.7362,
+      "y": 0.908,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Cave"
+    },
+    {
+      "id": "b0168",
+      "x": 0.427,
+      "y": 0.1369,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0169",
+      "x": 0.8954,
+      "y": 0.4379,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0170",
+      "x": 0.0808,
+      "y": 0.8532,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0171",
+      "x": 0.0701,
+      "y": 0.9287,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0172",
+      "x": 0.8951,
+      "y": 0.7457,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Arete"
+    },
+    {
+      "id": "b0173",
+      "x": 0.0619,
+      "y": 0.0783,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0174",
+      "x": 0.8057,
+      "y": 0.0686,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Toit"
+    },
+    {
+      "id": "b0175",
+      "x": 0.8081,
+      "y": 0.898,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0176",
+      "x": 0.3954,
+      "y": 0.0509,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0177",
+      "x": 0.942,
+      "y": 0.1634,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0178",
+      "x": 0.0508,
+      "y": 0.7113,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Competition"
+    },
+    {
+      "id": "b0179",
+      "x": 0.0507,
+      "y": 0.9429,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0180",
+      "x": 0.9479,
+      "y": 0.8736,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0181",
+      "x": 0.04,
+      "y": 0.1457,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0182",
+      "x": 0.8071,
+      "y": 0.1444,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Toit"
+    },
+    {
+      "id": "b0183",
+      "x": 0.9564,
+      "y": 0.939,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0184",
+      "x": 0.4431,
+      "y": 0.0597,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0185",
+      "x": 0.9432,
+      "y": 0.4372,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0186",
+      "x": 0.0637,
+      "y": 0.9489,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0187",
+      "x": 0.1312,
+      "y": 0.8819,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0188",
+      "x": 0.9172,
+      "y": 0.7725,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Arete"
+    },
+    {
+      "id": "b0189",
+      "x": 0.0429,
+      "y": 0.3626,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0190",
+      "x": 0.906,
+      "y": 0.0479,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0191",
+      "x": 0.9117,
+      "y": 0.9586,
+      "cotation": "V1",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0192",
+      "x": 0.4111,
+      "y": 0.0659,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0193",
+      "x": 0.9512,
+      "y": 0.2977,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0194",
+      "x": 0.0493,
+      "y": 0.9538,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0195",
+      "x": 0.4483,
+      "y": 0.8993,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0196",
+      "x": 0.9642,
+      "y": 0.7595,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0197",
+      "x": 0.0257,
+      "y": 0.4238,
+      "cotation": "V7",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0198",
+      "x": 0.8426,
+      "y": 0.0444,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0199",
+      "x": 0.6413,
+      "y": 0.9149,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0200",
+      "x": 0.1068,
+      "y": 0.1462,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0201",
+      "x": 0.6836,
+      "y": 0.9175,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0202",
+      "x": 0.2334,
+      "y": 0.0746,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0203",
+      "x": 0.9036,
+      "y": 0.185,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0204",
+      "x": 0.087,
+      "y": 0.8794,
+      "cotation": "V6",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0205",
+      "x": 0.2098,
+      "y": 0.9073,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0206",
+      "x": 0.9387,
+      "y": 0.7094,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0207",
+      "x": 0.0867,
+      "y": 0.1567,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0208",
+      "x": 0.7816,
+      "y": 0.1105,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0209",
+      "x": 0.7732,
+      "y": 0.8768,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0210",
+      "x": 0.3458,
+      "y": 0.0513,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0211",
+      "x": 0.9233,
+      "y": 0.243,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0212",
+      "x": 0.0528,
+      "y": 0.5479,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0213",
+      "x": 0.1462,
+      "y": 0.9546,
+      "cotation": "V3",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0214",
+      "x": 0.9327,
+      "y": 0.7069,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0215",
+      "x": 0.0349,
+      "y": 0.1584,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0216",
+      "x": 0.6658,
+      "y": 0.0821,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0217",
+      "x": 0.7583,
+      "y": 0.9594,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Cave"
+    },
+    {
+      "id": "b0218",
+      "x": 0.2211,
+      "y": 0.1464,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0219",
+      "x": 0.9507,
+      "y": 0.1265,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0220",
+      "x": 0.0432,
+      "y": 0.9324,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0221",
+      "x": 0.4397,
+      "y": 0.8724,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0222",
+      "x": 0.9048,
+      "y": 0.8062,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0223",
+      "x": 0.0348,
+      "y": 0.4638,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0224",
+      "x": 0.5668,
+      "y": 0.1131,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Toit"
+    },
+    {
+      "id": "b0225",
+      "x": 0.9452,
+      "y": 0.8876,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0226",
+      "x": 0.1305,
+      "y": 0.0587,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0227",
+      "x": 0.9668,
+      "y": 0.405,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0228",
+      "x": 0.0305,
+      "y": 0.6277,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Competition"
+    },
+    {
+      "id": "b0229",
+      "x": 0.118,
+      "y": 0.8631,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0230",
+      "x": 0.9534,
+      "y": 0.712,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Arete"
+    },
+    {
+      "id": "b0231",
+      "x": 0.0509,
+      "y": 0.0655,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0232",
+      "x": 0.6829,
+      "y": 0.0986,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0233",
+      "x": 0.8252,
+      "y": 0.9079,
+      "cotation": "V3",
+      "couleur": "rouge",
+      "style": "Cave"
+    },
+    {
+      "id": "b0234",
+      "x": 0.4648,
+      "y": 0.0702,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0235",
+      "x": 0.9363,
+      "y": 0.2844,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0236",
+      "x": 0.0916,
+      "y": 0.599,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0237",
+      "x": 0.0427,
+      "y": 0.8896,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0238",
+      "x": 0.9183,
+      "y": 0.629,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0239",
+      "x": 0.0855,
+      "y": 0.452,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0240",
+      "x": 0.6083,
+      "y": 0.0863,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0241",
+      "x": 0.7624,
+      "y": 0.9264,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0242",
+      "x": 0.1187,
+      "y": 0.0873,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0243",
+      "x": 0.91,
+      "y": 0.0658,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0244",
+      "x": 0.0691,
+      "y": 0.5987,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0245",
+      "x": 0.3553,
+      "y": 0.9246,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0246",
+      "x": 0.973,
+      "y": 0.7405,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0247",
+      "x": 0.0791,
+      "y": 0.2024,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0248",
+      "x": 0.7863,
+      "y": 0.098,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0249",
+      "x": 0.6532,
+      "y": 0.9371,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0250",
+      "x": 0.4028,
+      "y": 0.1025,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0251",
+      "x": 0.6849,
+      "y": 0.9095,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0252",
+      "x": 0.2594,
+      "y": 0.1147,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0253",
+      "x": 0.9433,
+      "y": 0.3846,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0254",
+      "x": 0.0723,
+      "y": 0.8947,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0255",
+      "x": 0.0791,
+      "y": 0.8971,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0256",
+      "x": 0.9002,
+      "y": 0.9604,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0257",
+      "x": 0.0405,
+      "y": 0.3703,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0258",
+      "x": 0.5622,
+      "y": 0.1229,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0259",
+      "x": 0.6339,
+      "y": 0.9366,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0260",
+      "x": 0.3716,
+      "y": 0.0774,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0261",
+      "x": 0.9606,
+      "y": 0.4131,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0262",
+      "x": 0.0672,
+      "y": 0.6885,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0263",
+      "x": 0.0682,
+      "y": 0.9196,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0264",
+      "x": 0.9493,
+      "y": 0.6876,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0265",
+      "x": 0.1013,
+      "y": 0.2776,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Prow"
+    },
+    {
+      "id": "b0266",
+      "x": 0.5376,
+      "y": 0.0865,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0267",
+      "x": 0.7717,
+      "y": 0.8889,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0268",
+      "x": 0.1958,
+      "y": 0.0409,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0269",
+      "x": 0.9179,
+      "y": 0.2338,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Devers"
+    },
+    {
+      "id": "b0270",
+      "x": 0.0836,
+      "y": 0.6658,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0271",
+      "x": 0.1361,
+      "y": 0.9106,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0272",
+      "x": 0.9483,
+      "y": 0.7628,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Arete"
+    },
+    {
+      "id": "b0273",
+      "x": 0.0837,
+      "y": 0.3301,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0274",
+      "x": 0.5894,
+      "y": 0.0445,
+      "cotation": "V4",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0275",
+      "x": 0.5688,
+      "y": 0.9136,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Cave"
+    },
+    {
+      "id": "b0276",
+      "x": 0.2751,
+      "y": 0.0836,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0277",
+      "x": 0.9599,
+      "y": 0.1875,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Devers"
+    },
+    {
+      "id": "b0278",
+      "x": 0.0327,
+      "y": 0.8389,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Competition"
+    },
+    {
+      "id": "b0279",
+      "x": 0.1245,
+      "y": 0.9159,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0280",
+      "x": 0.9132,
+      "y": 0.5474,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Arete"
+    },
+    {
+      "id": "b0281",
+      "x": 0.0655,
+      "y": 0.0407,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0282",
+      "x": 0.6561,
+      "y": 0.1001,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0283",
+      "x": 0.609,
+      "y": 0.8841,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0284",
+      "x": 0.1381,
+      "y": 0.1383,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0285",
+      "x": 0.9542,
+      "y": 0.1288,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0286",
+      "x": 0.1009,
+      "y": 0.8333,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0287",
+      "x": 0.0694,
+      "y": 0.9322,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0288",
+      "x": 0.9559,
+      "y": 0.5935,
+      "cotation": "V9",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0289",
+      "x": 0.0816,
+      "y": 0.1918,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0290",
+      "x": 0.9722,
+      "y": 0.1009,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0291",
+      "x": 0.675,
+      "y": 0.9217,
+      "cotation": "V2",
+      "couleur": "rouge",
+      "style": "Cave"
+    },
+    {
+      "id": "b0292",
+      "x": 0.223,
+      "y": 0.0704,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0293",
+      "x": 0.9679,
+      "y": 0.4565,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0294",
+      "x": 0.0652,
+      "y": 0.7683,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0295",
+      "x": 0.0686,
+      "y": 0.8871,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0296",
+      "x": 0.9578,
+      "y": 0.5708,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0297",
+      "x": 0.026,
+      "y": 0.1887,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0298",
+      "x": 0.705,
+      "y": 0.0959,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0299",
+      "x": 0.6313,
+      "y": 0.8866,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0300",
+      "x": 0.4361,
+      "y": 0.0651,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0301",
+      "x": 0.623,
+      "y": 0.8589,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0302",
+      "x": 0.3208,
+      "y": 0.0487,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0303",
+      "x": 0.9492,
+      "y": 0.0917,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0304",
+      "x": 0.0414,
+      "y": 0.6174,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0305",
+      "x": 0.1761,
+      "y": 0.8969,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0306",
+      "x": 0.9372,
+      "y": 0.7521,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0307",
+      "x": 0.1003,
+      "y": 0.3632,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0308",
+      "x": 0.6954,
+      "y": 0.0499,
+      "cotation": "V8",
+      "couleur": "bleu",
+      "style": "Toit"
+    },
+    {
+      "id": "b0309",
+      "x": 0.8524,
+      "y": 0.9315,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0310",
+      "x": 0.2105,
+      "y": 0.0553,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0311",
+      "x": 0.9477,
+      "y": 0.4624,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0312",
+      "x": 0.0498,
+      "y": 0.6358,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0313",
+      "x": 0.228,
+      "y": 0.8756,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0314",
+      "x": 0.9417,
+      "y": 0.5492,
+      "cotation": "V6",
+      "couleur": "noir",
+      "style": "Arete"
+    },
+    {
+      "id": "b0315",
+      "x": 0.0912,
+      "y": 0.1651,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Prow"
+    },
+    {
+      "id": "b0316",
+      "x": 0.7782,
+      "y": 0.0497,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0317",
+      "x": 0.589,
+      "y": 0.8552,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0318",
+      "x": 0.1971,
+      "y": 0.0506,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0319",
+      "x": 0.9158,
+      "y": 0.0767,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0320",
+      "x": 0.0506,
+      "y": 0.8575,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Competition"
+    },
+    {
+      "id": "b0321",
+      "x": 0.3799,
+      "y": 0.8946,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0322",
+      "x": 0.933,
+      "y": 0.8182,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Arete"
+    },
+    {
+      "id": "b0323",
+      "x": 0.0938,
+      "y": 0.425,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0324",
+      "x": 0.8001,
+      "y": 0.1198,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Toit"
+    },
+    {
+      "id": "b0325",
+      "x": 0.7914,
+      "y": 0.9623,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Cave"
+    },
+    {
+      "id": "b0326",
+      "x": 0.1568,
+      "y": 0.1412,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0327",
+      "x": 0.9609,
+      "y": 0.0854,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0328",
+      "x": 0.0629,
+      "y": 0.7041,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0329",
+      "x": 0.4504,
+      "y": 0.9105,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0330",
+      "x": 0.8988,
+      "y": 0.5614,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0331",
+      "x": 0.0439,
+      "y": 0.0451,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0332",
+      "x": 0.8699,
+      "y": 0.0519,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0333",
+      "x": 0.9034,
+      "y": 0.9333,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0334",
+      "x": 0.4227,
+      "y": 0.0817,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0335",
+      "x": 0.9464,
+      "y": 0.3325,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0336",
+      "x": 0.0303,
+      "y": 0.8341,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0337",
+      "x": 0.3164,
+      "y": 0.8939,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0338",
+      "x": 0.9066,
+      "y": 0.621,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Arete"
+    },
+    {
+      "id": "b0339",
+      "x": 0.0891,
+      "y": 0.2982,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Prow"
+    },
+    {
+      "id": "b0340",
+      "x": 0.6624,
+      "y": 0.1042,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0341",
+      "x": 0.6432,
+      "y": 0.9588,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0342",
+      "x": 0.0731,
+      "y": 0.0698,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0343",
+      "x": 0.9332,
+      "y": 0.4052,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0344",
+      "x": 0.0643,
+      "y": 0.8331,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0345",
+      "x": 0.4141,
+      "y": 0.879,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0346",
+      "x": 0.9501,
+      "y": 0.5575,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0347",
+      "x": 0.0681,
+      "y": 0.0446,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Prow"
+    },
+    {
+      "id": "b0348",
+      "x": 0.5823,
+      "y": 0.0644,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0349",
+      "x": 0.8872,
+      "y": 0.8982,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0350",
+      "x": 0.0409,
+      "y": 0.1125,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0351",
+      "x": 0.7351,
+      "y": 0.9518,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0352",
+      "x": 0.2075,
+      "y": 0.057,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0353",
+      "x": 0.948,
+      "y": 0.0737,
+      "cotation": "V5",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0354",
+      "x": 0.0689,
+      "y": 0.5996,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0355",
+      "x": 0.1046,
+      "y": 0.9299,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0356",
+      "x": 0.9379,
+      "y": 0.6479,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0357",
+      "x": 0.0596,
+      "y": 0.1671,
+      "cotation": "V7",
+      "couleur": "jaune",
+      "style": "Prow"
+    },
+    {
+      "id": "b0358",
+      "x": 0.9071,
+      "y": 0.1151,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Toit"
+    },
+    {
+      "id": "b0360",
+      "x": 0.3266,
+      "y": 0.0832,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0361",
+      "x": 0.952,
+      "y": 0.1244,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Devers"
+    },
+    {
+      "id": "b0362",
+      "x": 0.0738,
+      "y": 0.957,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Competition"
+    },
+    {
+      "id": "b0363",
+      "x": 0.3347,
+      "y": 0.9601,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0364",
+      "x": 0.9252,
+      "y": 0.6053,
+      "cotation": "V4",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0365",
+      "x": 0.0343,
+      "y": 0.3278,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Prow"
+    },
+    {
+      "id": "b0366",
+      "x": 0.6101,
+      "y": 0.0798,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0367",
+      "x": 0.8723,
+      "y": 0.8979,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Cave"
+    },
+    {
+      "id": "b0368",
+      "x": 0.246,
+      "y": 0.0718,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0369",
+      "x": 0.9196,
+      "y": 0.1229,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Devers"
+    },
+    {
+      "id": "b0370",
+      "x": 0.0555,
+      "y": 0.6269,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Competition"
+    },
+    {
+      "id": "b0371",
+      "x": 0.3857,
+      "y": 0.9468,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0372",
+      "x": 0.9425,
+      "y": 0.7739,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0373",
+      "x": 0.0751,
+      "y": 0.2241,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0374",
+      "x": 0.9476,
+      "y": 0.1243,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Toit"
+    },
+    {
+      "id": "b0375",
+      "x": 0.9458,
+      "y": 0.9155,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Cave"
+    },
+    {
+      "id": "b0376",
+      "x": 0.2233,
+      "y": 0.0779,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0377",
+      "x": 0.9098,
+      "y": 0.1159,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Devers"
+    },
+    {
+      "id": "b0378",
+      "x": 0.0641,
+      "y": 0.9546,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0379",
+      "x": 0.0605,
+      "y": 0.8901,
+      "cotation": "V9",
+      "couleur": "rouge",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0380",
+      "x": 0.9242,
+      "y": 0.898,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Arete"
+    },
+    {
+      "id": "b0381",
+      "x": 0.0762,
+      "y": 0.2682,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Prow"
+    },
+    {
+      "id": "b0382",
+      "x": 0.8422,
+      "y": 0.1096,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0383",
+      "x": 0.5781,
+      "y": 0.9563,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Cave"
+    },
+    {
+      "id": "b0384",
+      "x": 0.3969,
+      "y": 0.04,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0385",
+      "x": 0.9164,
+      "y": 0.3432,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Devers"
+    },
+    {
+      "id": "b0386",
+      "x": 0.0806,
+      "y": 0.6818,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Competition"
+    },
+    {
+      "id": "b0387",
+      "x": 0.4102,
+      "y": 0.9525,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0388",
+      "x": 0.8976,
+      "y": 0.5931,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Arete"
+    },
+    {
+      "id": "b0389",
+      "x": 0.0846,
+      "y": 0.2182,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Prow"
+    },
+    {
+      "id": "b0390",
+      "x": 0.7695,
+      "y": 0.0495,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Toit"
+    },
+    {
+      "id": "b0391",
+      "x": 0.7434,
+      "y": 0.8994,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Cave"
+    },
+    {
+      "id": "b0392",
+      "x": 0.3621,
+      "y": 0.1036,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Dalle"
+    },
+    {
+      "id": "b0393",
+      "x": 0.9301,
+      "y": 0.3254,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Devers"
+    },
+    {
+      "id": "b0394",
+      "x": 0.04,
+      "y": 0.7352,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Competition"
+    },
+    {
+      "id": "b0395",
+      "x": 0.2489,
+      "y": 0.901,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Traverse"
+    },
+    {
+      "id": "b0396",
+      "x": 0.9345,
+      "y": 0.6508,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Arete"
+    },
+    {
+      "id": "b0398",
+      "x": 0.6123,
+      "y": 0.1346,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Toit"
+    },
+    {
+      "id": "b0399",
+      "x": 0.6466,
+      "y": 0.8875,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Cave"
+    },
+    {
+      "id": "b0400",
+      "x": 0.1053,
+      "y": 0.0953,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle"
+    }
+  ]
+}

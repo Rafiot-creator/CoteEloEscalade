@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <!-- Bande des murs -->
+  <rect x="0" y="0" width="1000" height="700" fill="#dedcd4" stroke="#222" stroke-width="4"/>
+  <!-- Sol -->
+  <rect x="130" y="130" width="740" height="440" rx="8" fill="#f7f7f4" stroke="#222" stroke-width="3"/>
+
+  <!-- Separations entre les huit zones de mur -->
+  <line x1="500" y1="0" x2="500" y2="130" stroke="#222" stroke-width="2"/>
+  <line x1="500" y1="570" x2="500" y2="700" stroke="#222" stroke-width="2"/>
+  <line x1="0" y1="350" x2="130" y2="350" stroke="#222" stroke-width="2"/>
+  <line x1="870" y1="350" x2="1000" y2="350" stroke="#222" stroke-width="2"/>
+
+  <!-- Titre, dans le sol -->
+  <text x="500" y="185" text-anchor="middle" font-size="32" font-weight="800" fill="#222" letter-spacing="1">COTE ELO ESCALADE</text>
+  <text x="500" y="213" text-anchor="middle" font-size="17" fill="#555" letter-spacing="0.5">PLAN INVENTE — CENTRE DEMO</text>
+
+  <!-- Zone tapis, decorative -->
+  <rect x="330" y="260" width="340" height="180" rx="16" fill="#eceae3"/>
+  <text x="500" y="355" text-anchor="middle" font-size="16" fill="#777" letter-spacing="1">ZONE TAPIS</text>
+
+  <!-- Accueil -->
+  <rect x="420" y="500" width="160" height="40" rx="10" fill="none" stroke="#222" stroke-width="2"/>
+  <text x="500" y="525" text-anchor="middle" font-size="16" fill="#333" letter-spacing="1">ACCUEIL</text>
+
+  <!-- Etiquettes des huit styles de mur -->
+  <text x="250" y="72" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1">DALLE</text>
+  <text x="750" y="72" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1">TOIT</text>
+  <text x="935" y="175" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 935 175)">DEVERS</text>
+  <text x="935" y="525" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 935 525)">ARETE</text>
+  <text x="750" y="640" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1">CAVE</text>
+  <text x="250" y="640" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1">TRAVERSE</text>
+  <text x="65" y="525" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 65 525)">COMPETITION</text>
+  <text x="65" y="175" text-anchor="middle" font-size="24" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 65 175)">PROW</text>
+</svg>
