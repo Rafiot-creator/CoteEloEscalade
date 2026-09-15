@@ -27,6 +27,7 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
   const [selection, setSelection] = useState<string | null>(null)
   const [suivi, setSuivi] = useState<Record<string, boolean>>({})
   const zoneRef = useRef<HTMLDivElement>(null)
+  const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
   const { montrer, cacher, noeud } = useInfobulle()
 
@@ -47,6 +48,12 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
     () => carte?.blocs.find((b) => b.id === selection) ?? null,
     [carte, selection]
   )
+
+  // Sur une grande carte, le panneau d'edition serait hors ecran sans ca :
+  // rien ne dirait qu'un clic sur une pastille a fonctionne.
+  useEffect(() => {
+    if (selection) editionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [selection])
 
   if (!carte) return <p className="vide">{t('Chargement de la carte…', 'Loading the map…')}</p>
 
@@ -232,6 +239,7 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
       </Carte>
 
       {accesComplet && blocSelectionne && (
+        <div ref={editionRef}>
         <Carte titre={t('Modifier le bloc', 'Edit boulder')}>
           <div className="param">
             <div className="param-tete">
@@ -269,6 +277,7 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
             </button>
           </div>
         </Carte>
+        </div>
       )}
 
       {accesComplet && (
