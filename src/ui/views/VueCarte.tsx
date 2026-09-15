@@ -156,7 +156,12 @@ export function VueCarte({
   }
 
   const ajouter = (e: React.MouseEvent) => {
-    if (!accesComplet || glisse.current) return
+    if (!accesComplet) {
+      // Clic sur le fond de carte (pas un bloc) : referme le popup ouvert au clic.
+      setSurvole(null)
+      return
+    }
+    if (glisse.current) return
     const { x, y } = relatif(e.clientX, e.clientY)
     const bloc: BlocCarte = { id: nouvelId(), x, y, cotation: 'V4', couleur: 'bleu', style: '' }
     setCarte({ ...carte, blocs: [...carte.blocs, bloc] })
@@ -178,6 +183,16 @@ export function VueCarte({
     setSuivi({ ...suivi, [id]: valeur })
   }
 
+  // Ouvre le popup flash/reussi/echec au clic (plutot qu'au seul survol) :
+  // necessaire des qu'il n'y a pas de souris pour survoler, par ex. sur une
+  // tablette en salle. Toujours "ouvre" plutot que "bascule" : le clic suit
+  // en pratique un survol qui a deja mis `survole` a cet id, un bascule le
+  // refermerait aussitot. Fermeture : cliquer ailleurs sur la carte, ou
+  // deplacer la souris hors du bloc.
+  const ouvrirPopup = (id: string) => {
+    setSurvole(id)
+  }
+
   const enregistrer = (id: string, type: TypeEnvoi) => (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!enregistrerAscension || !grimpeurValide) return
@@ -185,7 +200,9 @@ export function VueCarte({
   }
 
   const debuterGlisse = (id: string) => (e: React.MouseEvent) => {
-    if (!accesComplet) return
+    // Shift+clic sert a ouvrir le popup flash/reussi/echec en vue complete
+    // (le clic seul deplace/selectionne le bloc) : pas de glisse dans ce cas.
+    if (!accesComplet || e.shiftKey) return
     e.stopPropagation()
     glisse.current = { id, deplace: false }
     const bouger = (ev: MouseEvent) => {
@@ -207,7 +224,10 @@ export function VueCarte({
     telecharger(`carte-${centreId}.json`, JSON.stringify(carte, null, 2), 'application/json')
   }
 
-  const envoyes = carte.blocs.filter((b) => envoisReels.has(b.id) || suivi[b.id]).length
+  const envoyes = carte.blocs.filter((b) => {
+    const s = envoisReels.get(b.id)
+    return s === 'flash' || s === 'reussi' || suivi[b.id]
+  }).length
 
   return (
     <div className="large">
@@ -258,12 +278,12 @@ export function VueCarte({
         sousTitre={
           accesComplet
             ? t(
-                "Cliquer sur la carte pour ajouter un bloc. Cliquer un bloc existant pour le modifier, ou le glisser pour le repositionner.",
-                'Click the map to add a boulder. Click an existing boulder to edit it, or drag it to reposition.'
+                "Cliquer sur la carte pour ajouter un bloc. Cliquer un bloc existant pour le modifier, ou le glisser pour le repositionner. Majuscule (shift) + clic sur un bloc pour l'enregistrer en flash, réussi ou échec.",
+                "Click the map to add a boulder. Click an existing boulder to edit it, or drag it to reposition. Shift + click a boulder to log it as a flash, a send or a fail."
               )
             : t(
-                "Survolez un bloc pour l'enregistrer en flash, réussi ou échec.",
-                'Hover a boulder to log it as a flash, a send or a fail.'
+                "Survolez ou cliquez un bloc pour l'enregistrer en flash, réussi ou échec.",
+                'Hover or click a boulder to log it as a flash, a send or a fail.'
               )
         }
         actions={
@@ -302,7 +322,7 @@ export function VueCarte({
             const zoneRect = zoneRef.current?.getBoundingClientRect()
             return carte.blocs.map((b) => {
               const statut = envoisReels.get(b.id)
-              const fait = !!statut || !!suivi[b.id]
+              const fait = statut === 'flash' || statut === 'reussi' || !!suivi[b.id]
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
               const ancreX = (zoneRect?.left ?? 0) + b.x * (zoneRect?.width ?? 0)
@@ -318,8 +338,14 @@ export function VueCarte({
                     onMouseDown={debuterGlisse(b.id)}
                     onClick={(e) => {
                       e.stopPropagation()
-                      if (accesComplet) setSelection(b.id)
-                      else basculerEnvoye(b.id)
+                      if (accesComplet) {
+                        if (e.shiftKey) ouvrirPopup(b.id)
+                        else setSelection(b.id)
+                      } else if (enregistrerAscension) {
+                        ouvrirPopup(b.id)
+                      } else {
+                        basculerEnvoye(b.id)
+                      }
                     }}
                     style={{
                       position: 'absolute',
@@ -369,12 +395,23 @@ export function VueCarte({
                       <div className="t">{b.nom || b.cotation}</div>
                       <div className="l">
                         <span>{t('Statut', 'Status')}</span>
-                        <b style={{ color: fait ? 'var(--bon)' : 'var(--encre-3)' }}>
+                        <b
+                          style={{
+                            color:
+                              statut === 'flash' || statut === 'reussi'
+                                ? 'var(--bon)'
+                                : statut === 'echec'
+                                  ? 'var(--critique)'
+                                  : 'var(--encre-3)',
+                          }}
+                        >
                           {statut === 'flash'
                             ? t('Flash ⚡', 'Flash ⚡')
-                            : fait
+                            : statut === 'reussi'
                               ? t('Réussi ✓', 'Sent ✓')
-                              : t('Pas encore envoyé', 'Not sent yet')}
+                              : statut === 'echec'
+                                ? t('Échoué', 'Failed')
+                                : t('Jamais essayé', 'Not attempted yet')}
                         </b>
                       </div>
                       <div className="l">

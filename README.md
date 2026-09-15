@@ -737,27 +737,41 @@ partagée en salle. Le nom choisi est mémorisé par centre pour ne pas le retap
 visite, avec un bouton pour l'effacer. C'est un repère purement visuel, qui n'entre dans aucun
 calcul — voir plus bas pourquoi ça ne suffisait plus.
 
-### Pastilles et survol
+### Pastilles, survol et popup
 
 Les blocs sont des pastilles rondes à fond métallique (dégradé + reflet), la cotation V
 affichée au centre. La couleur de fond suit la couleur réelle des prises (bleu, vert, jaune,
 orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte
-clair ou foncé choisi pour rester lisible sur chaque fond. Au survol, un popup indique le nom
-du bloc, son statut (« Flash ⚡ », « Réussi ✓ » — les deux en vert — ou « Pas encore envoyé »
-en gris), sa cotation affichée
-suivie de sa cote Elo exacte entre parenthèses (celle de la formule mélange, quand ce bloc
-existe aussi dans le jeu de données d'ascensions), son style, et trois boutons — flash (⚡,
-vert), réussi (✓, jaune), échec (✕, rouge). Ce popup est en `position: fixed`, pas relatif à la
-carte : la zone de carte a `overflow: hidden` pour ne pas laisser un bloc glissé déborder du
-plan, et un popup positionné normalement s'y serait fait couper près des bords.
+clair ou foncé choisi pour rester lisible sur chaque fond.
 
-Un bloc déjà envoyé par le grimpeur choisi (`Statut` ci-dessus) se reconnaît aussi sans survoler
-: sa pastille passe en gris (opacité réduite + désaturation) avec un liseré vert, dans les deux
-niveaux d'accès — avant cette étape, ce traitement visuel n'existait qu'en vue visiteur.
+Survoler un bloc (ou cliquer dessus — voir plus bas) ouvre un popup : nom du bloc, son statut
+pour le grimpeur choisi (« Flash ⚡ » ou « Réussi ✓ » en vert, « Échoué » en rouge, ou « Jamais
+essayé » en gris), sa cotation affichée suivie de sa cote Elo exacte entre parenthèses (celle
+de la formule mélange, quand ce bloc existe aussi dans le jeu de données d'ascensions), son
+style, et les trois boutons flash (⚡, vert), réussi (✓, jaune), échec (✕, rouge). Ce popup est
+en `position: fixed`, pas relatif à la carte : la zone de carte a `overflow: hidden` pour ne
+pas laisser un bloc glissé déborder du plan, et un popup positionné normalement s'y serait fait
+couper près des bords.
+
+Un bloc déjà envoyé (flash ou réussi, pas simplement tenté) par le grimpeur choisi se
+reconnaît aussi sans survoler : sa pastille passe en gris (opacité réduite + désaturation) avec
+un liseré vert, dans les deux niveaux d'accès.
+
+**Ouvrir le popup au clic plutôt qu'au survol.** Le survol seul exclut les appareils sans
+souris (une tablette en salle, justement l'usage visé). En vue visiteur, cliquer un bloc ouvre
+le popup — s'il n'y a pas de jeu de données connecté (`enregistrerAscension` absent, cf. plus
+bas), le clic retombe sur l'ancien bascule `suivi.ts`, pour ne pas retirer la seule
+interaction disponible sur un centre non connecté. En accès complet, le clic sert déjà à
+sélectionner/déplacer un bloc : **Majuscule (shift) + clic** ouvre le popup sans déclencher ni
+la sélection ni le glisser (`debuterGlisse` ignore l'événement quand `e.shiftKey` est vrai).
+Cliquer le fond de la carte (pas un bloc), en vue visiteur, referme le popup ouvert.
+
+Le popup s'ouvre (`setSurvole(id)`), il ne bascule pas : un clic suit presque toujours un
+survol qui a déjà ouvert le même popup, un bascule le refermerait aussitôt.
 
 ### Enregistrer un envoi comme une vraie ascension
 
-Les trois boutons du survol appellent `Atelier.enregistrerAscension(blocId, grimpeurNom, type)`
+Les trois boutons du popup appellent `Atelier.enregistrerAscension(blocId, grimpeurNom, type)`
 (`src/ui/etat.ts`), qui ne fait rien de plus qu'ajouter une ligne au dataset — mêmes champs
 que `data/ascensions.csv` (`essais: 1` pour flash et échec, `2` pour réussi ; cette valeur
 n'entre dans aucun calcul, cf. `core/types.ts`, elle ne fait que refléter honnêtement l'écart
@@ -780,13 +794,15 @@ calcul : le pipeline ne voit qu'un seul dataset cohérent, trié chronologiqueme
 tapé sur la Carte recalcule donc immédiatement les cotes affichées ailleurs (onglets Blocs,
 Grimpeurs), exactement comme une ligne du CSV le ferait.
 
-L'anneau « envoyé » sur une pastille (vue visiteur) suit la même logique de cohérence : il ne
-se base plus sur un simple drapeau local, mais sur `Atelier.envoisConnus(grimpeurNom)`, qui
-regarde l'ensemble des ascensions (fichier + Carte) pour ce grimpeur. Un grimpeur qui a déjà
-réellement envoyé un bloc le voit donc marqué dès l'arrivée sur la Carte, sans avoir à
-re-cliquer quoi que ce soit. L'ancien suivi `localStorage` (`suivi.ts`) reste utilisé en
-complément uniquement pour les cas non connectés (nom non reconnu, centre sans dataset) — un
-repère purement visuel, comme avant.
+Le statut affiché dans le popup et l'anneau « envoyé » sur une pastille reposent tous les deux
+sur `Atelier.envoisConnus(grimpeurNom)`, qui parcourt l'ensemble des ascensions du grimpeur
+(fichier + Carte) et retient, par bloc, le meilleur statut connu — un flash l'emporte sur un
+envoi en plusieurs essais, une réussite (quelle qu'elle soit) l'emporte sur un échec, l'absence
+totale d'ascension laisse le bloc « jamais essayé ». Un grimpeur qui a déjà réellement envoyé
+ou raté un bloc le voit donc annoté dès l'arrivée sur la Carte, sans avoir à re-cliquer quoi
+que ce soit. L'ancien suivi `localStorage` (`suivi.ts`) reste utilisé en complément uniquement
+pour les cas non connectés (nom non reconnu, centre sans dataset) — un repère purement visuel,
+comme avant, qui ne distingue pas flash/réussi/échec.
 
 ### Cartes disponibles aujourd'hui
 
@@ -956,3 +972,10 @@ fait accompli.
   essais. Le statut affiché est maintenant « Flash ⚡ » ou « Réussi ✓ », déterminé depuis
   `essais === 1` sur l'ascension retenue (`Atelier.envoisConnus`, § « Enregistrer un envoi
   comme une vraie ascension ») — un flash l'emporte dès qu'il y en a un pour ce bloc.
+- Encore un retour : le statut devait aussi dire si un bloc avait été tenté sans succès
+  (`'echec'`, distinct de l'absence totale de tentative), et les boutons flash/réussi/échec
+  devaient être accessibles au clic — pas seulement au survol, qui exclut les appareils sans
+  souris. `envoisConnus` renvoie maintenant aussi `'echec'` (une réussite l'emporte toujours
+  dessus). Cliquer un bloc ouvre le popup en vue visiteur (retombe sur l'ancien suivi local si
+  le centre n'a pas de dataset connecté) ; en accès complet, où le clic sert déjà à
+  sélectionner/déplacer, c'est Majuscule (shift) + clic. Voir « Pastilles, survol et popup ».

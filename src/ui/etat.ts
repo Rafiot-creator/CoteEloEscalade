@@ -14,8 +14,8 @@ export type TypeEnvoi = 'flash' | 'reussi' | 'echec'
 /** Pourquoi un envoi n'a pas pu etre enregistre comme une vraie ascension. */
 export type EchecEnregistrement = 'grimpeur-inconnu' | 'bloc-inconnu'
 
-/** Comment un bloc deja envoye l'a ete : premier essai, ou pas. */
-export type StatutEnvoi = 'flash' | 'reussi'
+/** L'etat d'un bloc pour un grimpeur donne, d'apres ses ascensions connues. */
+export type StatutEnvoi = 'flash' | 'reussi' | 'echec'
 
 /**
  * L'etat de l'atelier : un dataset, une formule, ses reglages, un resultat.
@@ -41,11 +41,12 @@ export interface Atelier {
    */
   enregistrerAscension: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
   /**
-   * Blocs deja envoyes (reussite) par un grimpeur nomme, fichier + Carte
-   * confondus, avec pour chacun si c'etait un flash ou un envoi en plusieurs
-   * essais (`essais === 1` dans l'ascension retenue, cf. `core/types.ts` —
-   * un flash l'emporte des qu'il y en a un, meme si d'autres passages sur le
-   * meme bloc ont pris plus d'essais).
+   * Statut de chaque bloc deja tente par un grimpeur nomme, fichier + Carte
+   * confondus : `'flash'` ou `'reussi'` (essais === 1 ou non sur l'ascension
+   * retenue, cf. `core/types.ts`), `'echec'` si seulement des tentatives
+   * ratees, absent si le bloc n'a jamais ete tente. Une reussite l'emporte
+   * toujours sur un echec (un grimpeur qui a fini par reussir n'est pas en
+   * echec), et un flash l'emporte sur une reussite en plusieurs essais.
    */
   envoisConnus: (grimpeurNom: string) => Map<string, StatutEnvoi>
 
@@ -140,10 +141,12 @@ export function useAtelier(): Atelier {
       const carte = new Map<string, StatutEnvoi>()
       const grimpeur = nom ? dataset?.grimpeurs.find((g) => g.nom.trim().toLowerCase() === nom) : undefined
       if (!grimpeur || !dataset) return carte
+      const rang: Record<StatutEnvoi, number> = { flash: 3, reussi: 2, echec: 1 }
       for (const a of dataset.ascensions) {
-        if (a.grimpeurId !== grimpeur.id || a.resultat !== 'reussite') continue
-        if (carte.get(a.blocId) === 'flash') continue // deja le meilleur statut possible
-        carte.set(a.blocId, a.essais === 1 ? 'flash' : 'reussi')
+        if (a.grimpeurId !== grimpeur.id) continue
+        const statut: StatutEnvoi = a.resultat === 'echec' ? 'echec' : a.essais === 1 ? 'flash' : 'reussi'
+        const actuel = carte.get(a.blocId)
+        if (!actuel || rang[statut] > rang[actuel]) carte.set(a.blocId, statut)
       }
       return carte
     },
