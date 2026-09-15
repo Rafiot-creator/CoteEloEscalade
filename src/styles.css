@@ -373,6 +373,9 @@ table.donnees td.principal { font-weight: 500; }
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
+  /* Sans ca, un tap peut etre interprete comme le debut d'un double-tap de
+     zoom (delai ~300ms, voire tap avale) sur certains navigateurs mobiles. */
+  touch-action: manipulation;
 }
 .carte-popup-actions button.flash { background: var(--bon); }
 .carte-popup-actions button.reussi { background: var(--attention); }

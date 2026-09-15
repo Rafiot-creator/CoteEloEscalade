@@ -85,6 +85,18 @@ export function VueCarte({
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
   const [largeurCarte, setLargeurCarte] = useState(640)
 
+  // Sur un ecran tactile, un tap declenche des evenements souris simules
+  // (mouseenter/mouseout compris), mais sans survol continu reel : selon le
+  // navigateur, le popup pouvait se rouvrir/refermer tout seul juste apres
+  // l'avoir ouvert au tap, rendant les boutons flash/reussi/echec inertes au
+  // doigt. `(hover: hover)` est vrai seulement pour un pointeur qui peut
+  // vraiment survoler (souris) : sur tactile on n'attache pas du tout les
+  // gestionnaires de survol, et seul le clic (ouvre/deplace le popup) et le
+  // clic sur le fond (ferme) pilotent l'affichage.
+  const [survolPossible] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches
+  )
+
   // Sur un petit ecran, la carte elle-meme retrecit (elle occupe toute la
   // largeur, sans les marges d'un bureau) : les pastilles a taille fixe s'y
   // chevauchaient. RAYON suit donc la largeur reelle de la carte plutot
@@ -103,7 +115,13 @@ export function VueCarte({
     return () => window.removeEventListener('resize', mesurer)
   }, [carte])
 
-  const RAYON = largeurCarte < 420 ? 12 : 20
+  // Echelle continue plutot qu'un seuil unique : les positions des blocs
+  // (x/y en fractions 0-1) retrecissent avec la carte, donc l'espacement
+  // entre pastilles retrecit dans la meme proportion. Un simple "plus petit
+  // sous 420px" gardait des pastilles proportionnellement plus grosses (donc
+  // plus serrees) que sur bureau. 20px a ~1150px de large (repere bureau) ->
+  // ~1,7 % de la largeur ; on garde ce ratio, borne pour rester utilisable.
+  const RAYON = Math.round(Math.max(8, Math.min(20, largeurCarte * 0.018)))
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -358,8 +376,8 @@ export function VueCarte({
                 <div
                   key={b.id}
                   style={{ position: 'absolute', left: `${b.x * 100}%`, top: `${b.y * 100}%` }}
-                  onMouseEnter={() => setSurvole(b.id)}
-                  onMouseLeave={() => setSurvole((s) => (s === b.id ? null : s))}
+                  onMouseEnter={survolPossible ? () => setSurvole(b.id) : undefined}
+                  onMouseLeave={survolPossible ? () => setSurvole((s) => (s === b.id ? null : s)) : undefined}
                 >
                   <div
                     onMouseDown={debuterGlisse(b.id)}
@@ -387,10 +405,11 @@ export function VueCarte({
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: couleur.texte,
-                      fontSize: RAYON < 20 ? 9 : 12,
+                      fontSize: Math.max(7, Math.round(RAYON * 0.6)),
                       fontWeight: 700,
                       textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
                       cursor: accesComplet ? 'grab' : 'pointer',
+                      touchAction: 'manipulation',
                       opacity: fait ? 0.55 : 1,
                       filter: fait ? 'grayscale(0.85)' : undefined,
                     }}

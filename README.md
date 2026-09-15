@@ -745,10 +745,14 @@ orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), a
 clair ou foncé choisi pour rester lisible sur chaque fond.
 
 **Taille des pastilles.** Leur rayon (`RAYON` dans `VueCarte.tsx`) suit la largeur réelle de la
-carte plutôt qu'un seuil fixe : sous 420 px (un téléphone, où la carte occupe toute la largeur
-sans les marges d'un bureau) elles passent de 40 px à 24 px de diamètre, sans quoi elles se
-chevauchaient sur un centre dense comme Démo. Mesurée via un `useLayoutEffect` qui lit
-`getBoundingClientRect().width` au montage et à chaque `resize` de la fenêtre — pas un
+carte selon une échelle continue plutôt qu'un seuil fixe : `RAYON = largeur × 1,8 %`, borné
+entre 8 et 20 px. La raison de l'échelle continue plutôt qu'un simple « plus petit sous X px » :
+les positions des blocs (`x`/`y`, des fractions 0–1 de la largeur de la carte) rétrécissent
+avec la carte, donc l'espacement entre pastilles rétrécit dans la même proportion — un rayon
+qui ne baisse pas dans cette même proportion reste relativement trop gros (et donc chevauche
+ses voisins) même s'il a diminué en valeur absolue. Le ratio (1,8 %) reprend le rapport
+observé sur bureau (20 px pour une carte d'environ 1150 px). Mesurée via un `useLayoutEffect`
+qui lit `getBoundingClientRect().width` au montage et à chaque `resize` de la fenêtre — pas un
 `ResizeObserver` : les navigateurs limitent ou retardent ses callbacks sur un onglet sans le
 focus, ce qui a fait échouer la première version pendant les tests (l'observer ne se déclenchait
 jamais dans l'outil d'automatisation utilisé pour vérifier ce correctif, un détail qui aurait pu
@@ -807,6 +811,17 @@ invisible entre pastille et popup a aussi été essayé et abandonné : limité 
 pastille, il laissait un angle mort en diagonale vers les boutons (plus bas), et sur une carte
 dense il pouvait chevaucher une pastille voisine et lui voler le survol. Coller les deux
 directement règle les deux problèmes sans configuration supplémentaire.
+
+**Sur écran tactile, pas de survol du tout.** `onMouseEnter`/`onMouseLeave` ne sont attachés
+que si `window.matchMedia('(hover: hover)').matches` (vrai pour une souris, faux pour un doigt
+sur écran tactile) — calculé une fois au montage (`survolPossible` dans `VueCarte.tsx`). Un tap
+génère des événements souris simulés (y compris `mouseenter`/`mouseout`) sans survol continu
+réel derrière, et selon le navigateur ça pouvait rouvrir/refermer le popup tout seul juste après
+l'avoir ouvert au tap — les boutons flash/réussi/échec semblaient alors ne réagir à aucun tap.
+Sur tactile, seul le clic (ouvre/change de bloc) et le clic sur le fond (ferme) pilotent
+l'affichage, comme décrit plus haut. Les boutons du popup et la pastille ont aussi
+`touch-action: manipulation` (`styles.css`), pour écarter le délai/double-tap de zoom que
+certains navigateurs mobiles imposent par défaut sur un élément cliquable.
 
 ### Enregistrer un envoi comme une vraie ascension
 
@@ -1074,3 +1089,17 @@ fait accompli.
   déclenchait jamais dans cet outil de test (probablement parce que Chrome limite ses
   callbacks sur un onglet sans le focus) ; remplacée par un `useLayoutEffect` qui mesure au
   montage et au `resize` de la fenêtre, plus simple et vérifiable.
+- Raphaël a retesté sur son téléphone : encore trop gros, et aucun effet en tapant du doigt
+  les boutons flash/réussi/échec. Deux causes distinctes :
+  - le seuil unique (420 px → 24 px) gardait les pastilles *proportionnellement* plus grosses
+    que sur bureau, puisque l'espacement entre elles (des fractions 0–1 de la largeur de la
+    carte) rétrécit dans la même proportion que la carte. Remplacé par une échelle continue
+    (`largeur × 1,8 %`, reprenant le ratio observé sur bureau, bornée entre 8 et 20 px) — voir
+    « Taille des pastilles ».
+  - `onMouseEnter`/`onMouseLeave` (nécessaires pour le correctif précédent sur la fermeture du
+    popup) sont piégeux sur tactile : un tap simule aussi `mouseenter`/`mouseout` sans survol
+    réel derrière, ce qui pouvait rouvrir/refermer le popup tout seul et rendre les boutons
+    inertes au doigt. Ces deux gestionnaires ne sont désormais attachés que si
+    `matchMedia('(hover: hover)')` est vrai ; sur tactile, seul le clic pilote l'affichage. Ajout
+    de `touch-action: manipulation` sur la pastille et les boutons du popup en prévention d'un
+    délai/double-tap de zoom. Voir « Sur écran tactile, pas de survol du tout ».
