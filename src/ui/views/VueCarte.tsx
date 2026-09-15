@@ -3,7 +3,7 @@ import { COTATIONS } from '../../core/cotations'
 import { chargerCarte } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import type { Resultat } from '../../core/pipeline'
-import type { EchecEnregistrement, TypeEnvoi } from '../etat'
+import type { EchecEnregistrement, StatutEnvoi, TypeEnvoi } from '../etat'
 import { Carte, Tuile } from '../components/base'
 import { nombre, telecharger } from '../format'
 import { useLangue } from '../langue'
@@ -74,7 +74,7 @@ export function VueCarte({
    */
   enregistrerAscension?: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
   /** Blocs deja envoyes par un grimpeur nomme, d'apres l'ensemble du dataset. */
-  envoisConnus?: (grimpeurNom: string) => Set<string>
+  envoisConnus?: (grimpeurNom: string) => Map<string, StatutEnvoi>
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
@@ -96,7 +96,7 @@ export function VueCarte({
   // grimpeur (fichier + Carte confondus) se montre envoye sans qu'il ait
   // besoin de re-cliquer quoi que ce soit.
   const envoisReels = useMemo(
-    () => envoisConnus?.(grimpeurChoisi) ?? new Set<string>(),
+    () => envoisConnus?.(grimpeurChoisi) ?? new Map<string, StatutEnvoi>(),
     [envoisConnus, grimpeurChoisi]
   )
 
@@ -301,7 +301,8 @@ export function VueCarte({
           {(() => {
             const zoneRect = zoneRef.current?.getBoundingClientRect()
             return carte.blocs.map((b) => {
-              const fait = envoisReels.has(b.id) || !!suivi[b.id]
+              const statut = envoisReels.get(b.id)
+              const fait = !!statut || !!suivi[b.id]
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
               const ancreX = (zoneRect?.left ?? 0) + b.x * (zoneRect?.width ?? 0)
@@ -369,7 +370,11 @@ export function VueCarte({
                       <div className="l">
                         <span>{t('Statut', 'Status')}</span>
                         <b style={{ color: fait ? 'var(--bon)' : 'var(--encre-3)' }}>
-                          {fait ? t('Envoyé ✓', 'Sent ✓') : t('Pas encore envoyé', 'Not sent yet')}
+                          {statut === 'flash'
+                            ? t('Flash ⚡', 'Flash ⚡')
+                            : fait
+                              ? t('Réussi ✓', 'Sent ✓')
+                              : t('Pas encore envoyé', 'Not sent yet')}
                         </b>
                       </div>
                       <div className="l">

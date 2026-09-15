@@ -743,7 +743,8 @@ Les blocs sont des pastilles rondes à fond métallique (dégradé + reflet), la
 affichée au centre. La couleur de fond suit la couleur réelle des prises (bleu, vert, jaune,
 orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte
 clair ou foncé choisi pour rester lisible sur chaque fond. Au survol, un popup indique le nom
-du bloc, son statut (« Envoyé ✓ » en vert ou « Pas encore envoyé »), sa cotation affichée
+du bloc, son statut (« Flash ⚡ », « Réussi ✓ » — les deux en vert — ou « Pas encore envoyé »
+en gris), sa cotation affichée
 suivie de sa cote Elo exacte entre parenthèses (celle de la formule mélange, quand ce bloc
 existe aussi dans le jeu de données d'ascensions), son style, et trois boutons — flash (⚡,
 vert), réussi (✓, jaune), échec (✕, rouge). Ce popup est en `position: fixed`, pas relatif à la
@@ -951,3 +952,7 @@ fait accompli.
   complet), et le statut « envoyé » n'apparaissait nulle part au survol. Corrigé : le grisé
   (opacité + désaturation) s'applique maintenant dans les deux vues, et le popup au survol
   affiche une ligne « Statut » (Envoyé ✓ / Pas encore envoyé).
+- Nouveau retour de Raphaël : ce statut ne distinguait pas flash et réussi en plusieurs
+  essais. Le statut affiché est maintenant « Flash ⚡ » ou « Réussi ✓ », déterminé depuis
+  `essais === 1` sur l'ascension retenue (`Atelier.envoisConnus`, § « Enregistrer un envoi
+  comme une vraie ascension ») — un flash l'emporte dès qu'il y en a un pour ce bloc.
