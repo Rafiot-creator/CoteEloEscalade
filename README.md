@@ -744,6 +744,23 @@ affichée au centre. La couleur de fond suit la couleur réelle des prises (bleu
 orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte
 clair ou foncé choisi pour rester lisible sur chaque fond.
 
+**Taille des pastilles.** Leur rayon (`RAYON` dans `VueCarte.tsx`) suit la largeur réelle de la
+carte plutôt qu'un seuil fixe : sous 420 px (un téléphone, où la carte occupe toute la largeur
+sans les marges d'un bureau) elles passent de 40 px à 24 px de diamètre, sans quoi elles se
+chevauchaient sur un centre dense comme Démo. Mesurée via un `useLayoutEffect` qui lit
+`getBoundingClientRect().width` au montage et à chaque `resize` de la fenêtre — pas un
+`ResizeObserver` : les navigateurs limitent ou retardent ses callbacks sur un onglet sans le
+focus, ce qui a fait échouer la première version pendant les tests (l'observer ne se déclenchait
+jamais dans l'outil d'automatisation utilisé pour vérifier ce correctif, un détail qui aurait pu
+tout aussi bien se produire sur un vrai téléphone en veille).
+
+Cette taille dépendait d'une correction de layout plus large : `.marque` (titre + sous-titre de
+l'en-tête) avait un `white-space: nowrap` qui l'empêchait de rétrécir sous ~470 px même dans
+`@media (max-width: 620px)`, ce qui forçait toute la page — carte comprise — à rester aussi
+large que ce sous-titre. Sans ce correctif (`.marque { white-space: normal }` dans cette même
+media query, `styles.css`), la carte n'aurait jamais atteint le seuil de 420 px sur un vrai
+téléphone, peu importe le seuil choisi pour `RAYON`.
+
 Survoler un bloc (ou cliquer dessus — voir plus bas) ouvre un popup : nom du bloc, son statut
 pour le grimpeur choisi (« Flash ⚡ » ou « Réussi ✓ » en vert, « Échoué » en rouge, ou « Jamais
 essayé » en gris), sa cotation affichée suivie de sa cote Elo exacte entre parenthèses (celle
@@ -1043,3 +1060,17 @@ fait accompli.
   remplacement lui-même. Voir « Changer d'avis » dans « Enregistrer un envoi comme une vraie
   ascension » pour le compromis assumé (une seule entrée Carte par bloc, pas un historique de
   chaque clic).
+- Raphaël a testé sur son téléphone : les pastilles, à taille fixe, se chevauchaient sur un
+  centre dense comme Démo. `RAYON` suit maintenant la largeur réelle de la carte (40 px de
+  diamètre au-dessus de 420 px, 24 px en dessous) — voir « Pastilles, survol et popup »,
+  § « Taille des pastilles ». Cette étape a mis au jour un vrai bug de layout au passage :
+  `.marque` (titre + sous-titre) avait un `white-space: nowrap` qui l'empêchait de rétrécir
+  même dans la media query dédiée aux petits écrans, forçant toute la page à rester large
+  d'environ 720 px sur n'importe quel appareil — la carte n'aurait donc jamais pu descendre
+  sous 420 px sans ce correctif, peu importe la taille des pastilles. Repéré uniquement en
+  vérifiant la largeur réelle de la carte via JavaScript (les captures d'écran de l'outil
+  d'automatisation utilisé pour tester ne le laissaient pas voir, la fenêtre de test restant
+  à sa pleine largeur de bureau). Une première implémentation avec `ResizeObserver` ne se
+  déclenchait jamais dans cet outil de test (probablement parce que Chrome limite ses
+  callbacks sur un onglet sans le focus) ; remplacée par un `useLayoutEffect` qui mesure au
+  montage et au `resize` de la fenêtre, plus simple et vérifiable.

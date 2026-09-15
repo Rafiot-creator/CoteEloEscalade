@@ -78,15 +78,20 @@ attente (`git status` clean).
   `.github/workflows/deploy.yml`, avant le retrait de Node 20 des runners GitHub Actions le
   16 septembre 2026 (annonce GitHub). Tests (62) toujours au vert après la modification. Piste
   refermée dans `DECISIONS.md` § 7.
-- Écran Carte : trois boutons au survol d'un bloc (flash/réussi/échec). Pour le centre Démo et
-  un nom de grimpeur reconnu du dataset, ils enregistrent une vraie ascension
+- Écran Carte : trois boutons flash/réussi/échec, ouverts au survol ou au clic (Majuscule+clic
+  en accès complet, où le clic sert déjà à sélectionner/déplacer). Pour le centre Démo et un
+  nom de grimpeur reconnu du dataset, ils enregistrent une vraie ascension
   (`src/ui/ascensionsLocales.ts`, fusionnée dans `useAtelier`/`etat.ts`) qui recalcule les
-  cotes affichées ailleurs (Blocs, Grimpeurs) — pas un simple suivi visuel comme avant. Sans
-  centre connecté ou sans nom reconnu, les boutons restent visibles mais désactivés. L'anneau
-  « envoyé » (vue visiteur) suit maintenant l'historique réel (`Atelier.envoisConnus`) plutôt
-  qu'un drapeau `localStorage` isolé. Détails dans le README, § « La carte des blocs ».
-  Testé manuellement dans Chrome (flash/réussi/échec, vue complète et visiteur, popup
-  désactivé sans nom valide) : tout fonctionne comme attendu. Tests (62) et typecheck au vert.
+  cotes affichées ailleurs (Blocs, Grimpeurs) — pas un simple suivi visuel comme avant. Un
+  nouveau clic remplace directement l'envoi précédemment ajouté depuis la Carte pour ce
+  bloc/grimpeur (pas d'étape d'annulation séparée, essayée puis simplifiée dans la même
+  session). Statut affiché au popup : Flash / Réussi / Échoué / Jamais essayé
+  (`Atelier.envoisConnus`, meilleur statut sur fichier + Carte). Pastilles redimensionnées sous
+  420 px de large (téléphone) — a nécessité de corriger au passage un `white-space: nowrap`
+  sur `.marque` qui empêchait toute la page de rétrécir sous ~720 px sur petit écran. Détails
+  et tout l'historique des allers-retours dans le README, § « La carte des blocs » et journal
+  du 2026-09-15. Tests (62) et typecheck au vert ; largement testé manuellement dans Chrome
+  (voir aussi la mémoire `feedback-browser-hover-testing` pour les pièges de ce genre de test).
 
 ## Prochaine étape
 

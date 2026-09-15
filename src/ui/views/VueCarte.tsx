@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { COTATIONS } from '../../core/cotations'
 import { chargerCarte } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
@@ -46,8 +46,6 @@ function nouvelId(): string {
   return `b${Date.now().toString(36)}${Math.round(Math.random() * 1000)}`
 }
 
-const RAYON = 20
-
 export function VueCarte({
   centreId,
   accesComplet,
@@ -85,6 +83,27 @@ export function VueCarte({
   const zoneRef = useRef<HTMLDivElement>(null)
   const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
+  const [largeurCarte, setLargeurCarte] = useState(640)
+
+  // Sur un petit ecran, la carte elle-meme retrecit (elle occupe toute la
+  // largeur, sans les marges d'un bureau) : les pastilles a taille fixe s'y
+  // chevauchaient. RAYON suit donc la largeur reelle de la carte plutot
+  // qu'un seuil sur la fenetre, pour rester coherent si la carte est plus
+  // etroite que l'ecran (barre laterale, fenetre partagee...). Mesure au
+  // redimensionnement de la fenetre plutot que via ResizeObserver : les
+  // navigateurs limitent ou retardent les callbacks de ResizeObserver sur un
+  // onglet qui n'a pas le focus, ce qui aurait laisse la carte a sa taille
+  // par defaut le temps que l'onglet redevienne actif.
+  useLayoutEffect(() => {
+    const mesurer = () => {
+      if (zoneRef.current) setLargeurCarte(zoneRef.current.getBoundingClientRect().width)
+    }
+    mesurer()
+    window.addEventListener('resize', mesurer)
+    return () => window.removeEventListener('resize', mesurer)
+  }, [carte])
+
+  const RAYON = largeurCarte < 420 ? 12 : 20
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -368,7 +387,7 @@ export function VueCarte({
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: couleur.texte,
-                      fontSize: 12,
+                      fontSize: RAYON < 20 ? 9 : 12,
                       fontWeight: 700,
                       textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
                       cursor: accesComplet ? 'grab' : 'pointer',

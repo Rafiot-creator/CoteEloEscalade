@@ -177,6 +177,11 @@ p { margin: 0; }
 }
 @media (max-width: 620px) {
   .entete { height: auto; padding: 8px 14px; flex-wrap: wrap; gap: 8px; }
+  /* Sans ca, le sous-titre garde sa largeur "nowrap" de bureau meme ici : la
+     carte-mere (`.marque`, en `flex-wrap: wrap` sur `.entete`) ne retrecit
+     jamais sous cette largeur, et toute la page reste plus large que l'ecran
+     — la Carte en particulier n'a alors jamais l'occasion de retrecir. */
+  .marque { white-space: normal; }
   .nav { margin-left: 0; }
   .contenu { padding: 14px; }
 }
