@@ -5,7 +5,7 @@ import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import type { Resultat } from '../../core/pipeline'
 import { useInfobulle } from '../charts/base'
 import { Carte, Tuile } from '../components/base'
-import { telecharger } from '../format'
+import { nombre, telecharger } from '../format'
 import { useLangue } from '../langue'
 import { suiviLocal } from '../suivi'
 
@@ -59,9 +59,9 @@ export function VueCarte({
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
   const { montrer, cacher, noeud } = useInfobulle()
 
-  const calculeeParId = useMemo(() => {
-    const m = new Map<string, string>()
-    for (const b of resultatMelange?.blocs ?? []) m.set(b.id, b.cotationCalculee)
+  const coteParId = useMemo(() => {
+    const m = new Map<string, number>()
+    for (const b of resultatMelange?.blocs ?? []) m.set(b.id, b.rating)
     return m
   }, [resultatMelange])
 
@@ -208,7 +208,7 @@ export function VueCarte({
           {carte.blocs.map((b) => {
             const fait = !!suivi[b.id]
             const couleur = infoCouleur(b.couleur)
-            const calculee = calculeeParId.get(b.id)
+            const cote = coteParId.get(b.id)
             return (
               <div
                 key={b.id}
@@ -222,7 +222,7 @@ export function VueCarte({
                   montrer(e, {
                     titre: b.nom || b.cotation,
                     lignes: [
-                      [t('Cotation', 'Grade'), calculee ? `${b.cotation} (${calculee})` : b.cotation],
+                      [t('Cotation', 'Grade'), cote !== undefined ? `${b.cotation} (${nombre(cote)})` : b.cotation],
                       [t('Couleur', 'Color'), t(couleur.fr, couleur.en)],
                       [t('Style', 'Style'), b.style || '—'],
                     ],
