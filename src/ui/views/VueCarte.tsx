@@ -13,14 +13,20 @@ import { suiviLocal } from '../suivi'
  * Couleur des prises, du mauve au rouge (ordre du spectre visible), puis
  * noir et blanc ajoutes aux extremes. C'est la couleur reelle choisie par
  * l'ouvreur — elle ne depend pas de la cotation.
+ *
+ * Teintes fluo plutot que la palette "data" du site (trop sourde pour des
+ * prises d'escalade) : des couleurs fixes, independantes du theme clair/
+ * sombre, puisqu'il s'agit d'un attribut physique du bloc. Le vert et le
+ * jaune fluo sont trop clairs pour du texte blanc lisible : leur cotation
+ * passe en noir, comme sur fond blanc.
  */
 const PALETTE_COULEURS = [
-  { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#8b3fd1', texte: '#fff' },
-  { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: 'var(--serie-1)', texte: '#fff' },
-  { id: 'vert', fr: 'Vert', en: 'Green', fond: 'var(--serie-3)', texte: '#fff' },
-  { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: 'var(--serie-4)', texte: '#fff' },
-  { id: 'orange', fr: 'Orange', en: 'Orange', fond: 'var(--serie-2)', texte: '#fff' },
-  { id: 'rouge', fr: 'Rouge', en: 'Red', fond: 'var(--critique)', texte: '#fff' },
+  { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#9d00ff', texte: '#fff' },
+  { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: '#0080ff', texte: '#fff' },
+  { id: 'vert', fr: 'Vert', en: 'Green', fond: '#00e676', texte: '#111' },
+  { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#eaff00', texte: '#111' },
+  { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#ff5500', texte: '#fff' },
+  { id: 'rouge', fr: 'Rouge', en: 'Red', fond: '#ff1744', texte: '#fff' },
   { id: 'noir', fr: 'Noir', en: 'Black', fond: '#18181b', texte: '#fff' },
   { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#f5f5f2', texte: '#111' },
 ] as const
