@@ -337,11 +337,12 @@ export function VueCarte({
                       fontWeight: 700,
                       textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
                       cursor: accesComplet ? 'grab' : 'pointer',
-                      opacity: !accesComplet && fait ? 0.45 : 1,
+                      opacity: fait ? 0.55 : 1,
+                      filter: fait ? 'grayscale(0.85)' : undefined,
                     }}
                   >
                     {b.cotation.replace(/^V/i, '')}
-                    {!accesComplet && fait && (
+                    {fait && (
                       <span
                         style={{
                           position: 'absolute',
@@ -365,6 +366,12 @@ export function VueCarte({
                       }}
                     >
                       <div className="t">{b.nom || b.cotation}</div>
+                      <div className="l">
+                        <span>{t('Statut', 'Status')}</span>
+                        <b style={{ color: fait ? 'var(--bon)' : 'var(--encre-3)' }}>
+                          {fait ? t('Envoyé ✓', 'Sent ✓') : t('Pas encore envoyé', 'Not sent yet')}
+                        </b>
+                      </div>
                       <div className="l">
                         <span>{t('Cotation', 'Grade')}</span>
                         <b>{cote !== undefined ? `${b.cotation} (${nombre(cote)})` : b.cotation}</b>

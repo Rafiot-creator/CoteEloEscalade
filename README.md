@@ -743,12 +743,16 @@ Les blocs sont des pastilles rondes à fond métallique (dégradé + reflet), la
 affichée au centre. La couleur de fond suit la couleur réelle des prises (bleu, vert, jaune,
 orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte
 clair ou foncé choisi pour rester lisible sur chaque fond. Au survol, un popup indique le nom
-du bloc, sa cotation affichée suivie de sa cote Elo exacte entre parenthèses (celle de la
-formule mélange, quand ce bloc existe aussi dans le jeu de données d'ascensions), son style, et
-trois boutons — flash (⚡, vert), réussi (✓, jaune), échec (✕, rouge). Ce popup est en
-`position: fixed`, pas relatif à la carte : la zone de carte a `overflow: hidden` pour ne pas
-laisser un bloc glissé déborder du plan, et un popup positionné normalement s'y serait fait
-couper près des bords.
+du bloc, son statut (« Envoyé ✓ » en vert ou « Pas encore envoyé »), sa cotation affichée
+suivie de sa cote Elo exacte entre parenthèses (celle de la formule mélange, quand ce bloc
+existe aussi dans le jeu de données d'ascensions), son style, et trois boutons — flash (⚡,
+vert), réussi (✓, jaune), échec (✕, rouge). Ce popup est en `position: fixed`, pas relatif à la
+carte : la zone de carte a `overflow: hidden` pour ne pas laisser un bloc glissé déborder du
+plan, et un popup positionné normalement s'y serait fait couper près des bords.
+
+Un bloc déjà envoyé par le grimpeur choisi (`Statut` ci-dessus) se reconnaît aussi sans survoler
+: sa pastille passe en gris (opacité réduite + désaturation) avec un liseré vert, dans les deux
+niveaux d'accès — avant cette étape, ce traitement visuel n'existait qu'en vue visiteur.
 
 ### Enregistrer un envoi comme une vraie ascension
 
@@ -943,3 +947,7 @@ fait accompli.
   visuel d'avant : les cotes recalculées se répercutent immédiatement sur les onglets Blocs et
   Grimpeurs, et l'anneau « envoyé » de la Carte reflète désormais l'historique réel du
   grimpeur plutôt qu'un drapeau local indépendant.
+- Retour de Raphaël : le grisé des blocs déjà envoyés était invisible en vue complète (accès
+  complet), et le statut « envoyé » n'apparaissait nulle part au survol. Corrigé : le grisé
+  (opacité + désaturation) s'applique maintenant dans les deux vues, et le popup au survol
+  affiche une ligne « Statut » (Envoyé ✓ / Pas encore envoyé).
