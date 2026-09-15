@@ -43,10 +43,13 @@ export interface Atelier {
   /**
    * Statut de chaque bloc deja tente par un grimpeur nomme, fichier + Carte
    * confondus : `'flash'` ou `'reussi'` (essais === 1 ou non sur l'ascension
-   * retenue, cf. `core/types.ts`), `'echec'` si seulement des tentatives
-   * ratees, absent si le bloc n'a jamais ete tente. Une reussite l'emporte
-   * toujours sur un echec (un grimpeur qui a fini par reussir n'est pas en
-   * echec), et un flash l'emporte sur une reussite en plusieurs essais.
+   * retenue, cf. `core/types.ts`), `'echec'`, ou absent si le bloc n'a
+   * jamais ete tente. C'est l'ascension la plus RECENTE qui l'emporte, pas
+   * la meilleure : un nouvel envoi tape sur la Carte est toujours plus
+   * recent que l'historique du fichier, donc change toujours le statut
+   * affiche, y compris pour le degrader (flash -> echec compris) — corriger
+   * un mauvais clic ou changer d'avis doit marcher a tout moment, dans
+   * n'importe quel sens.
    */
   envoisConnus: (grimpeurNom: string) => Map<string, StatutEnvoi>
 
@@ -150,12 +153,16 @@ export function useAtelier(): Atelier {
       const carte = new Map<string, StatutEnvoi>()
       const grimpeur = nom ? dataset?.grimpeurs.find((g) => g.nom.trim().toLowerCase() === nom) : undefined
       if (!grimpeur || !dataset) return carte
-      const rang: Record<StatutEnvoi, number> = { flash: 3, reussi: 2, echec: 1 }
+      // Le plus recent l'emporte (pas le "meilleur") : `dataset.ascensions`
+      // est trie chronologiquement, donc ecrire par-dessus a chaque passage
+      // suffit. Un nouvel envoi tape sur la Carte est toujours plus recent
+      // que l'historique du fichier, donc change toujours le statut affiche
+      // — dans n'importe quel sens (flash -> echec compris) : une correction
+      // ou un vrai changement d'avis doit pouvoir se faire a tout moment,
+      // pas seulement pour ameliorer le statut.
       for (const a of dataset.ascensions) {
         if (a.grimpeurId !== grimpeur.id) continue
-        const statut: StatutEnvoi = a.resultat === 'echec' ? 'echec' : a.essais === 1 ? 'flash' : 'reussi'
-        const actuel = carte.get(a.blocId)
-        if (!actuel || rang[statut] > rang[actuel]) carte.set(a.blocId, statut)
+        carte.set(a.blocId, a.resultat === 'echec' ? 'echec' : a.essais === 1 ? 'flash' : 'reussi')
       }
       return carte
     },

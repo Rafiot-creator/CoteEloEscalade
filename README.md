@@ -869,15 +869,17 @@ concerné).
 
 Le statut affiché dans le popup et l'anneau « envoyé » sur une pastille reposent tous les deux
 sur `Atelier.envoisConnus(grimpeurNom)`, qui parcourt l'ensemble des ascensions du grimpeur
-(fichier + le seul envoi Carte par bloc) et retient, par bloc, le meilleur statut connu — un
-flash l'emporte sur un envoi en plusieurs essais, une réussite (quelle qu'elle soit) l'emporte
-sur un échec, l'absence totale d'ascension laisse le bloc « jamais essayé ». Un grimpeur qui a
-déjà réellement envoyé ou raté un bloc (d'après le fichier) le voit donc annoté dès l'arrivée
-sur la Carte, et un envoi déjà confirmé par le fichier n'est pas « effaçable » en cliquant
-échec sur la Carte — cliquer n'ajoute une correction que là où la Carte est la seule source.
-L'ancien suivi `localStorage` (`suivi.ts`) reste utilisé en complément uniquement pour les cas
-non connectés (nom non reconnu, centre sans dataset) — un repère purement visuel, comme avant,
-qui ne distingue pas flash/réussi/échec.
+(fichier + le seul envoi Carte par bloc), triées chronologiquement, et retient, par bloc, la
+**plus récente** — pas la meilleure. Un grimpeur qui a déjà réellement envoyé ou raté un bloc
+(d'après le fichier) le voit donc annoté dès l'arrivée sur la Carte ; et comme un envoi tapé sur
+la Carte est toujours plus récent que l'historique du fichier, cliquer un bouton change toujours
+le statut affiché, y compris pour le faire redescendre (flash → échec compris). C'est voulu :
+Raphaël a été explicite là-dessus après une première version qui ne laissait « gagner » que la
+meilleure ascension (voir le journal du 2026-09-15) — se corriger ou changer d'avis doit marcher
+à tout moment, dans n'importe quel sens, pas seulement pour améliorer le statut. L'ancien suivi
+`localStorage` (`suivi.ts`) reste utilisé en complément uniquement pour les cas non connectés
+(nom non reconnu, centre sans dataset) — un repère purement visuel, comme avant, qui ne
+distingue pas flash/réussi/échec.
 
 ### Cartes disponibles aujourd'hui
 
@@ -1121,9 +1123,13 @@ fait accompli.
   - pour l'absence d'effet : `title` (l'explication d'un bouton désactivé) ne s'affiche jamais
     au toucher, donc un bouton grisé qu'on ne remarque pas comme tel semblait simplement ignorer
     le tap. Ajouté le même texte en visible sous les boutons quand ils sont désactivés — voir
-    « Enregistrer un envoi comme une vraie ascension ». Autre explication possible pour un bouton
-    bel et bien actif : cliquer un bouton qui n'améliore pas le meilleur statut déjà retenu (par
-    ex. échec sur un bloc déjà flashé dans le fichier) ne change rien à l'affichage, c'est le
-    comportement voulu (cf. « un envoi déjà confirmé par le fichier n'est pas “effaçable” »
-    plus haut) mais ça peut se confondre avec un bug si on ne teste que sur des blocs déjà
-    envoyés.
+    « Enregistrer un envoi comme une vraie ascension ».
+- Raphaël a précisé le fond du problème : il veut pouvoir changer le statut d'un bloc « en tout
+  temps et en tout sens » (flash ↔ réussi ↔ échec), erreur de clic ou vrai changement d'avis.
+  `envoisConnus` retenait jusque-là le *meilleur* statut sur l'ensemble des ascensions
+  (fichier + Carte), ce qui empêchait justement de redescendre un bloc déjà flashé ou réussi au
+  fichier — exactement le blocage que le test précédent avait pris pour un bug de clic sans
+  effet. Changé pour retenir la *plus récente* plutôt que la meilleure : comme un envoi tapé sur
+  la Carte est toujours plus récent que l'historique du fichier, cliquer un bouton change
+  désormais toujours le statut affiché, peu importe le sens. Voir « Enregistrer un envoi comme
+  une vraie ascension ».
