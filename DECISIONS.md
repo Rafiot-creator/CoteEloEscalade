@@ -236,4 +236,3 @@ est un changement dans `src/core/sources/` et nulle part ailleurs.
   cotation. C'est un autre modèle, pas un raffinement de celui-ci.
 - **L'import utilisateur** par glisser-déposer : un second `SourceProvider`, sans toucher aux
   parseurs, aux formules ni à l'interface.
-- **Les actions GitHub `checkout@v4` et `setup-node@v4`** ciblent Node 20, que GitHub déprécie.

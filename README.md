@@ -892,3 +892,9 @@ fait accompli.
   des envois est désormais par grimpeur plutôt que global à l'appareil.
 - Survol d'une pastille : ajout du nom du bloc et de sa cote Elo exacte entre parenthèses,
   à côté de la cotation affichée.
+
+### 2026-09-15
+
+- Mise à jour de `actions/checkout` et `actions/setup-node` vers leur version 5 (runtime
+  Node 24) dans `.github/workflows/deploy.yml` : Node 20 est retiré des runners GitHub Actions
+  le 16 septembre 2026, ces actions y tournaient encore. Piste refermée dans `DECISIONS.md`.
