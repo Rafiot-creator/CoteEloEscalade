@@ -87,7 +87,7 @@ export function VueDonnees({ dataset }: { dataset: Dataset }) {
   const colBlocs: Colonne<(typeof blocs)[number]>[] = [
     { cle: 'nom', titre: t('Bloc', 'Boulder'), principal: true, valeur: (b) => b.nom },
     { cle: 'gym', titre: t('Salle', 'Gym'), valeur: (b) => b.gym },
-    { cle: 'secteur', titre: t('Secteur', 'Sector'), valeur: (b) => b.secteur, aide: t('Zone du mur.', 'Area of the wall.') },
+    { cle: 'secteur', titre: t('Style', 'Style'), valeur: (b) => b.secteur, aide: t('Type de mur ou de mouvement.', 'Wall type or movement style.') },
     {
       cle: 'couleur',
       titre: t('Couleur', 'Color'),

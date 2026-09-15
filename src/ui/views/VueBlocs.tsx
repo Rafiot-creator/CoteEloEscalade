@@ -127,9 +127,9 @@ export function VueBlocs({
       : []),
     {
       cle: 'secteur',
-      titre: t('Secteur', 'Sector'),
+      titre: t('Style', 'Style'),
       valeur: (b) => b.secteur,
-      aide: t('Zone du mur où se trouve le bloc.', 'Area of the wall where the boulder is located.'),
+      aide: t('Type de mur ou de mouvement du bloc (dévers, dalle, toit...).', "The boulder's wall type or movement style (overhang, slab, roof...)."),
     },
     {
       cle: 'couleur',

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAccesComplet } from './ui/acces'
 import { useAtelier } from './ui/etat'
 import { LangueProvider, useLangue } from './ui/langue'
+import { VueCarte } from './ui/views/VueCarte'
 import { VueDonnees } from './ui/views/VueDonnees'
 import { VueFichiers } from './ui/views/VueFichiers'
 import { VueFormules } from './ui/views/VueFormules'
@@ -11,6 +12,7 @@ import { VueBlocs } from './ui/views/VueBlocs'
 const ONGLETS = [
   { id: 'blocs', fr: 'Blocs', en: 'Boulders', reserve: false },
   { id: 'grimpeurs', fr: 'Grimpeurs', en: 'Climbers', reserve: false },
+  { id: 'carte', fr: 'Carte', en: 'Map', reserve: false },
   { id: 'formules', fr: 'Formules', en: 'Formulas', reserve: true },
   { id: 'donnees', fr: 'Données', en: 'Data', reserve: true },
   { id: 'fichiers', fr: 'Fichiers', en: 'Files', reserve: true },
@@ -122,7 +124,9 @@ function Contenu() {
       </header>
 
       <main className="contenu">
-        {centre.id !== 'demo' && (
+        {onglet === 'carte' && <VueCarte centreId={centreId} accesComplet={vueComplete} />}
+
+        {onglet !== 'carte' && centre.id !== 'demo' && (
           <div className="large">
             <div className="carte">
               <h2>{t(`Pas encore de données pour ${centre.fr}`, `No data yet for ${centre.en}`)}</h2>
@@ -136,7 +140,7 @@ function Contenu() {
           </div>
         )}
 
-        {centre.id === 'demo' && atelier.erreur && (
+        {onglet !== 'carte' && centre.id === 'demo' && atelier.erreur && (
           <div className="large">
             <div className="carte" style={{ borderColor: 'var(--critique)' }}>
               <h2>{t('Le chargement a échoué', 'Loading failed')}</h2>
@@ -145,11 +149,11 @@ function Contenu() {
           </div>
         )}
 
-        {centre.id === 'demo' && atelier.chargement && (
+        {onglet !== 'carte' && centre.id === 'demo' && atelier.chargement && (
           <p className="vide">{t('Chargement des fichiers…', 'Loading files…')}</p>
         )}
 
-        {centre.id === 'demo' && atelier.dataset && atelier.resultat && (
+        {onglet !== 'carte' && centre.id === 'demo' && atelier.dataset && atelier.resultat && (
           <>
             {onglet === 'blocs' && (
               <VueBlocs resultat={atelier.resultat} resultats={atelier.resultats} simplifie={!vueComplete} />
