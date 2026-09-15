@@ -764,10 +764,20 @@ bas), le clic retombe sur l'ancien bascule `suivi.ts`, pour ne pas retirer la se
 interaction disponible sur un centre non connecté. En accès complet, le clic sert déjà à
 sélectionner/déplacer un bloc : **Majuscule (shift) + clic** ouvre le popup sans déclencher ni
 la sélection ni le glisser (`debuterGlisse` ignore l'événement quand `e.shiftKey` est vrai).
-Cliquer le fond de la carte (pas un bloc), en vue visiteur, referme le popup ouvert.
+Cliquer le fond de la carte (pas un bloc) referme le popup ouvert, dans les deux niveaux
+d'accès.
 
 Le popup s'ouvre (`setSurvole(id)`), il ne bascule pas : un clic suit presque toujours un
 survol qui a déjà ouvert le même popup, un bascule le refermerait aussitôt.
+
+**Le popup ne se ferme pas en quittant la pastille au survol.** Entre la pastille (un cercle
+de 40 px) et le popup (décalé de quelques pixels pour ne pas le recouvrir) se trouve une bande
+de fond de carte qui n'appartient ni à l'un ni à l'autre : la traverser en ligne droite pour
+atteindre les boutons faisait perdre le survol et refermait le popup avant d'avoir pu cliquer
+— exactement le bug que Raphaël a signalé (« les boutons disparaissent dès que la souris
+quitte la pastille »). Il n'y a donc pas de gestionnaire `onMouseLeave` sur le bloc : le popup
+reste ouvert jusqu'à survoler un autre bloc (qui prend sa place) ou cliquer le fond de la
+carte.
 
 ### Enregistrer un envoi comme une vraie ascension
 
@@ -979,3 +989,11 @@ fait accompli.
   dessus). Cliquer un bloc ouvre le popup en vue visiteur (retombe sur l'ancien suivi local si
   le centre n'a pas de dataset connecté) ; en accès complet, où le clic sert déjà à
   sélectionner/déplacer, c'est Majuscule (shift) + clic. Voir « Pastilles, survol et popup ».
+- Dernier retour de Raphaël sur la Carte : en vue visiteur, cliquer un bloc ne semblait rien
+  faire, et les boutons disparaissaient dès que la souris quittait la pastille. Cause réelle :
+  le popup se fermait au survol (`onMouseLeave`) dès que le curseur quittait la pastille pour
+  rejoindre les boutons, dans la bande de fond de carte entre les deux qui n'appartient à
+  aucun des deux éléments — testé avec des sauts de curseur directs plus tôt dans la session,
+  jamais avec un déplacement continu, donc jamais repéré. Retiré `onMouseLeave` : le popup
+  reste ouvert jusqu'à survoler un autre bloc ou cliquer le fond de la carte. Revérifié cette
+  fois avec un déplacement de souris en plusieurs étapes, dans les deux vues.

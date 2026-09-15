@@ -162,6 +162,7 @@ export function VueCarte({
       return
     }
     if (glisse.current) return
+    setSurvole(null)
     const { x, y } = relatif(e.clientX, e.clientY)
     const bloc: BlocCarte = { id: nouvelId(), x, y, cotation: 'V4', couleur: 'bleu', style: '' }
     setCarte({ ...carte, blocs: [...carte.blocs, bloc] })
@@ -187,8 +188,15 @@ export function VueCarte({
   // necessaire des qu'il n'y a pas de souris pour survoler, par ex. sur une
   // tablette en salle. Toujours "ouvre" plutot que "bascule" : le clic suit
   // en pratique un survol qui a deja mis `survole` a cet id, un bascule le
-  // refermerait aussitot. Fermeture : cliquer ailleurs sur la carte, ou
-  // deplacer la souris hors du bloc.
+  // refermerait aussitot.
+  //
+  // Le popup ne se ferme PAS en quittant la pastille au survol (pas de
+  // onMouseLeave) : entre la pastille et le popup se trouve quelques pixels
+  // de fond de carte qui n'appartiennent a aucun des deux — les traverser en
+  // ligne droite pour atteindre les boutons y ferait perdre le survol et
+  // refermerait le popup avant d'avoir pu cliquer. Le popup reste donc
+  // ouvert jusqu'a survoler un autre bloc (qui prend sa place) ou cliquer le
+  // fond de la carte (cf. `ajouter`).
   const ouvrirPopup = (id: string) => {
     setSurvole(id)
   }
@@ -332,7 +340,6 @@ export function VueCarte({
                   key={b.id}
                   style={{ position: 'absolute', left: `${b.x * 100}%`, top: `${b.y * 100}%` }}
                   onMouseEnter={() => setSurvole(b.id)}
-                  onMouseLeave={() => setSurvole((s) => (s === b.id ? null : s))}
                 >
                   <div
                     onMouseDown={debuterGlisse(b.id)}
