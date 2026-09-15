@@ -816,26 +816,28 @@ calcul : le pipeline ne voit qu'un seul dataset cohérent, trié chronologiqueme
 tapé sur la Carte recalcule donc immédiatement les cotes affichées ailleurs (onglets Blocs,
 Grimpeurs), exactement comme une ligne du CSV le ferait.
 
+**Changer d'avis.** Cliquer un nouveau bouton pour un bloc déjà enregistré *depuis la Carte*
+remplace l'envoi précédent pour ce couple bloc/grimpeur au lieu de s'y ajouter — flash, puis
+échec par erreur, puis réussi : le dernier clic gagne, sans étape d'annulation séparée. Ça ne
+touche jamais aux ascensions du fichier CSV, immuables ; seul l'unique envoi ajouté depuis la
+Carte pour ce bloc est remplacé. Une première version ajoutait chaque clic comme une ligne
+séparée (pour ne perdre aucune tentative réelle sur plusieurs séances) avec un lien « Annuler »
+à part pour rattraper un mauvais clic — Raphaël a trouvé ça lourd pour un geste aussi courant :
+remplacer directement au clic suivant est plus simple, au prix de ne garder que le dernier
+envoi tapé sur la Carte pour un bloc donné (l'historique réel du fichier CSV, lui, n'est pas
+concerné).
+
 Le statut affiché dans le popup et l'anneau « envoyé » sur une pastille reposent tous les deux
 sur `Atelier.envoisConnus(grimpeurNom)`, qui parcourt l'ensemble des ascensions du grimpeur
-(fichier + Carte) et retient, par bloc, le meilleur statut connu — un flash l'emporte sur un
-envoi en plusieurs essais, une réussite (quelle qu'elle soit) l'emporte sur un échec, l'absence
-totale d'ascension laisse le bloc « jamais essayé ». Un grimpeur qui a déjà réellement envoyé
-ou raté un bloc le voit donc annoté dès l'arrivée sur la Carte, sans avoir à re-cliquer quoi
-que ce soit. L'ancien suivi `localStorage` (`suivi.ts`) reste utilisé en complément uniquement
-pour les cas non connectés (nom non reconnu, centre sans dataset) — un repère purement visuel,
-comme avant, qui ne distingue pas flash/réussi/échec.
-
-**Corriger un clic.** Un mauvais bouton cliqué par erreur (ou un vrai changement — un
-grimpeur qui rate, puis revient plus tard et flashe le même bloc) ne doit pas rester coincé.
-Sous les trois boutons, un lien « Annuler mon dernier envoi (…) » apparaît dès qu'il existe un
-envoi ajouté *depuis la Carte* pour ce couple bloc/grimpeur (`Atelier.envoiLocalActuel`) ; le
-cliquer retire cet envoi (`Atelier.annulerDernierEnvoi`) et rien d'autre. Ça ne touche jamais
-aux ascensions du fichier CSV, immuables : seuls les envois tapés sur la Carte peuvent être
-annulés, un par un, en partant du plus récent pour ce bloc. Un vrai changement dans le temps
-(échec puis flash, par exemple) n'a lui besoin d'aucune annulation : `envoisConnus` retient
-déjà le meilleur statut sur l'ensemble des ascensions, donc cliquer le bon bouton la fois
-suivante suffit à corriger l'affichage.
+(fichier + le seul envoi Carte par bloc) et retient, par bloc, le meilleur statut connu — un
+flash l'emporte sur un envoi en plusieurs essais, une réussite (quelle qu'elle soit) l'emporte
+sur un échec, l'absence totale d'ascension laisse le bloc « jamais essayé ». Un grimpeur qui a
+déjà réellement envoyé ou raté un bloc (d'après le fichier) le voit donc annoté dès l'arrivée
+sur la Carte, et un envoi déjà confirmé par le fichier n'est pas « effaçable » en cliquant
+échec sur la Carte — cliquer n'ajoute une correction que là où la Carte est la seule source.
+L'ancien suivi `localStorage` (`suivi.ts`) reste utilisé en complément uniquement pour les cas
+non connectés (nom non reconnu, centre sans dataset) — un repère purement visuel, comme avant,
+qui ne distingue pas flash/réussi/échec.
 
 ### Cartes disponibles aujourd'hui
 
@@ -1034,3 +1036,10 @@ fait accompli.
   ascension », sous-section « Corriger un clic ») : corrige un clic malencontreux sans toucher
   aux ascensions du fichier CSV. Un vrai changement de statut dans le temps (échec puis flash)
   n'a pas besoin de cette annulation, `envoisConnus` retenant déjà le meilleur statut connu.
+- Raphaël a trouvé ce lien « Annuler » laborieux pour un geste courant (se corriger, ou changer
+  d'avis) : remplacé par un comportement plus direct — cliquer un nouveau bouton remplace
+  l'unique envoi ajouté depuis la Carte pour ce bloc/grimpeur, sans étape séparée. Retiré
+  `envoiLocalActuel`/`annulerDernierEnvoi` et le lien du popup ; `enregistrerAscension` fait le
+  remplacement lui-même. Voir « Changer d'avis » dans « Enregistrer un envoi comme une vraie
+  ascension » pour le compromis assumé (une seule entrée Carte par bloc, pas un historique de
+  chaque clic).

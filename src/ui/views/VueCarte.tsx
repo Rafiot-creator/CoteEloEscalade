@@ -55,8 +55,6 @@ export function VueCarte({
   grimpeurs,
   enregistrerAscension,
   envoisConnus,
-  envoiLocalActuel,
-  annulerDernierEnvoi,
 }: {
   centreId: string
   accesComplet: boolean
@@ -77,10 +75,6 @@ export function VueCarte({
   enregistrerAscension?: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
   /** Blocs deja envoyes par un grimpeur nomme, d'apres l'ensemble du dataset. */
   envoisConnus?: (grimpeurNom: string) => Map<string, StatutEnvoi>
-  /** Type du dernier envoi ajoute depuis la Carte pour ce bloc/grimpeur, s'il y en a un a annuler. */
-  envoiLocalActuel?: (blocId: string, grimpeurNom: string) => TypeEnvoi | null
-  /** Retire ce dernier envoi ajoute depuis la Carte (pas les ascensions du fichier). */
-  annulerDernierEnvoi?: (blocId: string, grimpeurNom: string) => boolean
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
@@ -337,7 +331,6 @@ export function VueCarte({
             return carte.blocs.map((b) => {
               const statut = envoisReels.get(b.id)
               const fait = statut === 'flash' || statut === 'reussi' || !!suivi[b.id]
-              const envoiLocal = envoiLocalActuel?.(b.id, grimpeurChoisi) ?? null
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
               const ancreX = (zoneRect?.left ?? 0) + b.x * (zoneRect?.width ?? 0)
@@ -480,20 +473,6 @@ export function VueCarte({
                           ✕
                         </button>
                       </div>
-                      {envoiLocal && (
-                        <button
-                          className="bouton discret carte-popup-annuler"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            annulerDernierEnvoi?.(b.id, grimpeurChoisi)
-                          }}
-                        >
-                          {t(
-                            `Annuler mon dernier envoi (${envoiLocal === 'flash' ? 'flash' : envoiLocal === 'reussi' ? 'réussi' : 'échec'})`,
-                            `Undo my last log (${envoiLocal === 'flash' ? 'flash' : envoiLocal === 'reussi' ? 'sent' : 'fail'})`
-                          )}
-                        </button>
-                      )}
                     </div>
                     )
                   })()}

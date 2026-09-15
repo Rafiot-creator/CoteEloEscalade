@@ -132,8 +132,6 @@ function Contenu() {
             grimpeurs={centreId === 'demo' ? atelier.dataset?.grimpeurs.map((g) => g.nom) : undefined}
             enregistrerAscension={centreId === 'demo' ? atelier.enregistrerAscension : undefined}
             envoisConnus={centreId === 'demo' ? atelier.envoisConnus : undefined}
-            envoiLocalActuel={centreId === 'demo' ? atelier.envoiLocalActuel : undefined}
-            annulerDernierEnvoi={centreId === 'demo' ? atelier.annulerDernierEnvoi : undefined}
           />
         )}
 

@@ -18,8 +18,7 @@ import type { Ascension } from '../core/types'
 export interface AscensionLocaleProvider {
   id: string
   lire(): Ascension[]
-  ajouter(ascension: Ascension): void
-  /** Remplace la liste entiere : sert a annuler un envoi mal clique. */
+  /** Remplace la liste entiere : un nouveau clic sur un bloc y remplace l'ancien. */
   ecrire(ascensions: Ascension[]): void
 }
 
@@ -34,11 +33,6 @@ export const ascensionsLocales: AscensionLocaleProvider = {
     } catch {
       return []
     }
-  },
-  ajouter(ascension) {
-    const actuel = ascensionsLocales.lire()
-    actuel.push(ascension)
-    ascensionsLocales.ecrire(actuel)
   },
   ecrire(ascensions) {
     try {
