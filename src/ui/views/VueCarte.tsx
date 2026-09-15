@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { COTATIONS, V_MAX, indexDeCotation } from '../../core/cotations'
+import { COTATIONS } from '../../core/cotations'
 import { chargerCarte } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import { useInfobulle } from '../charts/base'
@@ -8,11 +8,24 @@ import { telecharger } from '../format'
 import { useLangue } from '../langue'
 import { suiviLocal } from '../suivi'
 
-/** Rouge (V0) au mauve (V_MAX), dans l'ordre du spectre visible. */
-function couleurCote(cotation: string): string {
-  const idx = indexDeCotation(cotation) ?? 0
-  const teinte = (idx / V_MAX) * 270
-  return `hsl(${teinte}, 72%, 46%)`
+/**
+ * Couleur des prises, du mauve au rouge (ordre du spectre visible), puis
+ * noir et blanc ajoutes aux extremes. C'est la couleur reelle choisie par
+ * l'ouvreur — elle ne depend pas de la cotation.
+ */
+const PALETTE_COULEURS = [
+  { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#8b3fd1', texte: '#fff' },
+  { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: 'var(--serie-1)', texte: '#fff' },
+  { id: 'vert', fr: 'Vert', en: 'Green', fond: 'var(--serie-3)', texte: '#fff' },
+  { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: 'var(--serie-4)', texte: '#fff' },
+  { id: 'orange', fr: 'Orange', en: 'Orange', fond: 'var(--serie-2)', texte: '#fff' },
+  { id: 'rouge', fr: 'Rouge', en: 'Red', fond: 'var(--critique)', texte: '#fff' },
+  { id: 'noir', fr: 'Noir', en: 'Black', fond: '#18181b', texte: '#fff' },
+  { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#f5f5f2', texte: '#111' },
+] as const
+
+function infoCouleur(id: string) {
+  return PALETTE_COULEURS.find((c) => c.id === id) ?? PALETTE_COULEURS[1]
 }
 
 function nouvelId(): string {
@@ -68,7 +81,7 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
   const ajouter = (e: React.MouseEvent) => {
     if (!accesComplet || glisse.current) return
     const { x, y } = relatif(e.clientX, e.clientY)
-    const bloc: BlocCarte = { id: nouvelId(), x, y, cotation: 'V4', style: '' }
+    const bloc: BlocCarte = { id: nouvelId(), x, y, cotation: 'V4', couleur: 'bleu', style: '' }
     setCarte({ ...carte, blocs: [...carte.blocs, bloc] })
     setSelection(bloc.id)
   }
@@ -173,6 +186,7 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
           )}
           {carte.blocs.map((b) => {
             const fait = !!suivi[b.id]
+            const couleur = infoCouleur(b.couleur)
             return (
               <div
                 key={b.id}
@@ -185,7 +199,10 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
                 onMouseMove={(e) =>
                   montrer(e, {
                     titre: b.cotation,
-                    lignes: [[t('Style', 'Style'), b.style || '—']],
+                    lignes: [
+                      [t('Couleur', 'Color'), t(couleur.fr, couleur.en)],
+                      [t('Style', 'Style'), b.style || '—'],
+                    ],
                   })
                 }
                 onMouseLeave={cacher}
@@ -198,16 +215,15 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
                   marginLeft: -RAYON,
                   marginTop: -RAYON,
                   borderRadius: '50%',
-                  background: couleurCote(b.cotation),
-                  border: selection === b.id ? '2px solid var(--encre)' : '2px solid var(--surface)',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
+                  background: couleur.fond,
+                  boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35)`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff',
+                  color: couleur.texte,
                   fontSize: 12,
                   fontWeight: 700,
-                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                  textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
                   cursor: accesComplet ? 'grab' : 'pointer',
                   opacity: !accesComplet && fait ? 0.45 : 1,
                 }}
@@ -241,6 +257,34 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
       {accesComplet && blocSelectionne && (
         <div ref={editionRef}>
         <Carte titre={t('Modifier le bloc', 'Edit boulder')}>
+          <div className="param">
+            <div className="param-tete">
+              <label>{t('Couleur', 'Color')}</label>
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 2 }}>
+              {PALETTE_COULEURS.map((c) => (
+                <button
+                  key={c.id}
+                  title={t(c.fr, c.en)}
+                  aria-pressed={blocSelectionne.couleur === c.id}
+                  onClick={() => modifier(blocSelectionne.id, { couleur: c.id })}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    border: 'none',
+                    padding: 0,
+                    background: c.fond,
+                    cursor: 'pointer',
+                    boxShadow:
+                      blocSelectionne.couleur === c.id
+                        ? '0 0 0 2px var(--encre), 0 0 0 4px var(--surface)'
+                        : '0 0 0 2px var(--bord-fort)',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
           <div className="param">
             <div className="param-tete">
               <label>{t('Cotation', 'Grade')}</label>

@@ -13,6 +13,11 @@ export interface BlocCarte {
   y: number
   /** Cotation V affichee au centre de la pastille (ex. 'V4'). */
   cotation: string
+  /**
+   * Couleur des prises, choisie par l'ouvreur : identifiant de
+   * `PALETTE_COULEURS` (src/ui/views/VueCarte.tsx), ex. 'bleu', 'noir'.
+   */
+  couleur: string
   /** Style du bloc (dalle, devers, nom du secteur...). Texte libre. */
   style: string
 }
