@@ -263,6 +263,7 @@ src/core/                 tout le calcul — ne connaît pas React
     definitions/          une formule = un fichier
   calibrage.ts            cote Elo (unité interne) → cotation V
   pipeline.ts             fichiers → dataset → formule → résultat affichable
+  cartes/                 positions des blocs sur le plan d'un centre (indépendant du calcul)
 src/ui/                   React : n'a aucune connaissance du calcul
 ```
 
@@ -678,6 +679,7 @@ site soit utile.
 |---|---|
 | **Blocs** | Le verdict : combien de blocs contredisent leur étiquette, lesquels, de combien. Cote Elo, nuage calculé/affiché, distribution des écarts, tableau exportable. Un filtre par salle apparaît s'il y en a plusieurs. |
 | **Grimpeurs** | Classement avec cote Elo, niveau calculé (la cotation V envoyée une fois sur deux), courbes de progression. |
+| **Carte** | Plan du centre choisi, blocs positionnés en pastilles colorées. Ajouter, déplacer, modifier ou supprimer un bloc et exporter la carte sont réservés à l'accès complet ; en vue visiteur c'est une lecture seule, avec un suivi personnel (par nom saisi) des blocs déjà envoyés. Détails plus bas, « La carte des blocs ». |
 | **Formules** *(accès complet)* | Choix de la formule, réglage des paramètres, diagnostics, convergence, comparaison A/B de deux réglages. |
 | **Données** *(accès complet)* | Les tables après validation, filtrables, exportables — y compris toutes les lignes repliées dans les duels. |
 | **Fichiers** *(accès complet)* | Ce que le site sait de ses propres fichiers — et ce qu'il a refusé d'y lire. |
@@ -694,17 +696,67 @@ technique : « Écart », « Duels utiles » ou « Verdict » ne veulent rien di
 ## Deux niveaux d'accès : visiteur et complet
 
 Le site n'a ni serveur ni compte, donc pas de vraie authentification. Par défaut, un visiteur
-ne voit que les écrans **Blocs** et **Grimpeurs** — les trois autres, plus techniques, sont
-masqués. Visiter une fois une URL contenant un paramètre secret débloque l'« accès complet »
-sur ce navigateur (mémorisé en `localStorage`, `src/ui/acces.ts`) ; les cinq écrans
-apparaissent alors, et un bouton dans l'en-tête permet de basculer à volonté entre « Vue
+ne voit que les écrans **Blocs**, **Grimpeurs** et **Carte** — les trois autres, plus
+techniques, sont masqués. Visiter une fois une URL contenant un paramètre secret débloque
+l'« accès complet » sur ce navigateur (mémorisé en `localStorage`, `src/ui/acces.ts`) ; les six
+écrans apparaissent alors, et un bouton dans l'en-tête permet de basculer à volonté entre « Vue
 complète » et « Vue visiteur » sans perdre le déverrouillage.
+
+**Exception** : l'écran **Carte** est visible dans les deux vues, mais son édition (ajouter,
+déplacer, modifier, supprimer un bloc, exporter la carte) est réservée à l'accès complet ; la
+vue visiteur n'y a que de la lecture et le suivi personnel des envois. Voir « La carte des
+blocs » ci-dessous.
 
 **Ce n'est qu'un masquage d'interface, pas une protection réelle** : le site étant statique,
 le paramètre secret est visible dans le code source par quiconque le cherche. Suffisant tant
 que les données restent factices ; le jour où de vraies données personnelles entrent en jeu,
 il faudra un vrai compte côté serveur (voir « Quand vous ajouterez une deuxième salle » et la
 note sur les données personnelles plus haut).
+
+## La carte des blocs
+
+L'écran **Carte** montre le plan du centre choisi dans le menu déroulant, avec les blocs
+positionnés dessus sous forme de pastilles. C'est le seul écran où les deux niveaux d'accès
+coexistent dans la même vue plutôt que de se masquer entièrement : en accès complet on édite,
+en vue visiteur on ne fait que consulter et cocher ses propres envois.
+
+### Modèle de données et architecture
+
+`src/core/cartes/types.ts` déclare `BlocCarte` (position relative `x`/`y` de 0 à 1, cotation,
+couleur, style, nom optionnel de l'étiquette) et une interface `CarteProvider` — calquée sur
+`SourceProvider` (les CSV). La seule implémentation aujourd'hui (`src/core/cartes/sources.ts`)
+lit `data/cartes/<centreId>.json`, **versionné avec le code** comme le reste de `data/` : Git
+sert d'historique des positions. Ce choix anticipe explicitement un futur serveur — le jour où
+des ouvreurs modifieront la carte en direct, seule cette source change, `VueCarte.tsx` ne
+connaît que `chargerCarte(centreId)`.
+
+Le suivi « j'ai envoyé ce bloc » (`src/ui/suivi.ts`) suit le même principe : une interface
+`SuiviProvider`, aujourd'hui posée sur `localStorage`, indexée par couple **(centre,
+grimpeur)** — un même appareil peut donc suivre plusieurs grimpeurs, utile sur une tablette
+partagée en salle. Le nom choisi est mémorisé par centre pour ne pas le retaper à chaque
+visite, avec un bouton pour l'effacer.
+
+### Pastilles et survol
+
+Les blocs sont des pastilles rondes à fond métallique (dégradé + reflet), la cotation V
+affichée au centre. La couleur de fond suit la couleur réelle des prises (bleu, vert, jaune,
+orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte
+clair ou foncé choisi pour rester lisible sur chaque fond. Au survol, une bulle indique le nom
+du bloc, sa cotation affichée suivie de sa cote Elo exacte entre parenthèses (celle de la
+formule mélange, quand ce bloc existe aussi dans le jeu de données d'ascensions), et son style.
+
+### Cartes disponibles aujourd'hui
+
+- **Démo** — un plan inventé (`public/cartes/demo.svg`), huit bandes murales reprenant les huit
+  styles du jeu de données (Dalle, Toit, Devers, Arête, Cave, Traverse, Compétition, Prow). 50
+  blocs y sont placés, un échantillon proportionnel par style (méthode du plus grand reste,
+  `scripts/generer-carte-demo.mjs`) tiré des 369 du jeu de démonstration pour rester lisible ;
+  les positions ont ensuite été affinées à la main dans l'interface puis réexportées.
+- **Rose Bloc 1** — une vraie photo du plan de la salle (`public/cartes/rose-bloc-1.jpg`),
+  fournie par Raphaël et nettoyée des dates griffonnées au crayon (masquage colorimétrique +
+  interpolation), sans bloc positionné pour l'instant.
+- Les autres centres du menu n'ont pas encore de carte : l'écran affiche un canevas vierge,
+  cliquable en accès complet pour commencer à y placer des blocs.
 
 ## Site bilingue (français / anglais)
 
@@ -824,3 +876,19 @@ fait accompli.
   définitions de formules (la version anglaise garde « V grade »).
 - Harmonisation de ce README avec le même vocabulaire : toutes les occurrences de « cran »
   (au sens du modèle) sont devenues « cote ».
+- Renommage de la colonne « Secteur » en « Style » sur les écrans Blocs et Données (français et
+  anglais).
+- Ajout de l'écran **Carte**, visible par tous : édition complète des blocs en accès complet,
+  lecture seule avec suivi personnel des envois (par nom saisi) en vue visiteur — voir « La
+  carte des blocs » plus haut pour l'architecture (`CarteProvider`, `SuiviProvider`).
+- Carte inventée pour le centre Démo (`public/cartes/demo.svg`), 50 blocs répartis par style le
+  long des murs (`scripts/generer-carte-demo.mjs`), positions ensuite affinées à la main.
+- Carte réelle de Rose Bloc 1 ajoutée à partir d'une photo fournie par Raphaël, nettoyée des
+  dates manuscrites qui s'y trouvaient.
+- Palette des pastilles reprise trois fois sur retour de Raphaël : spectre plat → néon →
+  métallique (dégradé + reflet), en vérifiant à chaque fois le contraste du texte sur chaque
+  fond.
+- Sélecteur de nom de grimpeur ajouté à l'écran Carte, avec bouton pour l'effacer ; le suivi
+  des envois est désormais par grimpeur plutôt que global à l'appareil.
+- Survol d'une pastille : ajout du nom du bloc et de sa cote Elo exacte entre parenthèses,
+  à côté de la cotation affichée.
