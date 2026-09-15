@@ -78,6 +78,15 @@ attente (`git status` clean).
   `.github/workflows/deploy.yml`, avant le retrait de Node 20 des runners GitHub Actions le
   16 septembre 2026 (annonce GitHub). Tests (62) toujours au vert après la modification. Piste
   refermée dans `DECISIONS.md` § 7.
+- Écran Carte : trois boutons au survol d'un bloc (flash/réussi/échec). Pour le centre Démo et
+  un nom de grimpeur reconnu du dataset, ils enregistrent une vraie ascension
+  (`src/ui/ascensionsLocales.ts`, fusionnée dans `useAtelier`/`etat.ts`) qui recalcule les
+  cotes affichées ailleurs (Blocs, Grimpeurs) — pas un simple suivi visuel comme avant. Sans
+  centre connecté ou sans nom reconnu, les boutons restent visibles mais désactivés. L'anneau
+  « envoyé » (vue visiteur) suit maintenant l'historique réel (`Atelier.envoisConnus`) plutôt
+  qu'un drapeau `localStorage` isolé. Détails dans le README, § « La carte des blocs ».
+  Testé manuellement dans Chrome (flash/réussi/échec, vue complète et visiteur, popup
+  désactivé sans nom valide) : tout fonctionne comme attendu. Tests (62) et typecheck au vert.
 
 ## Prochaine étape
 

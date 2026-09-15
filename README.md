@@ -679,7 +679,7 @@ site soit utile.
 |---|---|
 | **Blocs** | Le verdict : combien de blocs contredisent leur étiquette, lesquels, de combien. Cote Elo, nuage calculé/affiché, distribution des écarts, tableau exportable. Un filtre par salle apparaît s'il y en a plusieurs. |
 | **Grimpeurs** | Classement avec cote Elo, niveau calculé (la cotation V envoyée une fois sur deux), courbes de progression. |
-| **Carte** | Plan du centre choisi, blocs positionnés en pastilles colorées. Ajouter, déplacer, modifier ou supprimer un bloc et exporter la carte sont réservés à l'accès complet ; en vue visiteur c'est une lecture seule, avec un suivi personnel (par nom saisi) des blocs déjà envoyés. Détails plus bas, « La carte des blocs ». |
+| **Carte** | Plan du centre choisi, blocs positionnés en pastilles colorées. Ajouter, déplacer, modifier ou supprimer un bloc et exporter la carte sont réservés à l'accès complet. Survoler un bloc propose trois boutons — flash, réussi, échec — pour enregistrer un envoi ; quand le centre a un jeu de données connecté (aujourd'hui, Démo) et que le nom saisi correspond à un grimpeur connu, c'est une vraie ascension qui s'ajoute au calcul, pas un simple repère visuel. Détails plus bas, « La carte des blocs ». |
 | **Formules** *(accès complet)* | Choix de la formule, réglage des paramètres, diagnostics, convergence, comparaison A/B de deux réglages. |
 | **Données** *(accès complet)* | Les tables après validation, filtrables, exportables — y compris toutes les lignes repliées dans les duels. |
 | **Fichiers** *(accès complet)* | Ce que le site sait de ses propres fichiers — et ce qu'il a refusé d'y lire. |
@@ -734,16 +734,54 @@ Le suivi « j'ai envoyé ce bloc » (`src/ui/suivi.ts`) suit le même principe :
 `SuiviProvider`, aujourd'hui posée sur `localStorage`, indexée par couple **(centre,
 grimpeur)** — un même appareil peut donc suivre plusieurs grimpeurs, utile sur une tablette
 partagée en salle. Le nom choisi est mémorisé par centre pour ne pas le retaper à chaque
-visite, avec un bouton pour l'effacer.
+visite, avec un bouton pour l'effacer. C'est un repère purement visuel, qui n'entre dans aucun
+calcul — voir plus bas pourquoi ça ne suffisait plus.
 
 ### Pastilles et survol
 
 Les blocs sont des pastilles rondes à fond métallique (dégradé + reflet), la cotation V
 affichée au centre. La couleur de fond suit la couleur réelle des prises (bleu, vert, jaune,
 orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte
-clair ou foncé choisi pour rester lisible sur chaque fond. Au survol, une bulle indique le nom
+clair ou foncé choisi pour rester lisible sur chaque fond. Au survol, un popup indique le nom
 du bloc, sa cotation affichée suivie de sa cote Elo exacte entre parenthèses (celle de la
-formule mélange, quand ce bloc existe aussi dans le jeu de données d'ascensions), et son style.
+formule mélange, quand ce bloc existe aussi dans le jeu de données d'ascensions), son style, et
+trois boutons — flash (⚡, vert), réussi (✓, jaune), échec (✕, rouge). Ce popup est en
+`position: fixed`, pas relatif à la carte : la zone de carte a `overflow: hidden` pour ne pas
+laisser un bloc glissé déborder du plan, et un popup positionné normalement s'y serait fait
+couper près des bords.
+
+### Enregistrer un envoi comme une vraie ascension
+
+Les trois boutons du survol appellent `Atelier.enregistrerAscension(blocId, grimpeurNom, type)`
+(`src/ui/etat.ts`), qui ne fait rien de plus qu'ajouter une ligne au dataset — mêmes champs
+que `data/ascensions.csv` (`essais: 1` pour flash et échec, `2` pour réussi ; cette valeur
+n'entre dans aucun calcul, cf. `core/types.ts`, elle ne fait que refléter honnêtement l'écart
+entre les trois). Deux conditions doivent être réunies pour que ça marche :
+
+- le centre a un jeu de données connecté (`enregistrerAscension` est passé à `VueCarte` par
+  `App.tsx` seulement si `centreId === 'demo'` — le seul cas aujourd'hui) ;
+- le nom saisi dans « Carte de : » correspond exactement à un grimpeur du dataset (comparaison
+  insensible à la casse et aux espaces).
+
+Si l'une des deux manque, les trois boutons restent visibles mais désactivés (grisés), avec un
+titre expliquant pourquoi. C'est délibéré : on ne veut pas qu'un envoi tapé sous un nom inventé
+se retrouve silencieusement associé à personne, ni qu'un centre sans données se mette à
+halluciner un classement.
+
+Ces ascensions ajoutées sont persistées dans `localStorage` (`src/ui/ascensionsLocales.ts`,
+même principe que `suiviLocal` — une interface `AscensionLocaleProvider` en vue d'un futur
+serveur) puis fusionnées avec celles de `data/ascensions.csv` dans `useAtelier` avant tout
+calcul : le pipeline ne voit qu'un seul dataset cohérent, trié chronologiquement. Un envoi
+tapé sur la Carte recalcule donc immédiatement les cotes affichées ailleurs (onglets Blocs,
+Grimpeurs), exactement comme une ligne du CSV le ferait.
+
+L'anneau « envoyé » sur une pastille (vue visiteur) suit la même logique de cohérence : il ne
+se base plus sur un simple drapeau local, mais sur `Atelier.envoisConnus(grimpeurNom)`, qui
+regarde l'ensemble des ascensions (fichier + Carte) pour ce grimpeur. Un grimpeur qui a déjà
+réellement envoyé un bloc le voit donc marqué dès l'arrivée sur la Carte, sans avoir à
+re-cliquer quoi que ce soit. L'ancien suivi `localStorage` (`suivi.ts`) reste utilisé en
+complément uniquement pour les cas non connectés (nom non reconnu, centre sans dataset) — un
+repère purement visuel, comme avant.
 
 ### Cartes disponibles aujourd'hui
 
@@ -898,3 +936,10 @@ fait accompli.
 - Mise à jour de `actions/checkout` et `actions/setup-node` vers leur version 5 (runtime
   Node 24) dans `.github/workflows/deploy.yml` : Node 20 est retiré des runners GitHub Actions
   le 16 septembre 2026, ces actions y tournaient encore. Piste refermée dans `DECISIONS.md`.
+- Ajout de trois boutons au survol d'un bloc sur la Carte — flash, réussi, échec — voir « La
+  carte des blocs » plus haut, § « Enregistrer un envoi comme une vraie ascension ». Pour le
+  centre Démo et un nom de grimpeur reconnu, ils ajoutent une vraie ligne d'ascension au
+  calcul (`src/ui/ascensionsLocales.ts`, fusionnée dans `useAtelier`) au lieu du simple suivi
+  visuel d'avant : les cotes recalculées se répercutent immédiatement sur les onglets Blocs et
+  Grimpeurs, et l'anneau « envoyé » de la Carte reflète désormais l'historique réel du
+  grimpeur plutôt qu'un drapeau local indépendant.

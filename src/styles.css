@@ -344,6 +344,37 @@ table.donnees td.principal { font-weight: 500; }
 .infobulle .d { color: var(--encre-2); margin-bottom: 5px; }
 .infobulle .l:has(span:empty) { color: var(--encre-3); font-size: 11px; justify-content: flex-end; }
 
+.carte-popup {
+  position: fixed;
+  z-index: 50;
+  background: var(--surface);
+  border: 1px solid var(--bord-fort);
+  border-radius: var(--r-s);
+  padding: 7px 9px;
+  font-size: 12px;
+  min-width: 168px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+}
+.carte-popup .t { font-weight: 600; margin-bottom: 3px; }
+.carte-popup .l { display: flex; justify-content: space-between; gap: 14px; color: var(--encre-2); }
+.carte-popup .l b { color: var(--encre); font-weight: 500; font-variant-numeric: tabular-nums; }
+.carte-popup-actions { display: flex; gap: 6px; margin-top: 8px; }
+.carte-popup-actions button {
+  flex: 1;
+  border: 1px solid transparent;
+  border-radius: var(--r-s);
+  color: #fff;
+  padding: 5px 0;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.carte-popup-actions button.flash { background: var(--bon); }
+.carte-popup-actions button.reussi { background: var(--attention); }
+.carte-popup-actions button.echec { background: var(--critique); }
+.carte-popup-actions button:not(:disabled):hover { filter: brightness(1.1); }
+.carte-popup-actions button:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(50%); }
+
 svg text { font-family: var(--sans); }
 .axe-texte { fill: var(--encre-3); font-size: 10.5px; }
 .etiquette-serie { fill: var(--encre-2); font-size: 11px; }

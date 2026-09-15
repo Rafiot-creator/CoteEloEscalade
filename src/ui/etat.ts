@@ -5,7 +5,14 @@ import { paramsParDefaut, type Formule, type Params } from '../core/formulas/typ
 import { construireDataset } from '../core/loaders/dataset'
 import { executerMemo, type Resultat } from '../core/pipeline'
 import { chargerToutesLesSources } from '../core/sources'
-import type { Dataset } from '../core/types'
+import type { Ascension, Dataset } from '../core/types'
+import { ascensionsLocales } from './ascensionsLocales'
+
+/** Les trois facons d'enregistrer un envoi depuis la Carte. */
+export type TypeEnvoi = 'flash' | 'reussi' | 'echec'
+
+/** Pourquoi un envoi n'a pas pu etre enregistre comme une vraie ascension. */
+export type EchecEnregistrement = 'grimpeur-inconnu' | 'bloc-inconnu'
 
 /**
  * L'etat de l'atelier : un dataset, une formule, ses reglages, un resultat.
@@ -20,6 +27,18 @@ export interface Atelier {
   dataset: Dataset | null
   chargement: boolean
   erreur: string | null
+
+  /**
+   * Enregistre un envoi (flash / reussi / echec) depuis la Carte comme une
+   * vraie ascension du dataset, pour un grimpeur designe par son nom. Renvoie
+   * `'ok'` si la ligne a ete ajoutee, ou pourquoi ce n'etait pas possible
+   * (nom qui ne correspond a aucun grimpeur connu, bloc qui ne correspond a
+   * aucun bloc du dataset — la Carte d'un centre sans jeu de donnees connecte,
+   * par exemple).
+   */
+  enregistrerAscension: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
+  /** Blocs deja envoyes (reussite) par un grimpeur nomme, fichier + Carte confondus. */
+  envoisConnus: (grimpeurNom: string) => Set<string>
 
   formules: Formule[]
   formule: Formule
@@ -46,7 +65,8 @@ export interface Atelier {
 }
 
 export function useAtelier(): Atelier {
-  const [dataset, setDataset] = useState<Dataset | null>(null)
+  const [datasetBase, setDatasetBase] = useState<Dataset | null>(null)
+  const [ascensionsAjoutees, setAscensionsAjoutees] = useState<Ascension[]>(() => ascensionsLocales.lire())
   const [erreur, setErreur] = useState<string | null>(null)
 
   const [formuleId, setFormuleId] = useState(FORMULE_PAR_DEFAUT.id)
@@ -60,7 +80,7 @@ export function useAtelier(): Atelier {
     let vivant = true
     chargerToutesLesSources()
       .then((fichiers) => {
-        if (vivant) setDataset(construireDataset(fichiers))
+        if (vivant) setDatasetBase(construireDataset(fichiers))
       })
       .catch((e: unknown) => {
         if (vivant) setErreur(e instanceof Error ? e.message : String(e))
@@ -69,6 +89,55 @@ export function useAtelier(): Atelier {
       vivant = false
     }
   }, [])
+
+  // Les ascensions ajoutees depuis la Carte s'ajoutent a celles du fichier :
+  // le pipeline ne voit qu'un seul dataset, coherent, trie chronologiquement.
+  const dataset = useMemo<Dataset | null>(() => {
+    if (!datasetBase) return null
+    if (!ascensionsAjoutees.length) return datasetBase
+    return {
+      ...datasetBase,
+      ascensions: [...datasetBase.ascensions, ...ascensionsAjoutees].sort((a, b) => a.t - b.t),
+    }
+  }, [datasetBase, ascensionsAjoutees])
+
+  const enregistrerAscension = useCallback(
+    (blocId: string, grimpeurNom: string, type: TypeEnvoi): 'ok' | EchecEnregistrement => {
+      const nom = grimpeurNom.trim().toLowerCase()
+      const grimpeur = datasetBase?.grimpeurs.find((g) => g.nom.trim().toLowerCase() === nom)
+      if (!nom || !grimpeur) return 'grimpeur-inconnu'
+      if (!datasetBase?.blocParId.has(blocId)) return 'bloc-inconnu'
+      const maintenant = new Date()
+      const ascension: Ascension = {
+        date: maintenant.toISOString().slice(0, 10),
+        t: maintenant.getTime(),
+        grimpeurId: grimpeur.id,
+        blocId,
+        resultat: type === 'echec' ? 'echec' : 'reussite',
+        // Le nombre d'essais n'entre dans aucun calcul (cf. core/types.ts) :
+        // ces valeurs ne font que refleter honnetement flash / plusieurs essais.
+        essais: type === 'flash' ? 1 : type === 'reussi' ? 2 : 1,
+      }
+      ascensionsLocales.ajouter(ascension)
+      setAscensionsAjoutees((a) => [...a, ascension])
+      return 'ok'
+    },
+    [datasetBase]
+  )
+
+  const envoisConnus = useCallback(
+    (grimpeurNom: string): Set<string> => {
+      const nom = grimpeurNom.trim().toLowerCase()
+      const set = new Set<string>()
+      const grimpeur = nom ? dataset?.grimpeurs.find((g) => g.nom.trim().toLowerCase() === nom) : undefined
+      if (!grimpeur || !dataset) return set
+      for (const a of dataset.ascensions) {
+        if (a.grimpeurId === grimpeur.id && a.resultat === 'reussite') set.add(a.blocId)
+      }
+      return set
+    },
+    [dataset]
+  )
 
   const formule = formuleParId(formuleId) ?? FORMULE_PAR_DEFAUT
   const params = parFormule[formule.id] ?? paramsParDefaut(formule.params)
@@ -112,6 +181,8 @@ export function useAtelier(): Atelier {
     dataset,
     chargement: !dataset && !erreur,
     erreur,
+    enregistrerAscension,
+    envoisConnus,
     formules: FORMULES,
     formule,
     choisirFormule: setFormuleId,

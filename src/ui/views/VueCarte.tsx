@@ -3,7 +3,7 @@ import { COTATIONS } from '../../core/cotations'
 import { chargerCarte } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import type { Resultat } from '../../core/pipeline'
-import { useInfobulle } from '../charts/base'
+import type { EchecEnregistrement, TypeEnvoi } from '../etat'
 import { Carte, Tuile } from '../components/base'
 import { nombre, telecharger } from '../format'
 import { useLangue } from '../langue'
@@ -53,6 +53,8 @@ export function VueCarte({
   accesComplet,
   resultatMelange,
   grimpeurs,
+  enregistrerAscension,
+  envoisConnus,
 }: {
   centreId: string
   accesComplet: boolean
@@ -65,22 +67,51 @@ export function VueCarte({
   resultatMelange?: Resultat | null
   /** Noms suggeres pour "quel grimpeur ?" (roster connu, ex. le centre demo). */
   grimpeurs?: string[]
+  /**
+   * Enregistre un envoi (flash/reussi/echec) comme une vraie ascension du
+   * dataset. Absent pour un centre sans jeu de donnees connecte : les boutons
+   * de la carte restent alors desactives (cf. `Atelier.enregistrerAscension`).
+   */
+  enregistrerAscension?: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
+  /** Blocs deja envoyes par un grimpeur nomme, d'apres l'ensemble du dataset. */
+  envoisConnus?: (grimpeurNom: string) => Set<string>
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
   const [selection, setSelection] = useState<string | null>(null)
+  const [survole, setSurvole] = useState<string | null>(null)
   const [grimpeurChoisi, setGrimpeurChoisi] = useState('')
   const [suivi, setSuivi] = useState<Record<string, boolean>>({})
   const zoneRef = useRef<HTMLDivElement>(null)
   const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
-  const { montrer, cacher, noeud } = useInfobulle()
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
     for (const b of resultatMelange?.blocs ?? []) m.set(b.id, b.rating)
     return m
   }, [resultatMelange])
+
+  // Coherent avec le reste du jeu de donnees : un bloc deja reussi par ce
+  // grimpeur (fichier + Carte confondus) se montre envoye sans qu'il ait
+  // besoin de re-cliquer quoi que ce soit.
+  const envoisReels = useMemo(
+    () => envoisConnus?.(grimpeurChoisi) ?? new Set<string>(),
+    [envoisConnus, grimpeurChoisi]
+  )
+
+  const grimpeurValide = useMemo(() => {
+    const nom = grimpeurChoisi.trim().toLowerCase()
+    return !!nom && !!grimpeurs?.some((g) => g.trim().toLowerCase() === nom)
+  }, [grimpeurChoisi, grimpeurs])
+
+  const actionsActives = !!enregistrerAscension && grimpeurValide
+  const raisonInactif = !enregistrerAscension
+    ? t("Ce centre n'a pas de jeu de données connecté.", 'This gym has no connected dataset.')
+    : t(
+        'Choisissez votre nom dans la liste des grimpeurs connus pour enregistrer un envoi.',
+        'Pick your name from the list of known climbers to log a send.'
+      )
 
   useEffect(() => {
     let vivant = true
@@ -147,6 +178,12 @@ export function VueCarte({
     setSuivi({ ...suivi, [id]: valeur })
   }
 
+  const enregistrer = (id: string, type: TypeEnvoi) => (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!enregistrerAscension || !grimpeurValide) return
+    enregistrerAscension(id, grimpeurChoisi, type)
+  }
+
   const debuterGlisse = (id: string) => (e: React.MouseEvent) => {
     if (!accesComplet) return
     e.stopPropagation()
@@ -170,7 +207,7 @@ export function VueCarte({
     telecharger(`carte-${centreId}.json`, JSON.stringify(carte, null, 2), 'application/json')
   }
 
-  const envoyes = carte.blocs.filter((b) => suivi[b.id]).length
+  const envoyes = carte.blocs.filter((b) => envoisReels.has(b.id) || suivi[b.id]).length
 
   return (
     <div className="large">
@@ -225,8 +262,8 @@ export function VueCarte({
                 'Click the map to add a boulder. Click an existing boulder to edit it, or drag it to reposition.'
               )
             : t(
-                "Cliquer un bloc pour indiquer si vous l'avez envoyé.",
-                "Click a boulder to mark whether you've sent it."
+                "Survolez un bloc pour l'enregistrer en flash, réussi ou échec.",
+                'Hover a boulder to log it as a flash, a send or a fail.'
               )
         }
         actions={
@@ -261,67 +298,117 @@ export function VueCarte({
               style={{ display: 'block', width: '100%', height: 'auto', userSelect: 'none' }}
             />
           )}
-          {carte.blocs.map((b) => {
-            const fait = !!suivi[b.id]
-            const couleur = infoCouleur(b.couleur)
-            const cote = coteParId.get(b.id)
-            return (
-              <div
-                key={b.id}
-                onMouseDown={debuterGlisse(b.id)}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (accesComplet) setSelection(b.id)
-                  else basculerEnvoye(b.id)
-                }}
-                onMouseMove={(e) =>
-                  montrer(e, {
-                    titre: b.nom || b.cotation,
-                    lignes: [
-                      [t('Cotation', 'Grade'), cote !== undefined ? `${b.cotation} (${nombre(cote)})` : b.cotation],
-                      [t('Couleur', 'Color'), t(couleur.fr, couleur.en)],
-                      [t('Style', 'Style'), b.style || '—'],
-                    ],
-                  })
-                }
-                onMouseLeave={cacher}
-                style={{
-                  position: 'absolute',
-                  left: `${b.x * 100}%`,
-                  top: `${b.y * 100}%`,
-                  width: RAYON * 2,
-                  height: RAYON * 2,
-                  marginLeft: -RAYON,
-                  marginTop: -RAYON,
-                  borderRadius: '50%',
-                  background: fondMetal(b.couleur),
-                  boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: couleur.texte,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
-                  cursor: accesComplet ? 'grab' : 'pointer',
-                  opacity: !accesComplet && fait ? 0.45 : 1,
-                }}
-              >
-                {b.cotation.replace(/^V/i, '')}
-                {!accesComplet && fait && (
-                  <span
+          {(() => {
+            const zoneRect = zoneRef.current?.getBoundingClientRect()
+            return carte.blocs.map((b) => {
+              const fait = envoisReels.has(b.id) || !!suivi[b.id]
+              const couleur = infoCouleur(b.couleur)
+              const cote = coteParId.get(b.id)
+              const ancreX = (zoneRect?.left ?? 0) + b.x * (zoneRect?.width ?? 0)
+              const ancreY = (zoneRect?.top ?? 0) + b.y * (zoneRect?.height ?? 0)
+              return (
+                <div
+                  key={b.id}
+                  style={{ position: 'absolute', left: `${b.x * 100}%`, top: `${b.y * 100}%` }}
+                  onMouseEnter={() => setSurvole(b.id)}
+                  onMouseLeave={() => setSurvole((s) => (s === b.id ? null : s))}
+                >
+                  <div
+                    onMouseDown={debuterGlisse(b.id)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (accesComplet) setSelection(b.id)
+                      else basculerEnvoye(b.id)
+                    }}
                     style={{
                       position: 'absolute',
-                      inset: -2,
+                      width: RAYON * 2,
+                      height: RAYON * 2,
+                      marginLeft: -RAYON,
+                      marginTop: -RAYON,
                       borderRadius: '50%',
-                      border: '2px solid var(--bon)',
+                      background: fondMetal(b.couleur),
+                      boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: couleur.texte,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
+                      cursor: accesComplet ? 'grab' : 'pointer',
+                      opacity: !accesComplet && fait ? 0.45 : 1,
                     }}
-                  />
-                )}
-              </div>
-            )
-          })}
-          {noeud}
+                  >
+                    {b.cotation.replace(/^V/i, '')}
+                    {!accesComplet && fait && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          inset: -2,
+                          borderRadius: '50%',
+                          border: '2px solid var(--bon)',
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {survole === b.id && (
+                    // `position: fixed` (plutot que relatif a la carte) pour echapper
+                    // au `overflow: hidden` de la zone de carte : sinon un bloc pres
+                    // d'un bord afficherait un popup coupe.
+                    <div
+                      className="carte-popup"
+                      style={{
+                        left: Math.min(ancreX + RAYON + 8, window.innerWidth - 200),
+                        top: Math.max(8, ancreY - RAYON),
+                      }}
+                    >
+                      <div className="t">{b.nom || b.cotation}</div>
+                      <div className="l">
+                        <span>{t('Cotation', 'Grade')}</span>
+                        <b>{cote !== undefined ? `${b.cotation} (${nombre(cote)})` : b.cotation}</b>
+                      </div>
+                      <div className="l">
+                        <span>{t('Couleur', 'Color')}</span>
+                        <b>{t(couleur.fr, couleur.en)}</b>
+                      </div>
+                      <div className="l">
+                        <span>{t('Style', 'Style')}</span>
+                        <b>{b.style || '—'}</b>
+                      </div>
+                      <div className="carte-popup-actions">
+                        <button
+                          className="flash"
+                          disabled={!actionsActives}
+                          title={actionsActives ? t('Flash (réussi du premier coup)', 'Flash (sent first try)') : raisonInactif}
+                          onClick={enregistrer(b.id, 'flash')}
+                        >
+                          ⚡
+                        </button>
+                        <button
+                          className="reussi"
+                          disabled={!actionsActives}
+                          title={actionsActives ? t('Réussi', 'Sent') : raisonInactif}
+                          onClick={enregistrer(b.id, 'reussi')}
+                        >
+                          ✓
+                        </button>
+                        <button
+                          className="echec"
+                          disabled={!actionsActives}
+                          title={actionsActives ? t('Échec', 'Failed attempt') : raisonInactif}
+                          onClick={enregistrer(b.id, 'echec')}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })
+          })()}
         </div>
 
         {!carte.blocs.length && (
