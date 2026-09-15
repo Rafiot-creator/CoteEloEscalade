@@ -53,7 +53,7 @@ cotes **intermédiaires** — et donc tous les autres duels joués pendant qu'un
 cours. C'est ce qui rend les courbes de progression lisibles : on y voit le creux du projet
 puis le rebond de l'envoi.
 
-Le prix, mesuré : l'erreur médiane passe de 0,20 à 0,25 cran par rapport au modèle qui
+Le prix, mesuré : l'erreur médiane passe de 0,20 à 0,25 cote par rapport au modèle qui
 n'enregistrait que l'issue. Les états intermédiaires sont plus bruités — c'est le coût d'un
 classement honnête sur le moment plutôt que rétrospectif.
 
@@ -63,7 +63,7 @@ qu'il apporte.
 
 ### On n'apprend rien d'un résultat joué d'avance
 
-Un grimpeur situé deux crans sous un bloc qui échoue, ou deux crans au-dessus qui réussit :
+Un grimpeur situé deux cotes sous un bloc qui échoue, ou deux cotes au-dessus qui réussit :
 le modèle l'avait déjà prédit, la correction est infime. Le problème n'est pas qu'elle soit
 petite, c'est qu'elle est **systématiquement dans le même sens**. Un bloc que seuls des
 grimpeurs bien plus faibles touchent ne reçoit que des échecs, donc une poussée vers le haut
@@ -75,7 +75,7 @@ compté : c'est l'*issue attendue* qui est ignorée, pas l'écart.
 
 | | Sans la règle | **Avec (2000 pts)** |
 |---|---|---|
-| Erreur médiane | 0,253 cran | **0,243 cran** |
+| Erreur médiane | 0,253 cote | **0,243 cote** |
 | Blocs sous-cotés détectés | 34 % | **57 %** |
 | Précision des signalements | 100 % | 98 % |
 | Blocs jugeables | 321 | 226 |
@@ -90,7 +90,7 @@ extrêmes de l'échelle :
 | Blocs jugés, sans la règle | 26 | 35 | 36 | 33 | 35 | 43 | 36 | 33 | 23 | 21 |
 | Blocs jugés, avec | **0** | 27 | 35 | 33 | 35 | 43 | 34 | 19 | **0** | **0** |
 
-Et ces 95 blocs écartés étaient précisément les plus mal estimés : **0,46 cran d'erreur
+Et ces 95 blocs écartés étaient précisément les plus mal estimés : **0,46 cote d'erreur
 moyenne, contre 0,29 pour ceux qui restent**. Autrement dit, le site cesse d'inventer une
 cotation pour les V10 que personne n'envoie et les V1 que personne ne rate ; il dit « je n'ai
 pas d'information » au lieu de produire un chiffre qui n'en était pas un.
@@ -112,7 +112,7 @@ tout le monde gagne tout, rien ne distingue un V2 d'un V8. Il faut donc que la s
 permette d'enregistrer « essayé, pas réussi ». C'est le point à vérifier en priorité sur
 votre export réel.
 
-## L'échelle : un cran V = 1000 points = dix contre un
+## L'échelle : une cote V = 1000 points = dix contre un
 
 Deux conventions se rejoignent, et c'est ce qui rend l'échelle lisible :
 
@@ -122,10 +122,10 @@ Deux conventions se rejoignent, et c'est ce qui rend l'échelle lisible :
    rapport 10:1 à 1000 points. (La convention des échecs le place à 400.)
 2. **Un bloc démarre à sa cotation × 1000** : un V1 à 1000, un V2 à 2000, un V10 à 10 000.
 
-Mises bout à bout : **un cran V d'écart, c'est dix chances contre une**. Un grimpeur coté
+Mises bout à bout : **une cote V d'écart, c'est dix chances contre une**. Un grimpeur coté
 5 000 (V5) envoie un V4 neuf fois sur dix, un V5 une fois sur deux, un V6 une fois sur dix.
-Deux crans valent 100 contre 1. La cote se lit donc directement : **divisez par 1000 et vous
-avez le cran V**, décimales comprises.
+Deux cotes valent 100 contre 1. La cote se lit donc directement : **divisez par 1000 et vous
+avez la cote V**, décimales comprises.
 
 **Les grimpeurs partent à leur niveau**, pas au milieu de l'échelle : un grimpeur V4 démarre
 vers 4 000. Ce niveau vient du champ `niveau_declare` s'il est renseigné (ce que beaucoup de
@@ -134,17 +134,17 @@ premiers duels — on choisit spontanément des blocs proches de son niveau. À 
 5 000.
 
 Sur ce jeu de données, l'amorce ne change pas les cotes finales de façon mesurable (0,253
-contre 0,249 cran d'erreur : c'est du bruit) — cinq mois suffisent à converger de toute
+contre 0,249 cote d'erreur : c'est du bruit) — cinq mois suffisent à converger de toute
 façon. Son intérêt est ailleurs : **la cote affichée d'un nouveau est juste dès sa première
 séance** au lieu de partir de V5 et de dériver pendant des semaines, en distribuant au
 passage des victoires imméritées aux blocs faciles qu'il affronte.
 
 **Le calcul confirme la convention.** En basculant le calibrage en mode régression, le site
-cherche lui-même combien de points sépare deux crans dans les données : il trouve
-**1005 points, avec un r² de 0,965**. Autrement dit, les 1000 points par cran ne sont pas
+cherche lui-même combien de points sépare deux cotes dans les données : il trouve
+**1005 points, avec un r² de 0,965**. Autrement dit, les 1000 points par cote ne sont pas
 qu'un choix commode — ils correspondent à ce que les résultats disent. C'est un contrôle à
-refaire sur vos vraies données : si la régression y trouve 600 ou 1500, c'est que les crans de
-la salle sont plus resserrés ou plus étalés que la convention ne le suppose.
+refaire sur vos vraies données : si la régression y trouve 600 ou 1500, c'est que les cotes de
+la salle sont plus resserrées ou plus étalées que la convention ne le suppose.
 
 Les cotes Elo brutes sont affichées dans une colonne dédiée des écrans **Blocs** et
 **Grimpeurs**, à côté de leur traduction en cotation V. Sur le jeu livré elles vont de
@@ -159,7 +159,7 @@ là où un départ neutre en signalerait davantage.
 Le mode **« Amorce uniforme »** (écran Formules) fait démarrer tous les blocs au même point :
 le résultat est alors totalement indépendant des cotations affichées, ce qui est la seule
 façon de les auditer sans biais. Le coût est réel et mesuré : l'erreur médiane passe de
-0,25 à 0,82 cran, parce que les blocs situés hors du champ de la communauté — les V1 que
+0,25 à 0,82 cote, parce que les blocs situés hors du champ de la communauté — les V1 que
 personne ne rate, les V10 que personne n'envoie — ne peuvent plus être placés que par
 défaut. À utiliser pour vérifier une intuition, pas comme réglage permanent.
 
@@ -196,7 +196,7 @@ Le jeu livré est **factice mais réaliste** : **une seule salle**, 55 grimpeurs
 
 - **une seule salle, pas de grimpeur nomade** — tout le monde affronte le même mur, donc
   toutes les cotes sont reliées entre elles. C'est le cas le plus favorable au classement ;
-- **autant de blocs par cran, de V1 à V10** — environ 36 de chacun. C'est une consigne
+- **autant de blocs par cote, de V1 à V10** — environ 36 de chacun. C'est une consigne
   d'ouverture, pas une conséquence : une salle réelle ouvre surtout du facile ;
 - **les ouvertures tournent** — 50 blocs neufs par mois, chacun en place une dizaine de
   semaines. Un bloc récent a donc peu de duels et n'est pas encore jugeable : 48 des 369
@@ -207,12 +207,12 @@ Le jeu livré est **factice mais réaliste** : **une seule salle**, 55 grimpeurs
 - **le nombre d'essais suit la marge** — un bloc largement dans les cordes tombe au premier
   essai, un bloc à la limite en demande une dizaine. C'est ce qui donne du sens à la
   pondération du style ;
-- **trois grimpeurs sur quatre déclarent un niveau à l'inscription**, à un cran près. Le
+- **trois grimpeurs sur quatre déclarent un niveau à l'inscription**, à une cote près. Le
   quatrième ne dit rien, et son niveau de départ est estimé depuis ses premiers blocs.
 
 ### La conséquence d'une ouverture uniforme
 
-La communauté est centrée sur V5 avec un cran d'écart-type ; les blocs, eux, s'étalent de V1
+La communauté est centrée sur V5 avec une cote d'écart-type ; les blocs, eux, s'étalent de V1
 à V10. Les extrêmes sortent donc du champ de la salle, et ça se voit dans le nombre de duels :
 
 | Cotation | V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | V10 |
@@ -238,7 +238,7 @@ avant d'y aller.
 
 Les cotes n'ont de sens **les unes par rapport aux autres** que si les données les relient.
 Deux salles sans aucun grimpeur commun sont deux systèmes indépendants : leurs échelles
-peuvent flotter l'une par rapport à l'autre de plusieurs crans sans que le calcul puisse s'en
+peuvent flotter l'une par rapport à l'autre de plusieurs cotes sans que le calcul puisse s'en
 apercevoir. Comparer un V5 de l'une à un V5 de l'autre n'aurait alors aucun sens — il faut des
 grimpeurs qui fréquentent les deux.
 
@@ -313,14 +313,14 @@ Le jeu de démonstration ayant une vérité terrain, on peut mesurer plutôt que
 
 | Formule | Erreur médiane | Corrélation avec la difficulté réelle | Brier | Temps |
 |---|---|---|---|---|
-| Elo bloc | 0,24 cran V | **0,985** | 0,062 | 22 ms |
-| **Glicko** | **0,19 cran V** | 0,979 | 0,058 | 119 ms |
+| Elo bloc | 0,24 cote V | **0,985** | 0,062 | 22 ms |
+| **Glicko** | **0,19 cote V** | 0,979 | 0,058 | 119 ms |
 
-Autrement dit : sur les 321 blocs jugeables, la cote calculée tombe à un quart de cran de la
+Autrement dit : sur les 321 blocs jugeables, la cote calculée tombe à un quart de cote de la
 difficulté réelle.
 
 **Glicko est passé devant.** Écarter les résultats joués d'avance l'a transformé : son erreur
-médiane tombe de 0,295 à 0,188 cran, et son taux de fausses alertes de 26 % à 4 %. La raison
+médiane tombe de 0,295 à 0,188 cote, et son taux de fausses alertes de 26 % à 4 %. La raison
 est nette — sa méthode pousse chaque bloc à son point fixe, y compris quand ce point fixe est
 à l'infini faute de contre-exemple. C'est cette séparation que le lissage des scores à 2 %
 tentait de rattraper ; écarter les résultats joués d'avance en supprime la cause.
@@ -347,8 +347,8 @@ que là où les deux composantes ont un avis.
 **Ce qui fait la précision, par ordre d'importance :**
 
 1. *Partir de la cotation de l'ouvreur* — sans cet a priori, l'erreur passe de 0,25 à
-   0,82 cran (voir plus haut le prix de ce choix) ;
-2. *Concentrer sur une seule salle* — le même code sur quatre salles donnait 0,42 cran ;
+   0,82 cote (voir plus haut le prix de ce choix) ;
+2. *Concentrer sur une seule salle* — le même code sur quatre salles donnait 0,42 cote ;
 3. *Écarter les résultats joués d'avance* — gain modeste sur l'erreur médiane, mais c'est le
    levier décisif pour la détection des blocs sous-cotés : 34 % → 57 % ;
 4. *Pondérer le style* — modeste mais réel, et un test le vérifie ;
@@ -377,11 +377,11 @@ vraie difficulté. Tout désaccord qui subsiste là-bas est du bruit pur.
 | | Monde réel | Témoin (ouvreur infaillible) |
 |---|---|---|
 | Blocs signalés | 45 sur 226 | **6 sur 226** (2,7 %) |
-| Écart médian | 0,18 cran | 0,10 cran |
+| Écart médian | 0,18 cote | 0,10 cote |
 
 Trois vérifications confirment que ces désaccords sont réels :
 
-- **Précision 98 %** — les blocs signalés sont presque tous réellement à plus d'un demi-cran
+- **Précision 98 %** — les blocs signalés sont presque tous réellement à plus d'une demi-cote
   de leur étiquette ;
 - **Sens correct dans plus de 90 % des cas** — le hasard en donnerait la moitié ;
 - **Corrélation 0,73** entre l'écart calculé et la vraie erreur de l'ouvreur, avec une pente
@@ -394,7 +394,7 @@ l'estimation est la plus incertaine.
 
 ### Le choix du seuil
 
-`SEUIL_DESACCORD` (dans `pipeline.ts`) vaut **0,75 cran**, et ce n'est pas une intuition : le
+`SEUIL_DESACCORD` (dans `pipeline.ts`) vaut **0,75 cote**, et ce n'est pas une intuition : le
 protocole du témoin permet de tracer la courbe complète.
 
 | Seuil | Signalés | Précision | Faux positifs (témoin) | Sandbags détectés |
@@ -418,8 +418,8 @@ En séparant les erreurs par sens, la détection n'est pas symétrique :
 
 | Vraie erreur de l'ouvreur | Blocs | Détectés | Déplacement moyen |
 |---|---|---|---|
-| Bloc **plus dur** que son étiquette (sandbag) | 32 | 4 (13 %) | 0,54 cran |
-| Bloc **plus facile** que son étiquette | 24 | 10 (42 %) | 0,77 cran |
+| Bloc **plus dur** que son étiquette (sandbag) | 32 | 4 (13 %) | 0,54 cote |
+| Bloc **plus facile** que son étiquette | 24 | 10 (42 %) | 0,77 cote |
 
 Ce n'est pas un effet de volume : les deux groupes ont 34 duels en moyenne. C'est une
 sous-convergence. Un bloc plus dur que son étiquette ne produit que des échecs — or l'échec
@@ -430,7 +430,7 @@ qui le font chuter vite. La logistique sature d'un côté et pas de l'autre.
 C'est ennuyeux, parce que le sandbag est justement ce qu'une salle veut repérer. Les leviers,
 mesurés :
 
-| Réglage (au seuil de 1 cran, sans écart négligé) | Sous-cotés détectés | Sur-cotés détectés |
+| Réglage (au seuil de 1 cote, sans écart négligé) | Sous-cotés détectés | Sur-cotés détectés |
 |---|---|---|
 | Défaut de l'époque | 13 % | 42 % |
 | 40 passes | 25 % | 58 % |
@@ -439,7 +439,7 @@ mesurés :
 | Glicko | 66 % | 58 % |
 
 Deux leviers ont été retenus, et ils se cumulent : abaisser le seuil de signalement à 0,75
-cran (13 % → 34 %) puis écarter les résultats joués d'avance (34 % → **57 %**). Aucun des deux
+cote (13 % → 34 %) puis écarter les résultats joués d'avance (34 % → **57 %**). Aucun des deux
 ne touche aux réglages du modèle lui-même.
 
 **Attention au piège de comparaison** : ce tableau met toutes les variantes au même seuil, ce
@@ -462,7 +462,7 @@ vient de bouger un réglage.
 
 L'intérêt n'est pas décoratif : **quand les deux formules s'écartent nettement sur un bloc,
 c'est que ce bloc est mal connu.** Sur le jeu livré, le bloc AR-0096 — que personne n'a envoyé —
-est coté 7 529 par l'Elo et 9 000 par Glicko, un cran et demi d'écart. Les deux disent « c'est
+est coté 7 529 par l'Elo et 9 000 par Glicko, une cote et demie d'écart. Les deux disent « c'est
 dur », aucune ne sait dire à quel point. À l'inverse, un bloc sur lequel les deux tombent à
 50 points près est une mesure solide.
 
@@ -474,7 +474,7 @@ la formule active : elle est donc toujours renseignée.
 Puisque les deux formules sont calculées de toute façon, l'écran **Blocs** les fait voter. Un
 bloc est signalé dès qu'**une** formule le conteste, et marqué **confirmé** quand les **deux**
 le font. Chacune ayant son propre bruit, elle a son propre seuil, déclaré dans sa définition
-(`seuilDesaccord`) : 0,75 cran pour l'Elo, 1,00 pour Glicko, choisis pour un taux de fausses
+(`seuilDesaccord`) : 0,75 cote pour l'Elo, 1,00 pour Glicko, choisis pour un taux de fausses
 alertes comparable sur le monde témoin.
 
 ### Détecter et coter sont deux métiers différents
@@ -487,7 +487,7 @@ Glicko y joue le rôle de la voix sensible : son seuil est descendu à 0,75 alor
 précision commanderait 1,00. Son rôle est de rattraper les blocs sous-cotés, que l'Elo laisse
 passer parce qu'un échec attendu ne le fait presque pas bouger.
 
-Mesuré sur l'ensemble des 369 blocs, dont 33 sont réellement sous-cotés d'un cran ou plus :
+Mesuré sur l'ensemble des 369 blocs, dont 33 sont réellement sous-cotés d'une cote ou plus :
 
 | Méthode | Fausses alertes | Précision | Sandbags trouvés |
 |---|---|---|---|
@@ -556,7 +556,7 @@ Deux pistes ont été essayées et écartées, chiffres à l'appui :
   « la difficulté vaut exactement l'étiquette × 1000 » est fausse pour presque tous les blocs.
   Le test détecte donc « l'étiquette n'est pas exacte », ce qui est vrai partout, au lieu de
   « l'étiquette est franchement fausse ». Il faudrait une hypothèse nulle d'intervalle
-  (± un demi-cran), donc un test d'équivalence, pas un test de point.
+  (± une demi-cote), donc un test d'équivalence, pas un test de point.
 - **Un troisième juré** (l'Elo sans a priori, dont les erreurs sont indépendantes de
   l'étiquette) : trop bruyant seul — 42 % de fausses alertes — il dégrade le jury.
 
@@ -726,9 +726,6 @@ L'implémentation vit dans `src/ui/langue.tsx` (contexte + hook `useLangue`, un 
 formules et le calibrage (`src/core/`) portent un champ optionnel `*En` à côté de chaque
 label ou aide français, lu par le petit helper `bilingue()`.
 
-**Note de vocabulaire** : l'interface dit désormais « cote V » là où elle disait « cran V »
-(un cran de la cotation V — voir plus bas). Ce document, lui, garde encore l'ancien terme
-dans ses explications ; à harmoniser si l'écart devient gênant.
 
 ## Plusieurs centres d'escalade (à venir)
 
@@ -825,3 +822,5 @@ fait accompli.
   depuis le pivot escalade de voies → bloc en salle (voir DECISIONS.md § 1).
 - Renommage du terme français « cran V » en « cote V » dans toute l'interface et les
   définitions de formules (la version anglaise garde « V grade »).
+- Harmonisation de ce README avec le même vocabulaire : toutes les occurrences de « cran »
+  (au sens du modèle) sont devenues « cote ».

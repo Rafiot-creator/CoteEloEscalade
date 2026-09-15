@@ -57,13 +57,12 @@ Détail complet dans le README, section « Journal des sessions ». En résumé 
   Fichiers) restent en français uniquement.
 - Corrections de vocabulaire : axe « voies » → « blocs » dans l'histogramme des écarts (reste
   du pivot escalade de voies → bloc, cf. `DECISIONS.md` § 1) ; « cran V » → « cote V » en
-  français dans toute l'interface (l'anglais garde « V grade »). Le README, lui, garde encore
-  « cran V » dans ses explications — pas encore harmonisé.
+  français dans toute l'interface (l'anglais garde « V grade »), et dans le README aussi
+  (harmonisé le même jour).
 - Références au dépôt/URL de l'ami (EricPrieur) corrigées dans README et ici.
 
 ## Prochaine étape
 
 Rien de décidé pour la prochaine session — à définir avec Raphael. Pistes en attente, au
-choix : brancher de vraies données sur un des centres du menu, harmoniser le vocabulaire
-« cran V »/« cote V » dans le README, ou une des pistes ouvertes listées dans `DECISIONS.md`
-(§ 7).
+choix : brancher de vraies données sur un des centres du menu, ou une des pistes ouvertes
+listées dans `DECISIONS.md` (§ 7).
