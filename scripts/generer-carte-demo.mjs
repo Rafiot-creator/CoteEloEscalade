@@ -24,6 +24,9 @@ const ZONES = {
 }
 const LARGEUR = 1000
 const HAUTEUR = 700
+/** Total de blocs a placer sur la carte : la salle simulee en a 369, largement
+ *  plus que ce qu'une carte peut montrer lisiblement. */
+const TOTAL_BLOCS = 50
 
 /** PRNG deterministe (mulberry32), pour que la disposition soit reproductible. */
 function pseudoAleatoire(graine) {
@@ -47,16 +50,45 @@ const csv = readFileSync(new URL('../data/blocs.csv', import.meta.url), 'utf8')
 const [entete, ...lignes] = csv.trim().split('\n')
 const colonnes = entete.split(',')
 
-const blocs = lignes.map((ligne) => {
+const tousLesBlocs = lignes.map((ligne) => {
   const valeurs = ligne.split(',')
-  const bloc = Object.fromEntries(colonnes.map((c, i) => [c, valeurs[i]]))
+  return Object.fromEntries(colonnes.map((c, i) => [c, valeurs[i]]))
+})
+
+// Quota par zone proportionnel a son effectif reel, arrondi par la methode
+// du plus grand reste pour tomber exactement sur TOTAL_BLOCS.
+const parZone = new Map()
+for (const bloc of tousLesBlocs) {
+  if (!parZone.has(bloc.secteur)) parZone.set(bloc.secteur, [])
+  parZone.get(bloc.secteur).push(bloc)
+}
+const quotas = [...parZone].map(([style, blocsDeLaZone]) => {
+  const exact = (TOTAL_BLOCS * blocsDeLaZone.length) / tousLesBlocs.length
+  return { style, blocsDeLaZone, quota: Math.floor(exact), reste: exact - Math.floor(exact) }
+})
+let manquants = TOTAL_BLOCS - quotas.reduce((s, q) => s + q.quota, 0)
+for (const q of [...quotas].sort((a, b) => b.reste - a.reste)) {
+  if (manquants <= 0) break
+  q.quota += 1
+  manquants -= 1
+}
+
+/** Score deterministe dans [0, 1), pour choisir un sous-ensemble reproductible. */
+const scoreSelection = (id) => pseudoAleatoire(graineDe(`${id}:selection`))()
+
+const blocsChoisis = quotas.flatMap(({ style, blocsDeLaZone, quota }) => {
+  if (!ZONES[style]) throw new Error(`Style sans zone sur le plan : ${style}`)
+  return [...blocsDeLaZone].sort((a, b) => scoreSelection(a.id) - scoreSelection(b.id)).slice(0, quota)
+})
+
+const blocs = blocsChoisis.map((bloc) => {
   const zone = ZONES[bloc.secteur]
-  if (!zone) throw new Error(`Style sans zone sur le plan : ${bloc.secteur}`)
   const alea = pseudoAleatoire(graineDe(bloc.id))
   const x = (zone.x0 + alea() * (zone.x1 - zone.x0)) / LARGEUR
   const y = (zone.y0 + alea() * (zone.y1 - zone.y0)) / HAUTEUR
   return {
     id: bloc.id,
+    nom: bloc.nom,
     x: Number(x.toFixed(4)),
     y: Number(y.toFixed(4)),
     cotation: bloc.cotation_officielle,

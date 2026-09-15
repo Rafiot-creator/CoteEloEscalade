@@ -198,8 +198,9 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
                 }}
                 onMouseMove={(e) =>
                   montrer(e, {
-                    titre: b.cotation,
+                    titre: b.nom || b.cotation,
                     lignes: [
+                      [t('Cotation', 'Grade'), b.cotation],
                       [t('Couleur', 'Color'), t(couleur.fr, couleur.en)],
                       [t('Style', 'Style'), b.style || '—'],
                     ],
@@ -257,6 +258,18 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
       {accesComplet && blocSelectionne && (
         <div ref={editionRef}>
         <Carte titre={t('Modifier le bloc', 'Edit boulder')}>
+          <div className="param">
+            <div className="param-tete">
+              <label>{t('Nom', 'Name')}</label>
+            </div>
+            <input
+              type="text"
+              value={blocSelectionne.nom ?? ''}
+              placeholder={t('ex. DA-0002', 'e.g. DA-0002')}
+              onChange={(e) => modifier(blocSelectionne.id, { nom: e.currentTarget.value })}
+              style={{ width: '100%' }}
+            />
+          </div>
           <div className="param">
             <div className="param-tete">
               <label>{t('Couleur', 'Color')}</label>

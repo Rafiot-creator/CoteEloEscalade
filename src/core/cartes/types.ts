@@ -8,6 +8,8 @@
  */
 export interface BlocCarte {
   id: string
+  /** Nom du bloc tel qu'il figure sur son etiquette (ex. 'DA-0002'). Optionnel : un bloc ajoute a la main sur la carte n'en a pas forcement. */
+  nom?: string
   /** Position relative sur le fond de carte, de 0 a 1. */
   x: number
   y: number
