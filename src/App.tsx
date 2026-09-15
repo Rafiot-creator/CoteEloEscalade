@@ -124,7 +124,9 @@ function Contenu() {
       </header>
 
       <main className="contenu">
-        {onglet === 'carte' && <VueCarte centreId={centreId} accesComplet={vueComplete} />}
+        {onglet === 'carte' && (
+          <VueCarte centreId={centreId} accesComplet={vueComplete} resultatMelange={atelier.resultats.get('melange')} />
+        )}
 
         {onglet !== 'carte' && centre.id !== 'demo' && (
           <div className="large">

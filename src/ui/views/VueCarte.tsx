@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { COTATIONS } from '../../core/cotations'
 import { chargerCarte } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
+import type { Resultat } from '../../core/pipeline'
 import { useInfobulle } from '../charts/base'
 import { Carte, Tuile } from '../components/base'
 import { telecharger } from '../format'
@@ -34,7 +35,21 @@ function nouvelId(): string {
 
 const RAYON = 20
 
-export function VueCarte({ centreId, accesComplet }: { centreId: string; accesComplet: boolean }) {
+export function VueCarte({
+  centreId,
+  accesComplet,
+  resultatMelange,
+}: {
+  centreId: string
+  accesComplet: boolean
+  /**
+   * Resultat de la formule "melange", pour afficher la cote calculee a cote
+   * de la cote affichee. Seul le centre demo a un jeu de donnees connecte :
+   * pour les autres, ce sera `null` et la carte n'affiche que la cote
+   * affichee, comme aujourd'hui.
+   */
+  resultatMelange?: Resultat | null
+}) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
   const [selection, setSelection] = useState<string | null>(null)
@@ -43,6 +58,12 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
   const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
   const { montrer, cacher, noeud } = useInfobulle()
+
+  const calculeeParId = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const b of resultatMelange?.blocs ?? []) m.set(b.id, b.cotationCalculee)
+    return m
+  }, [resultatMelange])
 
   useEffect(() => {
     let vivant = true
@@ -187,6 +208,7 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
           {carte.blocs.map((b) => {
             const fait = !!suivi[b.id]
             const couleur = infoCouleur(b.couleur)
+            const calculee = calculeeParId.get(b.id)
             return (
               <div
                 key={b.id}
@@ -200,7 +222,7 @@ export function VueCarte({ centreId, accesComplet }: { centreId: string; accesCo
                   montrer(e, {
                     titre: b.nom || b.cotation,
                     lignes: [
-                      [t('Cotation', 'Grade'), b.cotation],
+                      [t('Cotation', 'Grade'), calculee ? `${b.cotation} (${calculee})` : b.cotation],
                       [t('Couleur', 'Color'), t(couleur.fr, couleur.en)],
                       [t('Style', 'Style'), b.style || '—'],
                     ],
