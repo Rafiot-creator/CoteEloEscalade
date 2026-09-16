@@ -132,13 +132,19 @@ export function VueCarte({
   // compte le plus) — la legende (V-grade) reste lisible via son propre
   // minimum de police, decouple de RAYON.
   const RAYON = Math.round(Math.max(5, Math.min(20, largeurCarte * 0.018)))
-  // L'anneau "envoye" doit rester visiblement separe de la pastille a toute
-  // taille : un ecart/epaisseur fixes en pixels (2px avant) restaient bien
-  // en dessous de RAYON sur bureau, mais au plancher de RAYON (5px) sur
-  // telephone ils ne laissaient quasiment plus de marge — la pastille
-  // semblait deborder de l'anneau. Les deux suivent donc RAYON.
-  const EPAISSEUR_ANNEAU = Math.max(1, Math.round(RAYON * 0.12))
-  const ECART_ANNEAU = Math.max(2, Math.round(RAYON * 0.2))
+  // L'anneau "envoye" a besoin d'un ecart non nul avec la pastille, sans
+  // quoi elle semble deborder dessus (retour de Raphael sur telephone). Le
+  // bug n'etait pas que l'ecart etait trop petit sur bureau — border-box
+  // (styles.css) fait que la bordure de l'anneau mange sur l'inset : avec
+  // inset:-2 et une bordure de 2px, l'ecart reellement visible etait pile
+  // zero, a toute taille. Un premier correctif avait fait grandir l'ecart
+  // avec RAYON, mais ca gonflait l'anneau bien plus que necessaire sur
+  // bureau (jusqu'a 30 % de plus que la pastille) et rendait les pastilles
+  // "envoyees" visiblement plus grosses que les autres. Un petit ecart fixe
+  // suffit : il n'a pas besoin de grandir avec RAYON, juste de ne jamais
+  // retomber a zero.
+  const EPAISSEUR_ANNEAU = 1
+  const ECART_ANNEAU = 1
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()

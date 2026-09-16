@@ -1317,3 +1317,14 @@ fait accompli.
     l'`overflow: hidden` de la zone de carte près d'un bord — est maintenant traitée en bornant sa
     position dans les limites de la carte (bascule à gauche de la pastille si la place manque à
     droite, ajustement vertical similaire) plutôt qu'en sortant du flux normal.
+- Raphaël, en revérifiant sur PC après ce dernier lot de correctifs : les pastilles n'avaient
+  plus toutes la même taille. Le correctif de l'anneau « envoyé » ci-dessus corrigeait bien le
+  vrai bug (l'écart réel était nul, `border-box` faisant manger la bordure sur l'`inset`), mais
+  en le faisant grandir avec `RAYON` — alors que le bug n'exigeait qu'un écart *non nul*, pas un
+  écart *proportionnel*. Sur bureau (`RAYON` = 20), ça gonflait l'anneau jusqu'à 30 % de plus que
+  la pastille, contre 10 % avant toute cette histoire — d'où des pastilles « envoyées » qui
+  paraissaient nettement plus grosses que les autres. `EPAISSEUR_ANNEAU`/`ECART_ANNEAU` sont
+  redevenus des constantes fixes (1px chacune, contre 2px avant qui donnaient un écart nul) :
+  l'ajout total à la taille de la pastille retombe à 4px à toute taille, comme à l'origine, tout
+  en gardant un écart réel (non nul) au plancher de `RAYON` sur téléphone. Vérifié dans les deux
+  cas via le DOM : 1px d'écart réel à `RAYON` = 5 comme à `RAYON` = 20.

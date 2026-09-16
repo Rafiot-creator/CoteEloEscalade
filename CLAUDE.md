@@ -177,8 +177,16 @@ detail technique complet :
 
 Verifie dans Chrome (bureau, et via un retrecissement programmatique du conteneur de la carte
 pour simuler `RAYON` au plancher — `resize_window` n'a pas d'effet dans cet environnement).
-Tests (64) et build au vert. **Pas encore poussé, pas encore revu par Raphael sur son
-telephone.**
+Tests (64) et build au vert. Pousse (commit `8231abf`), deploiement verifie vert.
+
+Raphael, en revérifiant sur PC juste après : les pastilles n'avaient plus toutes la même taille.
+Le vrai bug de l'anneau (ecart reellement nul, cf. ci-dessus) etait corrige, mais en le faisant
+grandir avec `RAYON` plutot que de rester un petit ecart fixe non nul — ca gonflait l'anneau
+jusqu'a 30 % de plus que la pastille sur bureau (10 % avant toute cette histoire). Redevenu des
+constantes fixes (1px), qui n'ont pas besoin de grandir avec `RAYON`, juste de ne jamais
+retomber a zero. Verifie via le DOM : 1px d'ecart reel a `RAYON` = 5 comme a `RAYON` = 20 (contre
+3px puis 4px avec la version precedente sur bureau — sensiblement moins gonfle).
+Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
