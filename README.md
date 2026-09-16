@@ -781,7 +781,11 @@ couper près des bords.
 
 Un bloc déjà envoyé (flash ou réussi, pas simplement tenté) par le grimpeur choisi se
 reconnaît aussi sans survoler : sa pastille passe en gris (opacité réduite + désaturation) avec
-un liseré vert, dans les deux niveaux d'accès.
+un liseré vert épais (2 px, `var(--bon)`), dans les deux niveaux d'accès. À l'inverse, un bloc
+que ce grimpeur n'a **jamais tenté** (ni envoi, ni échec, statut absent de `envoisConnus`) porte
+un liseré vert fin et clair (1 px, `rgba(12, 163, 12, 0.5)`) — plus discret pour ne pas se
+confondre avec l'anneau plein d'un envoi. Un bloc raté (« Échoué ») n'a ni l'un ni l'autre : il
+a bien été tenté, donc pas « jamais essayé », mais pas envoyé non plus.
 
 **Ouvrir le popup au clic plutôt qu'au survol.** Le survol seul exclut les appareils sans
 souris (une tablette en salle, justement l'usage visé). En vue visiteur, cliquer un bloc ouvre
@@ -1133,3 +1137,6 @@ fait accompli.
   la Carte est toujours plus récent que l'historique du fichier, cliquer un bouton change
   désormais toujours le statut affiché, peu importe le sens. Voir « Enregistrer un envoi comme
   une vraie ascension ».
+- Ajout d'un liseré vert fin et clair (1 px, semi-transparent) autour des pastilles jamais
+  tentées par le grimpeur choisi dans le menu déroulant, pour les repérer d'un coup d'œil sans
+  survoler — distinct du liseré épais qui marque un envoi. Voir « Pastilles, survol et popup ».

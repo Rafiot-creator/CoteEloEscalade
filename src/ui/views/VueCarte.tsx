@@ -372,6 +372,7 @@ export function VueCarte({
             return carte.blocs.map((b) => {
               const statut = envoisReels.get(b.id)
               const fait = statut === 'flash' || statut === 'reussi' || !!suivi[b.id]
+              const nonEssaye = statut === undefined && !suivi[b.id]
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
               const ancreX = (zoneRect?.left ?? 0) + b.x * (zoneRect?.width ?? 0)
@@ -426,6 +427,18 @@ export function VueCarte({
                           inset: -2,
                           borderRadius: '50%',
                           border: '2px solid var(--bon)',
+                        }}
+                      />
+                    )}
+                    {nonEssaye && (
+                      // Liseré fin et clair : repere discret, a ne pas confondre
+                      // avec l'anneau plein qui marque un bloc deja envoye.
+                      <span
+                        style={{
+                          position: 'absolute',
+                          inset: -2,
+                          borderRadius: '50%',
+                          border: '1px solid rgba(12, 163, 12, 0.5)',
                         }}
                       />
                     )}
