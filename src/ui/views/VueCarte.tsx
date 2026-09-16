@@ -14,23 +14,25 @@ import { definirGrimpeurChoisi, lireGrimpeurChoisi, suiviLocal } from '../suivi'
  * noir et blanc ajoutes aux extremes. C'est la couleur reelle choisie par
  * l'ouvreur — elle ne depend pas de la cotation.
  *
- * Tons "metal" (amethyste, acier, emeraude, or, cuivre, rubis, gunmetal,
- * argent) plutot que des teintes plates : un reflet lustre commun
- * (BRILLANT) se superpose a la couleur de base de chaque pastille pour
- * l'effet lisse. Couleurs fixes, independantes du theme clair/sombre,
- * puisqu'il s'agit d'un attribut physique du bloc.
+ * Tons vifs plutot que des teintes plates : un reflet lustre commun
+ * (BRILLANT) se superpose a la couleur de base de chaque pastille pour un
+ * effet lisse et "metal" sans assourdir la couleur elle-meme — un premier
+ * jeu de tons plus sourds (amethyste, acier, emeraude...) rendait les
+ * couleurs difficiles a distinguer, surtout une fois desaturees pour les
+ * blocs deja envoyes (cf. plus bas). Couleurs fixes, independantes du theme
+ * clair/sombre, puisqu'il s'agit d'un attribut physique du bloc.
  */
 const BRILLANT = 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.75), rgba(255,255,255,0) 58%)'
 
 const PALETTE_COULEURS = [
-  { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#6a3093', texte: '#fff' },
-  { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: '#1f4e8c', texte: '#fff' },
-  { id: 'vert', fr: 'Vert', en: 'Green', fond: '#197850', texte: '#fff' },
-  { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#b8860b', texte: '#fff' },
-  { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#a15c2e', texte: '#fff' },
-  { id: 'rouge', fr: 'Rouge', en: 'Red', fond: '#8c1c24', texte: '#fff' },
-  { id: 'noir', fr: 'Noir', en: 'Black', fond: '#2b2b2f', texte: '#fff' },
-  { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#c9c9c9', texte: '#111' },
+  { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#9b30ff', texte: '#fff' },
+  { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: '#1d6fe0', texte: '#fff' },
+  { id: 'vert', fr: 'Vert', en: 'Green', fond: '#16a34a', texte: '#fff' },
+  { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#f2c200', texte: '#111' },
+  { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#ff7a1a', texte: '#111' },
+  { id: 'rouge', fr: 'Rouge', en: 'Red', fond: '#e11d2e', texte: '#fff' },
+  { id: 'noir', fr: 'Noir', en: 'Black', fond: '#242428', texte: '#fff' },
+  { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#e6e6e6', texte: '#111' },
 ] as const
 
 function infoCouleur(id: string) {
@@ -416,8 +418,8 @@ export function VueCarte({
                       textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
                       cursor: accesComplet ? 'grab' : 'pointer',
                       touchAction: 'manipulation',
-                      opacity: fait ? 0.55 : 1,
-                      filter: fait ? 'grayscale(0.85)' : undefined,
+                      opacity: fait ? 0.85 : 1,
+                      filter: fait ? 'grayscale(0.4) saturate(0.7)' : undefined,
                     }}
                   >
                     {b.cotation.replace(/^V/i, '')}

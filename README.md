@@ -1286,3 +1286,14 @@ fait accompli.
     rayon de pastille de 20 px, il faut ~35 unités du viewBox entre deux centres pour qu'elles ne
     se touchent pas ; réglé à 36. Vérifié après coup : distance minimale mesurée entre deux
     pastilles quelconques sur les 50 de la Démo, 36,3 unités.
+- Retour de Raphaël sur les couleurs des pastilles : les blocs déjà envoyés (`grayscale(0.85)` +
+  `opacity: 0.55`) perdaient complètement leur couleur d'origine, réduits à un gris quasi
+  uniforme. Adouci à `grayscale(0.4) saturate(0.7)` + `opacity: 0.85` — la teinte d'origine reste
+  reconnaissable, l'anneau vert autour de la pastille (déjà présent, indépendant du filtre)
+  continuant de porter seul le sens « envoyé ». Raphaël a aussi demandé des couleurs « plus
+  belles, plus flash » : la palette (`PALETTE_COULEURS`, `VueCarte.tsx`) — des tons « métal »
+  sourds (améthyste, acier, émeraude...) choisis lors d'une itération précédente — est remontée
+  vers des teintes plus vives (ex. jaune `#b8860b` → `#f2c200`, rouge `#8c1c24` → `#e11d2e`),
+  tout en gardant le reflet lustré (`BRILLANT`) qui donnait l'effet « métal » : c'est la
+  désaturation des blocs envoyés qui rendait ces tons déjà sourds difficiles à distinguer, pas le
+  reflet en lui-même.
