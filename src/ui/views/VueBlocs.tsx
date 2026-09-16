@@ -5,7 +5,7 @@ import { SEUIL_DESACCORD, type LigneBloc, type Resultat } from '../../core/pipel
 import { BasculeVue } from '../charts/base'
 import { Histogramme } from '../charts/Histogramme'
 import { Nuage } from '../charts/Nuage'
-import { Carte, Tuile } from '../components/base'
+import { Carte, LegendeCote, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { nombre, pourcent, signe, telecharger } from '../format'
 import { bilingue, useLangue } from '../langue'
@@ -354,6 +354,7 @@ export function VueBlocs({
           note={t('en valeur absolue', 'absolute value')}
         />
       </div>
+      <LegendeCote />
 
       {isoles.length > 0 && (
         <Carte titre={t('Salles isolées', 'Isolated gyms')}>

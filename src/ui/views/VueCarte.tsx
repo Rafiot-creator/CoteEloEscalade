@@ -4,7 +4,7 @@ import { chargerCarte } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import type { Resultat } from '../../core/pipeline'
 import type { EchecEnregistrement, StatutEnvoi, TypeEnvoi } from '../etat'
-import { Carte, Tuile } from '../components/base'
+import { Carte, LegendeCote, Tuile } from '../components/base'
 import { nombre, telecharger } from '../format'
 import { useLangue } from '../langue'
 import { definirGrimpeurChoisi, lireGrimpeurChoisi, suiviLocal } from '../suivi'
@@ -321,6 +321,7 @@ export function VueCarte({
           />
         )}
       </div>
+      {resultatMelange && <LegendeCote />}
 
       <Carte
         titre={t('Carte des blocs', 'Boulder map')}

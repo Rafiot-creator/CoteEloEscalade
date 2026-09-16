@@ -150,6 +150,13 @@ Les cotes Elo brutes sont affichées dans une colonne dédiée des écrans **Blo
 **Grimpeurs**, à côté de leur traduction en cotation V. Sur le jeu livré elles vont de
 985 à 10 006 pour les blocs et de 2 890 à 7 856 pour les grimpeurs.
 
+La conversion (« divisez par 1000 ») était jusque-là seulement dans la bulle d'aide au survol
+de l'en-tête de colonne — invisible sur tactile, où le survol n'existe pas. `LegendeCote`
+(`src/ui/components/base.tsx`) affiche donc en permanence, sous les tuiles de chiffres des
+écrans **Blocs**, **Grimpeurs** et **Carte** (cette dernière seulement quand le centre a un
+jeu de données connecté, sinon il n'y a aucune cote à convertir), le même rappel en texte
+visible : « 1 cote V = 1000 points (V1 = 1000, V2 = 2000, V3 = 3000…) ».
+
 ### Le prix de cette convention
 
 Partir de la cotation de l'ouvreur, c'est en faire un a priori : le classement le corrige
@@ -1151,3 +1158,8 @@ fait accompli.
   visible entre son bord et le cercle vert — « la pastille déborde encore du cercle ». Corrigé
   en mettant `inset` à `0` pile (le contour exact de la pastille) plutôt qu'une valeur positive :
   le cercle vert forme maintenant le bord visible complet, sans aucun débord de la pastille.
+- Ajout d'une légende permanente (« 1 cote V = 1000 points... ») sous les tuiles de chiffres des
+  écrans Blocs, Grimpeurs et Carte, demandée par Raphaël pour rendre la conversion cote/cote V
+  claire pour les utilisateurs — jusque-là elle n'était que dans la bulle d'aide au survol d'un
+  en-tête de colonne, invisible sur tactile. `LegendeCote`, § « L'échelle : une cote V = 1000
+  points = dix contre un ».

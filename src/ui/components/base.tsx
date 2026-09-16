@@ -60,6 +60,25 @@ export function Tuile({
 }
 
 /**
+ * Rappel visible (pas seulement au survol d'un en-tete de colonne) de la
+ * conversion cote <-> cote V : V1 = 1000, V2 = 2000, etc. Un utilisateur sur
+ * mobile ne voit jamais les bulles d'aide au survol (pas de survol sur
+ * tactile) ; ce texte reste donc lisible sans avoir a chercher un en-tete a
+ * survoler.
+ */
+export function LegendeCote() {
+  const { t } = useLangue()
+  return (
+    <p className="param-aide">
+      {t(
+        '1 cote V = 1000 points (V1 = 1000, V2 = 2000, V3 = 3000…) : divisez une cote par 1000 pour la lire en cote V.',
+        '1 V grade = 1000 points (V1 = 1000, V2 = 2000, V3 = 3000…): divide a rating by 1000 to read it as a V grade.'
+      )}
+    </p>
+  )
+}
+
+/**
  * Rendu d'un parametre a partir de sa seule declaration.
  *
  * C'est la piece qui fait que "deposer un fichier de formule" suffit : aucune

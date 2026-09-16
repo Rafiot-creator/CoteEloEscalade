@@ -5,7 +5,7 @@ import { formaterIndex } from '../../core/cotations'
 import type { LigneGrimpeur, Resultat } from '../../core/pipeline'
 import { BasculeVue } from '../charts/base'
 import { COULEURS_SERIES, Courbes, type Serie } from '../charts/Courbes'
-import { Carte, Tuile } from '../components/base'
+import { Carte, LegendeCote, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { dateCourte, nombre, pourcent } from '../format'
 import { bilingue, useLangue } from '../langue'
@@ -229,6 +229,7 @@ export function VueGrimpeurs({
           note={t('en moyenne', 'on average')}
         />
       </div>
+      <LegendeCote />
 
       <Carte
         titre={t('Progression', 'Progression')}
