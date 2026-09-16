@@ -35,6 +35,10 @@ const PALETTE_COULEURS = [
   { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#e6e6e6', texte: '#111' },
 ] as const
 
+/** Doit rester en phase avec `.carte-popup` dans styles.css (largeur fixe, hauteur estimee). */
+const POPUP_LARGEUR = 190
+const POPUP_HAUTEUR = 175
+
 function infoCouleur(id: string) {
   return PALETTE_COULEURS.find((c) => c.id === id) ?? PALETTE_COULEURS[1]
 }
@@ -128,6 +132,13 @@ export function VueCarte({
   // compte le plus) — la legende (V-grade) reste lisible via son propre
   // minimum de police, decouple de RAYON.
   const RAYON = Math.round(Math.max(5, Math.min(20, largeurCarte * 0.018)))
+  // L'anneau "envoye" doit rester visiblement separe de la pastille a toute
+  // taille : un ecart/epaisseur fixes en pixels (2px avant) restaient bien
+  // en dessous de RAYON sur bureau, mais au plancher de RAYON (5px) sur
+  // telephone ils ne laissaient quasiment plus de marge — la pastille
+  // semblait deborder de l'anneau. Les deux suivent donc RAYON.
+  const EPAISSEUR_ANNEAU = Math.max(1, Math.round(RAYON * 0.12))
+  const ECART_ANNEAU = Math.max(2, Math.round(RAYON * 0.2))
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -378,8 +389,6 @@ export function VueCarte({
               const nonEssaye = statut === undefined && !suivi[b.id]
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
-              const ancreX = (zoneRect?.left ?? 0) + b.x * (zoneRect?.width ?? 0)
-              const ancreY = (zoneRect?.top ?? 0) + b.y * (zoneRect?.height ?? 0)
               return (
                 <div
                   key={b.id}
@@ -427,9 +436,9 @@ export function VueCarte({
                       <span
                         style={{
                           position: 'absolute',
-                          inset: -2,
+                          inset: -(ECART_ANNEAU + EPAISSEUR_ANNEAU),
                           borderRadius: '50%',
-                          border: '2px solid var(--bon)',
+                          border: `${EPAISSEUR_ANNEAU}px solid var(--bon)`,
                         }}
                       />
                     )}
@@ -459,19 +468,36 @@ export function VueCarte({
                     // bas que la pastille) fermerait le popup avant d'y
                     // arriver, meme avec un pont limite a la hauteur de la
                     // pastille. Popup et pastille partagent le meme point haut
-                    // (`ancreY - RAYON`) : des que x depasse le bord de la
-                    // pastille, on est dans le popup, quel que soit y tant
-                    // qu'on reste dans sa hauteur.
-                    const popupLeft = Math.min(ancreX + RAYON - 2, window.innerWidth - 200)
+                    // par defaut : des que x depasse le bord de la pastille,
+                    // on est dans le popup, quel que soit y tant qu'on reste
+                    // dans sa hauteur.
+                    //
+                    // Position absolue (relative a la pastille, donc a la
+                    // carte), pas fixe (relative a la fenetre) : un popup fixe
+                    // ignore le pinch-zoom tactile sur mobile — sa taille en
+                    // pixels CSS ne change pas avec le zoom, mais la fenetre
+                    // visible, elle, retrecit d'autant, si bien qu'il finit par
+                    // deborder largement de l'ecran. En absolu, le popup fait
+                    // partie du contenu zoome comme le reste de la carte, donc
+                    // il zoome avec elle. La contrepartie du fixed (echapper au
+                    // `overflow: hidden` de la zone de carte) est traitee ici en
+                    // bornant sa position dans les limites de la carte plutot
+                    // qu'en sortant de son flux.
+                    const largeurZone = zoneRect?.width ?? 0
+                    const hauteurZone = zoneRect?.height ?? 0
+                    const bx = b.x * largeurZone
+                    const by = b.y * hauteurZone
+                    const aGauche = bx + RAYON - 2 + POPUP_LARGEUR > largeurZone
+                    const gauche = aGauche ? -(RAYON - 2 + POPUP_LARGEUR) : RAYON - 2
+                    const hautMax = Math.max(4, hauteurZone - POPUP_HAUTEUR - 4)
+                    const hautVoulu = by - RAYON
+                    const haut = Math.min(Math.max(4, hautVoulu), hautMax) - by
                     return (
-                    // `position: fixed` (plutot que relatif a la carte) pour echapper
-                    // au `overflow: hidden` de la zone de carte : sinon un bloc pres
-                    // d'un bord afficherait un popup coupe.
                     <div
                       className="carte-popup"
                       style={{
-                        left: popupLeft,
-                        top: Math.max(8, ancreY - RAYON),
+                        left: gauche,
+                        top: haut,
                       }}
                     >
                       <div className="t">{b.nom || b.cotation}</div>

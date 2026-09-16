@@ -1297,3 +1297,23 @@ fait accompli.
   tout en gardant le reflet lustré (`BRILLANT`) qui donnait l'effet « métal » : c'est la
   désaturation des blocs envoyés qui rendait ces tons déjà sourds difficiles à distinguer, pas le
   reflet en lui-même.
+- Raphaël a enfin testé sur son vrai téléphone (voir « Prochaine étape » des sessions
+  précédentes). Deux retours :
+  - **Les pastilles débordaient encore de l'anneau vert « envoyé »**, surtout visible sur
+    téléphone. Cause : l'anneau utilisait un écart et une épaisseur fixes en pixels (2px), pensés
+    pour `RAYON` = 20 (bureau) — au plancher de `RAYON` (5px sur les cartes les plus étroites),
+    ce même écart fixe ne laissait presque plus de marge relative. Les deux suivent désormais
+    `RAYON` (`EPAISSEUR_ANNEAU`, `ECART_ANNEAU`, `VueCarte.tsx`). Vérifié programmatiquement (pas
+    seulement à l'œil, difficile à cette taille) : à `RAYON` = 5, l'écart mesuré entre le bord de
+    la pastille et l'anneau est maintenant de 3px de chaque côté (il était de 0).
+  - **Le popup au clic apparaissait bien trop grand et débordait de l'écran** après un pinch-zoom
+    tactile (zoomer avec les doigts pour mieux voir les blocs, cf. « La carte des blocs »). Cause :
+    le popup était en `position: fixed`, positionné et dimensionné en pixels CSS *de la fenêtre
+    sans zoom* — un piège connu du web mobile, les navigateurs ne redimensionnent pas les éléments
+    `fixed` avec le pinch-zoom (qui n'agit que sur le viewport visuel), si bien qu'un popup pensé
+    pour occuper une petite portion de l'écran fini par excéder toute la zone visible une fois
+    zoomée. Passé en `position: absolute`, ancré sur la pastille elle-même (donc sur la carte) :
+    il zoome avec le reste du contenu comme prévu. La raison du `fixed` d'origine — échapper à
+    l'`overflow: hidden` de la zone de carte près d'un bord — est maintenant traitée en bornant sa
+    position dans les limites de la carte (bascule à gauche de la pastille si la place manque à
+    droite, ajustement vertical similaire) plutôt qu'en sortant du flux normal.

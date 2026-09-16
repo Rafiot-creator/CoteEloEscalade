@@ -350,14 +350,16 @@ table.donnees td.principal { font-weight: 500; }
 .infobulle .l:has(span:empty) { color: var(--encre-3); font-size: 11px; justify-content: flex-end; }
 
 .carte-popup {
-  position: fixed;
+  /* Absolue (relative a la pastille, cf. VueCarte.tsx) et pas fixe : un popup
+     fixe ignore le pinch-zoom tactile et finit par deborder de l'ecran. */
+  position: absolute;
   z-index: 50;
   background: var(--surface);
   border: 1px solid var(--bord-fort);
   border-radius: var(--r-s);
   padding: 7px 9px;
   font-size: 12px;
-  min-width: 168px;
+  width: 190px;
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
 }
 .carte-popup .t { font-weight: 600; margin-bottom: 3px; }

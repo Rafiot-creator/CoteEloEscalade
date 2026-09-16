@@ -139,35 +139,58 @@ distinctes derrière ce retour, voir le journal pour le détail :
   tableau Classement (bascule entre cote globale et cote d'un style, pour tous les grimpeurs),
   comme demandé.
 
-Poussé sur `main` (commit `f1b7b91` puis `92cd657`), déploiement GitHub Pages vérifié vert
-via l'API Actions.
+Poussé sur `main` (commits `f1b7b91`, `92cd657`, `67997f0`, `f93a24f`), déploiement GitHub Pages
+vérifié vert via l'API Actions après chaque push.
 
-Deux retours supplémentaires de Raphael traités dans la foulée :
+Retours supplémentaires de Raphael traités dans la foulée, tous poussés :
 
 - Sur les écrans **Blocs** et **Grimpeurs**, le tableau principal passe au-dessus des cartes
-  analytiques (graphiques), limité à 25 lignes par défaut au lieu de 50. Poussé (`92cd657`).
+  analytiques (graphiques), limité à 25 lignes par défaut au lieu de 50.
 - Les pastilles de la Carte Démo (régénérée § ci-dessus) se chevauchaient. Cause a deux
   niveaux, voir le journal du 2026-09-16 dans le README pour le detail : les neuf zones de mur
   se recouvraient geometriquement aux quatre coins (corrige), et le placement purement
   aleatoire dans une zone ne garantissait aucun espacement minimal (remplace par une grille qui
   maximise l'espacement, calibree sur la taille de reference des pastilles documentee dans le
   README). Verifie programmatiquement : 36,3 unites de separation minimale mesurees sur les 50
-  blocs, au-dessus du seuil de 35 requis pour ne pas se toucher a la taille de reference. **Pas
-  encore poussé.**
+  blocs, au-dessus du seuil de 35 requis pour ne pas se toucher a la taille de reference.
+- Les blocs deja envoyes (`grayscale(0.85)` + `opacity: 0.55`) perdaient leur couleur d'origine.
+  Adouci (`grayscale(0.4) saturate(0.7)` + `opacity: 0.85`). Palette (`PALETTE_COULEURS`,
+  `VueCarte.tsx`) remontee vers des teintes plus vives sur demande de Raphael, tout en gardant le
+  reflet lustre "metal".
+
+Raphael a enfin teste sur son vrai telephone (prevu depuis le 2026-09-15). Deux bugs trouves,
+tous les deux corriges dans la foulee — voir le journal du 2026-09-16 dans le README pour le
+detail technique complet :
+
+- L'anneau vert "envoye" avait un ecart/epaisseur fixes en pixels, penses pour `RAYON` = 20
+  (bureau) : au plancher de `RAYON` (5px, telephone) ce fixe ne laissait presque plus de marge,
+  la pastille semblait deborder de l'anneau. Les deux suivent desormais `RAYON`
+  (`EPAISSEUR_ANNEAU`, `ECART_ANNEAU`). Verifie programmatiquement (via le DOM, pas seulement a
+  l'oeil — trop petit a cette taille) : 3px d'ecart de chaque cote a `RAYON` = 5 (il etait de 0).
+- Le popup au clic/survol d'un bloc etait en `position: fixed`, un piege classique du web mobile
+  avec le pinch-zoom tactile (que Raphael utilise pour mieux voir les blocs) : les navigateurs ne
+  redimensionnent pas les elements `fixed` avec le zoom du viewport visuel, si bien que le popup
+  finissait par deborder largement de l'ecran zoome. Passe en `position: absolute`, ancre sur la
+  pastille (donc sur la carte elle-meme, qui zoome avec le reste). L'ancienne raison du `fixed`
+  (echapper a l'`overflow: hidden` de la zone de carte pres d'un bord) est traitee en bornant sa
+  position dans les limites de la carte (bascule a gauche si la place manque a droite).
+
+Verifie dans Chrome (bureau, et via un retrecissement programmatique du conteneur de la carte
+pour simuler `RAYON` au plancher — `resize_window` n'a pas d'effet dans cet environnement).
+Tests (64) et build au vert. **Pas encore poussé, pas encore revu par Raphael sur son
+telephone.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
+- **Retester sur le téléphone** les deux correctifs ci-dessus (anneau, popup) — vérifiés dans
+  Chrome et via simulation, mais l'historique de cette carte montre que plusieurs bugs mobiles
+  n'avaient été repérés qu'à l'usage réel du téléphone de Raphael.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
-  l'absence de chevauchement, mais la disposition reste generee, pas affinee a l'oeil comme
-  l'etait la toute premiere version de cette carte. Raphael peut vouloir la retoucher a la main
-  malgre tout, ou la laisser telle quelle si elle convient.
-- **Tester l'écran Carte sur un vrai téléphone** (reporté depuis le 2026-09-15, Raphael a dit
-  vouloir s'en occuper plus tard) : survol/clic sur les boutons flash/réussi/échec, taille des
-  pastilles, popup. Vérifié dans Chrome (bureau) et via des simulations de largeur étroite, mais
-  plusieurs bugs mobiles précédents n'avaient été repérés qu'à l'usage réel du téléphone de
-  Raphael.
+  l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
+  l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main
+  malgré tout, ou la laisser telle quelle si elle convient.
 
 Autres pistes en attente si rien de ce qui précède ne ressort : brancher de vraies données sur un
 des centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans
