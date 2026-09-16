@@ -431,13 +431,15 @@ export function VueCarte({
                       />
                     )}
                     {nonEssaye && (
-                      // Empiete sur la pastille (inset positif) plutot que de
-                      // deborder autour (comme l'anneau "envoye") : plus visible
-                      // sans agrandir l'empreinte de la pastille sur la carte.
+                      // Empiete sur la pastille (inset a 0, pas negatif comme
+                      // l'anneau "envoye") plutot que de deborder autour : pas
+                      // d'agrandissement de son empreinte sur la carte. Inset a
+                      // 0 pile, pas une valeur positive : sinon un fin bord de
+                      // la pastille depasse quand meme le cercle par-dessous.
                       <span
                         style={{
                           position: 'absolute',
-                          inset: 2,
+                          inset: 0,
                           borderRadius: '50%',
                           border: '2px solid rgba(12, 163, 12, 0.6)',
                         }}

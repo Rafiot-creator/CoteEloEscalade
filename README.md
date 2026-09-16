@@ -785,9 +785,10 @@ un liseré vert épais (2 px, `var(--bon)`, juste à l'extérieur de la pastille
 dans les deux niveaux d'accès. À l'inverse, un bloc que ce grimpeur n'a **jamais tenté** (ni
 envoi, ni échec, statut absent de `envoisConnus`) porte un liseré vert plus clair
 (`rgba(12, 163, 12, 0.6)`) qui empiète sur la pastille plutôt que de déborder autour
-(`inset: 2`, positif plutôt que négatif) : assez épais pour être visible au premier retour de
-Raphaël (un simple 1 px à l'extérieur passait inaperçu), sans agrandir pour autant l'empreinte
-de la pastille sur une carte déjà dense. Un bloc raté (« Échoué ») n'a ni l'un ni l'autre : il a
+(`inset: 0`, pile sur son contour — pas une valeur positive comme `2`, qui laisse un mince
+anneau de la couleur de la pastille visible entre son bord et le cercle vert) : assez épais
+pour être visible, sans agrandir pour autant l'empreinte de la pastille sur une carte déjà
+dense. Un bloc raté (« Échoué ») n'a ni l'un ni l'autre : il a
 bien été tenté, donc pas « jamais essayé », mais pas envoyé non plus.
 
 **Ouvrir le popup au clic plutôt qu'au survol.** Le survol seul exclut les appareils sans
@@ -1146,3 +1147,7 @@ fait accompli.
 - Retour de Raphaël : ce liseré passait inaperçu, trop fin. Épaissi à 2 px et repositionné pour
   empiéter sur la pastille (`inset` positif) plutôt que déborder autour comme demandé
   explicitement — plus visible sans agrandir l'empreinte de la pastille sur la carte.
+- Nouveau retour : avec `inset: 2`, un mince anneau de la couleur de la pastille restait
+  visible entre son bord et le cercle vert — « la pastille déborde encore du cercle ». Corrigé
+  en mettant `inset` à `0` pile (le contour exact de la pastille) plutôt qu'une valeur positive :
+  le cercle vert forme maintenant le bord visible complet, sans aucun débord de la pastille.
