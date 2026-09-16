@@ -4,8 +4,8 @@
     {
       "id": "b0097",
       "nom": "DA-0097",
-      "x": 0.4724,
-      "y": 0.0405,
+      "x": 0.3892,
+      "y": 0.0876,
       "cotation": "V9",
       "couleur": "noir",
       "style": "Dalle/force"
@@ -13,8 +13,8 @@
     {
       "id": "b0170",
       "nom": "DA-0170",
-      "x": 0.5561,
-      "y": 0.1204,
+      "x": 0.4356,
+      "y": 0.0956,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dalle/force"
@@ -22,8 +22,8 @@
     {
       "id": "b0120",
       "nom": "DA-0120",
-      "x": 0.439,
-      "y": 0.0608,
+      "x": 0.4763,
+      "y": 0.0897,
       "cotation": "V10",
       "couleur": "noir",
       "style": "Dalle/force"
@@ -31,8 +31,8 @@
     {
       "id": "b0379",
       "nom": "DA-0379",
-      "x": 0.3804,
-      "y": 0.0759,
+      "x": 0.5186,
+      "y": 0.0912,
       "cotation": "V9",
       "couleur": "rouge",
       "style": "Dalle/force"
@@ -40,8 +40,8 @@
     {
       "id": "b0297",
       "nom": "DA-0297",
-      "x": 0.3617,
-      "y": 0.0765,
+      "x": 0.5621,
+      "y": 0.0912,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dalle/force"
@@ -49,8 +49,8 @@
     {
       "id": "b0138",
       "nom": "DA-0138",
-      "x": 0.6279,
-      "y": 0.1243,
+      "x": 0.6136,
+      "y": 0.096,
       "cotation": "V8",
       "couleur": "rouge",
       "style": "Dalle/force"
@@ -58,8 +58,8 @@
     {
       "id": "b0313",
       "nom": "CO-0313",
-      "x": 0.0611,
-      "y": 0.1316,
+      "x": 0.065,
+      "y": 0.1902,
       "cotation": "V3",
       "couleur": "vert",
       "style": "Coordo"
@@ -67,8 +67,8 @@
     {
       "id": "b0222",
       "nom": "CO-0222",
-      "x": 0.0348,
-      "y": 0.3062,
+      "x": 0.0647,
+      "y": 0.243,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Coordo"
@@ -76,8 +76,8 @@
     {
       "id": "b0149",
       "nom": "CO-0149",
-      "x": 0.1003,
-      "y": 0.25,
+      "x": 0.0653,
+      "y": 0.2952,
       "cotation": "V10",
       "couleur": "noir",
       "style": "Coordo"
@@ -85,8 +85,8 @@
     {
       "id": "b0372",
       "nom": "CO-0372",
-      "x": 0.0725,
-      "y": 0.2739,
+      "x": 0.0651,
+      "y": 0.3477,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Coordo"
@@ -94,8 +94,8 @@
     {
       "id": "b0281",
       "nom": "CO-0281",
-      "x": 0.0655,
-      "y": 0.0407,
+      "x": 0.065,
+      "y": 0.3995,
       "cotation": "V1",
       "couleur": "jaune",
       "style": "Coordo"
@@ -103,8 +103,8 @@
     {
       "id": "b0363",
       "nom": "CO-0363",
-      "x": 0.0801,
-      "y": 0.4484,
+      "x": 0.0651,
+      "y": 0.4528,
       "cotation": "V4",
       "couleur": "vert",
       "style": "Coordo"
@@ -112,8 +112,8 @@
     {
       "id": "b0232",
       "nom": "DY-0232",
-      "x": 0.0531,
-      "y": 0.7717,
+      "x": 0.0649,
+      "y": 0.5477,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dyno"
@@ -121,8 +121,8 @@
     {
       "id": "b0200",
       "nom": "DY-0200",
-      "x": 0.0395,
-      "y": 0.9502,
+      "x": 0.0648,
+      "y": 0.6004,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dyno"
@@ -130,8 +130,8 @@
     {
       "id": "b0305",
       "nom": "DY-0305",
-      "x": 0.0519,
-      "y": 0.7114,
+      "x": 0.0649,
+      "y": 0.6523,
       "cotation": "V5",
       "couleur": "bleu",
       "style": "Dyno"
@@ -139,8 +139,8 @@
     {
       "id": "b0205",
       "nom": "DY-0205",
-      "x": 0.0578,
-      "y": 0.7504,
+      "x": 0.0649,
+      "y": 0.7048,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dyno"
@@ -148,8 +148,8 @@
     {
       "id": "b0282",
       "nom": "DY-0282",
-      "x": 0.0483,
-      "y": 0.777,
+      "x": 0.0649,
+      "y": 0.7572,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dyno"
@@ -157,8 +157,8 @@
     {
       "id": "b0382",
       "nom": "DY-0382",
-      "x": 0.0814,
-      "y": 0.8127,
+      "x": 0.0651,
+      "y": 0.8097,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dyno"
@@ -166,8 +166,8 @@
     {
       "id": "b0342",
       "nom": "TE-0342",
-      "x": 0.5731,
-      "y": 0.8841,
+      "x": 0.5686,
+      "y": 0.9002,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Technique/force"
@@ -175,8 +175,8 @@
     {
       "id": "b0374",
       "nom": "TE-0374",
-      "x": 0.9476,
-      "y": 0.9386,
+      "x": 0.6745,
+      "y": 0.9166,
       "cotation": "V4",
       "couleur": "vert",
       "style": "Technique/force"
@@ -184,8 +184,8 @@
     {
       "id": "b0324",
       "nom": "TE-0324",
-      "x": 0.8001,
-      "y": 0.9341,
+      "x": 0.7527,
+      "y": 0.9152,
       "cotation": "V5",
       "couleur": "bleu",
       "style": "Technique/force"
@@ -193,8 +193,8 @@
     {
       "id": "b0215",
       "nom": "TE-0215",
-      "x": 0.5808,
-      "y": 0.8827,
+      "x": 0.827,
+      "y": 0.8998,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Technique/force"
@@ -202,8 +202,8 @@
     {
       "id": "b0392",
       "nom": "TE-0392",
-      "x": 0.8621,
-      "y": 0.9179,
+      "x": 0.928,
+      "y": 0.9104,
       "cotation": "V4",
       "couleur": "vert",
       "style": "Technique/force"
@@ -211,8 +211,8 @@
     {
       "id": "b0296",
       "nom": "DA-0296",
-      "x": 0.247,
-      "y": 0.0451,
+      "x": 0.0591,
+      "y": 0.0882,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dalle/pied"
@@ -220,8 +220,8 @@
     {
       "id": "b0396",
       "nom": "DA-0396",
-      "x": 0.1646,
-      "y": 0.0664,
+      "x": 0.1007,
+      "y": 0.0903,
       "cotation": "V6",
       "couleur": "bleu",
       "style": "Dalle/pied"
@@ -229,8 +229,8 @@
     {
       "id": "b0260",
       "nom": "DA-0260",
-      "x": 0.243,
-      "y": 0.0774,
+      "x": 0.1467,
+      "y": 0.0913,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dalle/pied"
@@ -238,8 +238,8 @@
     {
       "id": "b0160",
       "nom": "DA-0160",
-      "x": 0.2074,
-      "y": 0.0863,
+      "x": 0.1895,
+      "y": 0.0922,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dalle/pied"
@@ -247,8 +247,8 @@
     {
       "id": "b0196",
       "nom": "DA-0196",
-      "x": 0.2697,
-      "y": 0.0954,
+      "x": 0.2351,
+      "y": 0.0931,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dalle/pied"
@@ -256,8 +256,8 @@
     {
       "id": "b0269",
       "nom": "DA-0269",
-      "x": 0.1061,
-      "y": 0.0885,
+      "x": 0.2744,
+      "y": 0.0924,
       "cotation": "V9",
       "couleur": "noir",
       "style": "Dalle/pied"
@@ -265,8 +265,8 @@
     {
       "id": "b0103",
       "nom": "DA-0103",
-      "x": 0.8359,
-      "y": 0.0885,
+      "x": 0.724,
+      "y": 0.0924,
       "cotation": "V4",
       "couleur": "bleu",
       "style": "Dalle/doigts"
@@ -274,8 +274,8 @@
     {
       "id": "b0271",
       "nom": "DA-0271",
-      "x": 0.7619,
-      "y": 0.0963,
+      "x": 0.7658,
+      "y": 0.0932,
       "cotation": "V1",
       "couleur": "jaune",
       "style": "Dalle/doigts"
@@ -283,8 +283,8 @@
     {
       "id": "b0353",
       "nom": "DA-0353",
-      "x": 0.8794,
-      "y": 0.0458,
+      "x": 0.8129,
+      "y": 0.0883,
       "cotation": "V5",
       "couleur": "jaune",
       "style": "Dalle/doigts"
@@ -292,8 +292,8 @@
     {
       "id": "b0030",
       "nom": "DA-0030",
-      "x": 0.909,
-      "y": 0.1498,
+      "x": 0.8575,
+      "y": 0.0984,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dalle/doigts"
@@ -301,8 +301,8 @@
     {
       "id": "b0239",
       "nom": "DA-0239",
-      "x": 0.906,
-      "y": 0.1467,
+      "x": 0.9013,
+      "y": 0.0981,
       "cotation": "V1",
       "couleur": "jaune",
       "style": "Dalle/doigts"
@@ -310,8 +310,8 @@
     {
       "id": "b0021",
       "nom": "DA-0021",
-      "x": 0.7643,
-      "y": 0.1337,
+      "x": 0.9412,
+      "y": 0.0969,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Dalle/doigts"
@@ -319,8 +319,8 @@
     {
       "id": "b0216",
       "nom": "TE-0216",
-      "x": 0.1658,
-      "y": 0.8964,
+      "x": 0.0735,
+      "y": 0.9039,
       "cotation": "V8",
       "couleur": "rouge",
       "style": "Technique/doigt"
@@ -328,8 +328,8 @@
     {
       "id": "b0093",
       "nom": "TE-0093",
-      "x": 0.3871,
-      "y": 0.8684,
+      "x": 0.1713,
+      "y": 0.8955,
       "cotation": "V3",
       "couleur": "vert",
       "style": "Technique/doigt"
@@ -337,8 +337,8 @@
     {
       "id": "b0116",
       "nom": "TE-0116",
-      "x": 0.0852,
-      "y": 0.9251,
+      "x": 0.2412,
+      "y": 0.9125,
       "cotation": "V7",
       "couleur": "noir",
       "style": "Technique/doigt"
@@ -346,8 +346,8 @@
     {
       "id": "b0134",
       "nom": "TE-0134",
-      "x": 0.3095,
-      "y": 0.9183,
+      "x": 0.3392,
+      "y": 0.9105,
       "cotation": "V6",
       "couleur": "bleu",
       "style": "Technique/doigt"
@@ -355,8 +355,8 @@
     {
       "id": "b0375",
       "nom": "TE-0375",
-      "x": 0.4458,
-      "y": 0.9155,
+      "x": 0.4324,
+      "y": 0.9096,
       "cotation": "V6",
       "couleur": "bleu",
       "style": "Technique/doigt"
@@ -364,8 +364,8 @@
     {
       "id": "b0085",
       "nom": "DÉ-0085",
-      "x": 0.9513,
-      "y": 0.1392,
+      "x": 0.9366,
+      "y": 0.1928,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dévers/force"
@@ -373,8 +373,8 @@
     {
       "id": "b0285",
       "nom": "DÉ-0285",
-      "x": 0.9542,
-      "y": 0.1288,
+      "x": 0.9369,
+      "y": 0.2553,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dévers/force"
@@ -382,8 +382,8 @@
     {
       "id": "b0335",
       "nom": "DÉ-0335",
-      "x": 0.9464,
-      "y": 0.3325,
+      "x": 0.9361,
+      "y": 0.3236,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dévers/force"
@@ -391,8 +391,8 @@
     {
       "id": "b0044",
       "nom": "DÉ-0044",
-      "x": 0.9415,
-      "y": 0.1123,
+      "x": 0.9356,
+      "y": 0.3806,
       "cotation": "V6",
       "couleur": "rouge",
       "style": "Dévers/force"
@@ -400,8 +400,8 @@
     {
       "id": "b0367",
       "nom": "DÉ-0367",
-      "x": 0.9567,
-      "y": 0.2155,
+      "x": 0.9372,
+      "y": 0.4462,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dévers/force"
@@ -409,8 +409,8 @@
     {
       "id": "b0286",
       "nom": "DÉ-0286",
-      "x": 0.9709,
-      "y": 0.8333,
+      "x": 0.9386,
+      "y": 0.5551,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dévers/doigts"
@@ -418,8 +418,8 @@
     {
       "id": "b0177",
       "nom": "DÉ-0177",
-      "x": 0.942,
-      "y": 0.6634,
+      "x": 0.9357,
+      "y": 0.6134,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dévers/doigts"
@@ -427,8 +427,8 @@
     {
       "id": "b0059",
       "nom": "DÉ-0059",
-      "x": 0.9565,
-      "y": 0.8885,
+      "x": 0.9372,
+      "y": 0.6823,
       "cotation": "V10",
       "couleur": "noir",
       "style": "Dévers/doigts"
@@ -436,8 +436,8 @@
     {
       "id": "b0295",
       "nom": "DÉ-0295",
-      "x": 0.9028,
-      "y": 0.6747,
+      "x": 0.9318,
+      "y": 0.7394,
       "cotation": "V6",
       "couleur": "bleu",
       "style": "Dévers/doigts"
@@ -445,8 +445,8 @@
     {
       "id": "b0386",
       "nom": "DÉ-0386",
-      "x": 0.9506,
-      "y": 0.6818,
+      "x": 0.9366,
+      "y": 0.8025,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Dévers/doigts"

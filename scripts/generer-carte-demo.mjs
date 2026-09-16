@@ -15,16 +15,21 @@ const COULEUR_PAR_NOM = { Bleu: 'bleu', Vert: 'vert', Jaune: 'jaune', Rouge: 'ro
 // Bandes murales du plan invente (coordonnees du viewBox 1000x700 de demo.svg),
 // avec une marge pour que les pastilles debordent le moins possible sur le
 // sol ou sur le mur voisin.
+// Les bandes du haut et du bas couvrent toute la largeur (y compris les
+// coins) ; celles de gauche et de droite s'arretent donc strictement entre
+// les deux pour ne jamais empieter sur un coin deja couvert par l'autre axe
+// (sans quoi deux zones "voisines" au coin pourraient y placer des pastilles
+// l'une sur l'autre).
 const ZONES = {
   'Dalle/pied': { x0: 25, x1: 308, y0: 25, y1: 105 },
   'Dalle/force': { x0: 358, x1: 642, y0: 25, y1: 105 },
   'Dalle/doigts': { x0: 692, x1: 975, y0: 25, y1: 105 },
-  'Dévers/force': { x0: 895, x1: 975, y0: 25, y1: 325 },
-  'Dévers/doigts': { x0: 895, x1: 975, y0: 375, y1: 675 },
+  'Dévers/force': { x0: 895, x1: 975, y0: 105, y1: 345 },
+  'Dévers/doigts': { x0: 895, x1: 975, y0: 355, y1: 595 },
   'Technique/force': { x0: 525, x1: 975, y0: 595, y1: 675 },
   'Technique/doigt': { x0: 25, x1: 475, y0: 595, y1: 675 },
-  Dyno: { x0: 25, x1: 105, y0: 375, y1: 675 },
-  Coordo: { x0: 25, x1: 105, y0: 25, y1: 325 },
+  Dyno: { x0: 25, x1: 105, y0: 355, y1: 595 },
+  Coordo: { x0: 25, x1: 105, y0: 105, y1: 345 },
 }
 const LARGEUR = 1000
 const HAUTEUR = 700
@@ -80,25 +85,80 @@ for (const q of [...quotas].sort((a, b) => b.reste - a.reste)) {
 /** Score deterministe dans [0, 1), pour choisir un sous-ensemble reproductible. */
 const scoreSelection = (id) => pseudoAleatoire(graineDe(`${id}:selection`))()
 
-const blocsChoisis = quotas.flatMap(({ style, blocsDeLaZone, quota }) => {
+/** Retrait depuis les bords de la zone : les pastilles ne collent ni au mur, ni a la zone voisine. */
+const MARGE_ZONE = 10
+/**
+ * Separation minimale garantie entre deux centres de pastilles, en unites du
+ * viewBox (1000x700). Calibree sur la taille de reference documentee dans le
+ * README (rayon 20px pour une carte affichee a ~1150px de large, donc un
+ * viewBox unit y vaut ~1150/1000 px) : un diametre de 40px de reference
+ * correspond a ~35 unites de viewBox, 36 ajoute une petite marge. La taille
+ * des pastilles etant proportionnelle a la largeur affichee (RAYON dans
+ * VueCarte.tsx), cette garantie tient a toute taille d'ecran tant que le
+ * plancher de 5px du rayon n'entre pas en jeu (cartes affichees sous
+ * ~280px de large, hors de l'usage normal).
+ */
+const SEPARATION_MIN = 36
+
+/**
+ * Place `n` pastilles dans une zone selon une grille qui epouse ses
+ * proportions, avec un leger jitter deterministe par bloc pour eviter un
+ * alignement trop mecanique. Le jitter est plafonne pour ne jamais faire
+ * descendre la separation entre deux pastilles voisines sous SEPARATION_MIN,
+ * meme dans le pire cas (les deux jitters au maximum, l'un vers l'autre).
+ */
+function positionsEnGrille(zone, n) {
+  const x0 = zone.x0 + MARGE_ZONE
+  const x1 = zone.x1 - MARGE_ZONE
+  const y0 = zone.y0 + MARGE_ZONE
+  const y1 = zone.y1 - MARGE_ZONE
+  const largeurZone = Math.max(1, x1 - x0)
+  const hauteurZone = Math.max(1, y1 - y0)
+  // Essaie toutes les repartitions en colonnes possibles et garde celle qui
+  // maximise la plus petite dimension de cellule : une formule basee sur le
+  // seul ratio largeur/hauteur de la zone (ex. racine carree) choisit parfois
+  // une grille etroite en colonnes alors qu'une seule rangee, plus large,
+  // laisserait bien plus d'espace entre les pastilles.
+  let meilleur = null
+  for (let colonnes = 1; colonnes <= n; colonnes++) {
+    const lignes = Math.ceil(n / colonnes)
+    const cellW = largeurZone / colonnes
+    const cellH = hauteurZone / lignes
+    const score = Math.min(cellW, cellH)
+    if (!meilleur || score > meilleur.score) meilleur = { colonnes, cellW, cellH, score }
+  }
+  const { colonnes, cellW, cellH, score } = meilleur
+  const jitter = Math.max(0, (score - SEPARATION_MIN) / 2)
+  return Array.from({ length: n }, (_, i) => ({
+    cx: x0 + cellW * ((i % colonnes) + 0.5),
+    cy: y0 + cellH * (Math.floor(i / colonnes) + 0.5),
+    jitter,
+  }))
+}
+
+const groupesParZone = quotas.map(({ style, blocsDeLaZone, quota }) => {
   if (!ZONES[style]) throw new Error(`Style sans zone sur le plan : ${style}`)
-  return [...blocsDeLaZone].sort((a, b) => scoreSelection(a.id) - scoreSelection(b.id)).slice(0, quota)
+  const choisis = [...blocsDeLaZone].sort((a, b) => scoreSelection(a.id) - scoreSelection(b.id)).slice(0, quota)
+  return { zone: ZONES[style], choisis }
 })
 
-const blocs = blocsChoisis.map((bloc) => {
-  const zone = ZONES[bloc.secteur]
-  const alea = pseudoAleatoire(graineDe(bloc.id))
-  const x = (zone.x0 + alea() * (zone.x1 - zone.x0)) / LARGEUR
-  const y = (zone.y0 + alea() * (zone.y1 - zone.y0)) / HAUTEUR
-  return {
-    id: bloc.id,
-    nom: bloc.nom,
-    x: Number(x.toFixed(4)),
-    y: Number(y.toFixed(4)),
-    cotation: bloc.cotation_officielle,
-    couleur: COULEUR_PAR_NOM[bloc.couleur] ?? 'bleu',
-    style: bloc.secteur,
-  }
+const blocs = groupesParZone.flatMap(({ zone, choisis }) => {
+  const positions = positionsEnGrille(zone, choisis.length)
+  return choisis.map((bloc, i) => {
+    const { cx, cy, jitter } = positions[i]
+    const alea = pseudoAleatoire(graineDe(bloc.id))
+    const x = cx + (alea() * 2 - 1) * jitter
+    const y = cy + (alea() * 2 - 1) * jitter
+    return {
+      id: bloc.id,
+      nom: bloc.nom,
+      x: Number((x / LARGEUR).toFixed(4)),
+      y: Number((y / HAUTEUR).toFixed(4)),
+      cotation: bloc.cotation_officielle,
+      couleur: COULEUR_PAR_NOM[bloc.couleur] ?? 'bleu',
+      style: bloc.secteur,
+    }
+  })
 })
 
 const carte = { fond: 'cartes/demo.svg', blocs }

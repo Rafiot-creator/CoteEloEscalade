@@ -1262,3 +1262,27 @@ fait accompli.
   Le badge d'écart coloré de la première version a été abandonné avec le tableau à part : la
   colonne affiche la cote brute, à comparer visuellement à la colonne Elo d'à côté, comme les
   formules le font déjà entre elles.
+- Sur demande de Raphaël, le tableau principal des écrans **Blocs** et **Grimpeurs** (tous les
+  blocs / le classement) passe au-dessus des cartes analytiques (nuage de points, histogramme,
+  courbe de progression), et se limite à 25 lignes par défaut (bouton « Afficher plus » pour le
+  reste) au lieu de 50.
+- Retour de Raphaël sur la régénération complète de la Carte Démo (ci-dessus) : les pastilles se
+  chevauchaient. Cause réelle, à deux niveaux :
+  - les neuf zones de mur (`ZONES`, `scripts/generer-carte-demo.mjs`) se **recouvraient
+    géométriquement aux quatre coins** — une zone du mur du haut (ex. Dalle/pied) et une zone du
+    mur latéral (ex. Coordo) réclamaient toutes les deux le même carré de coin, un défaut déjà
+    présent dans le tout premier découpage à huit zones mais jamais repéré faute d'avoir mesuré
+    les distances entre pastilles. Corrigé en réservant les coins aux bandes du haut et du bas
+    (pleine largeur) et en cantonnant les bandes latérales à la portion strictement entre les
+    deux.
+  - le placement, purement aléatoire dans le rectangle de la zone, ne garantissait aucun
+    espacement minimal. Remplacé par une grille qui épouse les proportions de chaque zone — en
+    essayant systématiquement tous les découpages en colonnes possibles et en gardant celui qui
+    maximise la plus petite dimension de cellule, plutôt qu'une formule basée sur le seul ratio
+    largeur/hauteur qui choisissait parfois une grille étroite là où une seule rangée large
+    aurait laissé bien plus de place — avec un léger jitter déterministe par bloc, plafonné pour
+    ne jamais faire descendre la séparation sous un seuil calibré sur la taille de référence
+    documentée dans le README (§ « Pastilles, survol et popup ») : à ~1150 px de large et un
+    rayon de pastille de 20 px, il faut ~35 unités du viewBox entre deux centres pour qu'elles ne
+    se touchent pas ; réglé à 36. Vérifié après coup : distance minimale mesurée entre deux
+    pastilles quelconques sur les 50 de la Démo, 36,3 unités.

@@ -139,17 +139,30 @@ distinctes derrière ce retour, voir le journal pour le détail :
   tableau Classement (bascule entre cote globale et cote d'un style, pour tous les grimpeurs),
   comme demandé.
 
-Retesté par Claude dans Chrome après les deux correctifs (Carte + colonne), mais **pas encore vu
-par Raphael**.
+Poussé sur `main` (commit `f1b7b91` puis `92cd657`), déploiement GitHub Pages vérifié vert
+via l'API Actions.
+
+Deux retours supplémentaires de Raphael traités dans la foulée :
+
+- Sur les écrans **Blocs** et **Grimpeurs**, le tableau principal passe au-dessus des cartes
+  analytiques (graphiques), limité à 25 lignes par défaut au lieu de 50. Poussé (`92cd657`).
+- Les pastilles de la Carte Démo (régénérée § ci-dessus) se chevauchaient. Cause a deux
+  niveaux, voir le journal du 2026-09-16 dans le README pour le detail : les neuf zones de mur
+  se recouvraient geometriquement aux quatre coins (corrige), et le placement purement
+  aleatoire dans une zone ne garantissait aucun espacement minimal (remplace par une grille qui
+  maximise l'espacement, calibree sur la taille de reference des pastilles documentee dans le
+  README). Verifie programmatiquement : 36,3 unites de separation minimale mesurees sur les 50
+  blocs, au-dessus du seuil de 35 requis pour ne pas se toucher a la taille de reference. **Pas
+  encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retour sur ce deuxième jet** (colonne déroulante dans Grimpeurs, neuf zones sur la Carte
-  Démo) — s'attendre à des ajustements, comme pour le reste de l'écran Carte.
-- **Raffiner à la main les positions des blocs sur la Carte Démo**, perdues par la régénération
-  complète (§ ci-dessus) — comme lors de la toute première mise en place de cette carte.
+- **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
+  l'absence de chevauchement, mais la disposition reste generee, pas affinee a l'oeil comme
+  l'etait la toute premiere version de cette carte. Raphael peut vouloir la retoucher a la main
+  malgre tout, ou la laisser telle quelle si elle convient.
 - **Tester l'écran Carte sur un vrai téléphone** (reporté depuis le 2026-09-15, Raphael a dit
   vouloir s'en occuper plus tard) : survol/clic sur les boutons flash/réussi/échec, taille des
   pastilles, popup. Vérifié dans Chrome (bureau) et via des simulations de largeur étroite, mais
