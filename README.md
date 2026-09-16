@@ -781,11 +781,14 @@ couper près des bords.
 
 Un bloc déjà envoyé (flash ou réussi, pas simplement tenté) par le grimpeur choisi se
 reconnaît aussi sans survoler : sa pastille passe en gris (opacité réduite + désaturation) avec
-un liseré vert épais (2 px, `var(--bon)`), dans les deux niveaux d'accès. À l'inverse, un bloc
-que ce grimpeur n'a **jamais tenté** (ni envoi, ni échec, statut absent de `envoisConnus`) porte
-un liseré vert fin et clair (1 px, `rgba(12, 163, 12, 0.5)`) — plus discret pour ne pas se
-confondre avec l'anneau plein d'un envoi. Un bloc raté (« Échoué ») n'a ni l'un ni l'autre : il
-a bien été tenté, donc pas « jamais essayé », mais pas envoyé non plus.
+un liseré vert épais (2 px, `var(--bon)`, juste à l'extérieur de la pastille — `inset: -2`),
+dans les deux niveaux d'accès. À l'inverse, un bloc que ce grimpeur n'a **jamais tenté** (ni
+envoi, ni échec, statut absent de `envoisConnus`) porte un liseré vert plus clair
+(`rgba(12, 163, 12, 0.6)`) qui empiète sur la pastille plutôt que de déborder autour
+(`inset: 2`, positif plutôt que négatif) : assez épais pour être visible au premier retour de
+Raphaël (un simple 1 px à l'extérieur passait inaperçu), sans agrandir pour autant l'empreinte
+de la pastille sur une carte déjà dense. Un bloc raté (« Échoué ») n'a ni l'un ni l'autre : il a
+bien été tenté, donc pas « jamais essayé », mais pas envoyé non plus.
 
 **Ouvrir le popup au clic plutôt qu'au survol.** Le survol seul exclut les appareils sans
 souris (une tablette en salle, justement l'usage visé). En vue visiteur, cliquer un bloc ouvre
@@ -1140,3 +1143,6 @@ fait accompli.
 - Ajout d'un liseré vert fin et clair (1 px, semi-transparent) autour des pastilles jamais
   tentées par le grimpeur choisi dans le menu déroulant, pour les repérer d'un coup d'œil sans
   survoler — distinct du liseré épais qui marque un envoi. Voir « Pastilles, survol et popup ».
+- Retour de Raphaël : ce liseré passait inaperçu, trop fin. Épaissi à 2 px et repositionné pour
+  empiéter sur la pastille (`inset` positif) plutôt que déborder autour comme demandé
+  explicitement — plus visible sans agrandir l'empreinte de la pastille sur la carte.

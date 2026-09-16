@@ -431,14 +431,15 @@ export function VueCarte({
                       />
                     )}
                     {nonEssaye && (
-                      // Liseré fin et clair : repere discret, a ne pas confondre
-                      // avec l'anneau plein qui marque un bloc deja envoye.
+                      // Empiete sur la pastille (inset positif) plutot que de
+                      // deborder autour (comme l'anneau "envoye") : plus visible
+                      // sans agrandir l'empreinte de la pastille sur la carte.
                       <span
                         style={{
                           position: 'absolute',
-                          inset: -2,
+                          inset: 2,
                           borderRadius: '50%',
-                          border: '1px solid rgba(12, 163, 12, 0.5)',
+                          border: '2px solid rgba(12, 163, 12, 0.6)',
                         }}
                       />
                     )}
