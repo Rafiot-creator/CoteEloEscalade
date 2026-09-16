@@ -74,28 +74,54 @@ attente (`git status` clean).
 
 ## État au 2026-09-15
 
-- Migration CI : `actions/checkout@v4`/`setup-node@v4` → `@v5` (runtime Node 24) dans
-  `.github/workflows/deploy.yml`, avant le retrait de Node 20 des runners GitHub Actions le
-  16 septembre 2026 (annonce GitHub). Tests (62) toujours au vert après la modification. Piste
-  refermée dans `DECISIONS.md` § 7.
-- Écran Carte : trois boutons flash/réussi/échec, ouverts au survol ou au clic (Majuscule+clic
-  en accès complet, où le clic sert déjà à sélectionner/déplacer). Pour le centre Démo et un
-  nom de grimpeur reconnu du dataset, ils enregistrent une vraie ascension
-  (`src/ui/ascensionsLocales.ts`, fusionnée dans `useAtelier`/`etat.ts`) qui recalcule les
-  cotes affichées ailleurs (Blocs, Grimpeurs) — pas un simple suivi visuel comme avant. Un
-  nouveau clic remplace directement l'envoi précédemment ajouté depuis la Carte pour ce
-  bloc/grimpeur (pas d'étape d'annulation séparée, essayée puis simplifiée dans la même
-  session). Statut affiché au popup : Flash / Réussi / Échoué / Jamais essayé
-  (`Atelier.envoisConnus`, meilleur statut sur fichier + Carte). Pastilles redimensionnées sous
-  420 px de large (téléphone) — a nécessité de corriger au passage un `white-space: nowrap`
-  sur `.marque` qui empêchait toute la page de rétrécir sous ~720 px sur petit écran. Détails
-  et tout l'historique des allers-retours dans le README, § « La carte des blocs » et journal
-  du 2026-09-15. Tests (62) et typecheck au vert ; largement testé manuellement dans Chrome
-  (voir aussi la mémoire `feedback-browser-hover-testing` pour les pièges de ce genre de test).
+Grosse session sur l'écran **Carte**, avec beaucoup d'allers-retours après tests réels de
+Raphaël (souris puis téléphone) — l'historique complet des essais abandonnés (pont invisible,
+`ResizeObserver`, lien « Annuler », statut « meilleur » plutôt que « le plus récent »...) et
+pourquoi ils ne suffisaient pas est dans le README, § « La carte des blocs » et journal du
+2026-09-15 ; ce qui suit est l'état final, pas le chemin pour y arriver.
+
+- Migration CI : `actions/checkout@v4`/`setup-node@v4` → `@v5` (runtime Node 24), avant le
+  retrait de Node 20 des runners GitHub Actions le 16 septembre 2026. Piste refermée dans
+  `DECISIONS.md` § 7.
+- Trois boutons flash/réussi/échec sur la Carte, ouverts au survol (souris uniquement —
+  `matchMedia('(hover: hover)')`, désactivé sur tactile où un tap simule des événements souris
+  trompeurs) ou au clic (Majuscule+clic en accès complet, où le clic sert déjà à
+  sélectionner/déplacer). Pour le centre Démo et un nom de grimpeur reconnu du dataset, ils
+  enregistrent une vraie ascension (`src/ui/ascensionsLocales.ts`, fusionnée dans
+  `useAtelier`/`etat.ts`) qui recalcule les cotes affichées ailleurs (Blocs, Grimpeurs).
+  Chaque clic **remplace** l'envoi précédemment ajouté depuis la Carte pour ce bloc/grimpeur, et
+  `Atelier.envoisConnus` retient le statut **le plus récent** (pas le meilleur) : Raphaël veut
+  pouvoir changer d'avis dans n'importe quel sens, à tout moment, y compris redescendre un bloc
+  déjà flashé. Popup : statut (Flash/Réussi/Échoué/Jamais essayé), raison visible (pas juste au
+  survol) quand les boutons sont désactivés. Pastille : anneau vert plein si envoyé, liseré vert
+  fin si jamais tenté (`inset: 0`, pile sur le bord — pas de débord).
+- Taille des pastilles (`RAYON`, `VueCarte.tsx`) : échelle continue proportionnelle à la largeur
+  réelle de la carte (`largeur × 1,8 %`, borné 5–20 px), pas un seuil fixe — un seuil gardait les
+  pastilles relativement trop grosses sur un téléphone, où l'espacement entre elles rétrécit
+  dans la même proportion que la carte. A aussi mis au jour un bug de layout indépendant :
+  `.marque` (titre + sous-titre) avait un `white-space: nowrap` qui empêchait toute la page de
+  rétrécir sous ~720 px sur petit écran, peu importe la taille des pastilles.
+- Légende permanente « 1 cote V = 1000 points (V1 = 1000, V2 = 2000...) » sous les tuiles des
+  écrans Blocs, Grimpeurs et Carte (`LegendeCote`, `src/ui/components/base.tsx`) — la conversion
+  n'était que dans une bulle d'aide au survol, invisible sur tactile.
+- Plusieurs mises au point de méthode utiles pour la suite (voir mémoires
+  `feedback-browser-hover-testing` et `feedback-resizeobserver-throttling`) : un survol/clic
+  testé par un saut de curseur direct ou dans l'outil d'automatisation ne reproduit pas fidèlement
+  un geste tactile réel ni un `ResizeObserver` sur un onglet sans focus — plusieurs correctifs de
+  cette session ont eu l'air de marcher en test avant d'échouer sur le vrai téléphone de Raphael.
+
+Tests (62) et typecheck au vert après chaque commit. Testé manuellement dans Chrome à chaque
+étape, mais **pas encore sur un vrai téléphone** au moment d'écrire ceci (prochaine étape).
 
 ## Prochaine étape
 
-Rien de décidé pour la prochaine session — à définir avec Raphael. Pistes en attente, au
-choix : brancher de vraies données sur un des centres du menu (autre que Rose Bloc 1), ou une
-des pistes ouvertes listées dans `DECISIONS.md` (§ 7) : seuil Glicko à 0,60, test
-d'équivalence, Glicko-2, modèle morphologique, import utilisateur par glisser-déposer.
+**Tester tout l'écran Carte sur un vrai téléphone** (prévu par Raphael à la prochaine session) :
+survol/clic sur les boutons flash/réussi/échec, taille des pastilles, popup. Les correctifs de
+cette session ont été vérifiés dans Chrome (bureau) et via des simulations de largeur étroite,
+mais plusieurs bugs mobiles précédents n'avaient été repérés qu'à l'usage réel sur le téléphone
+de Raphael — s'attendre à devoir encore ajuster.
+
+Autres pistes en attente si le téléphone ne révèle rien : brancher de vraies données sur un des
+centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans `DECISIONS.md`
+(§ 7) : seuil Glicko à 0,60, test d'équivalence, Glicko-2, modèle morphologique, import
+utilisateur par glisser-déposer.
