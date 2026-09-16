@@ -356,6 +356,16 @@ export function VueBlocs({
       </div>
       <LegendeCote />
 
+      <Carte
+        titre={t('Tous les blocs exploitables', 'All ratable boulders')}
+        sousTitre={t(
+          "Blocs ayant assez de duels utiles pour être jugés. Un bloc ouvert la semaine dernière n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touché. Le verdict résume l'avis des formules qui votent : accord avec l'ouvreur, à vérifier si l'une le conteste, confirmé si toutes le contestent. Les cotes de chaque formule sont affichées à côté : quand elles s'écartent nettement, c'est que le bloc est mal connu.",
+          "Boulders with enough useful duels to be judged. A boulder set last week isn't in yet, nor is one that only much stronger or much weaker climbers have touched. The verdict summarizes what the voting formulas say: agrees with the setter, flagged if one contests it, confirmed if all contest it. Each formula's rating is shown alongside: when they diverge sharply, the boulder is poorly documented."
+        )}
+      >
+        <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} pageTaille={25} />
+      </Carte>
+
       {isoles.length > 0 && (
         <Carte titre={t('Salles isolées', 'Isolated gyms')}>
           <p className="sous-titre">
@@ -422,16 +432,6 @@ export function VueBlocs({
           </p>
         </Carte>
       </div>
-
-      <Carte
-        titre={t('Tous les blocs exploitables', 'All ratable boulders')}
-        sousTitre={t(
-          "Blocs ayant assez de duels utiles pour être jugés. Un bloc ouvert la semaine dernière n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touché. Le verdict résume l'avis des formules qui votent : accord avec l'ouvreur, à vérifier si l'une le conteste, confirmé si toutes le contestent. Les cotes de chaque formule sont affichées à côté : quand elles s'écartent nettement, c'est que le bloc est mal connu.",
-          "Boulders with enough useful duels to be judged. A boulder set last week isn't in yet, nor is one that only much stronger or much weaker climbers have touched. The verdict summarizes what the voting formulas say: agrees with the setter, flagged if one contests it, confirmed if all contest it. Each formula's rating is shown alongside: when they diverge sharply, the boulder is poorly documented."
-        )}
-      >
-        <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} />
-      </Carte>
     </div>
   )
 }

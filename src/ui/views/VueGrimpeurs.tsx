@@ -282,10 +282,20 @@ export function VueGrimpeurs({
       <LegendeCote />
 
       <Carte
+        titre={t('Classement', 'Leaderboard')}
+        sousTitre={t(
+          "Le niveau calculé est la cotation V que le grimpeur envoie une fois sur deux. Les cotes des deux formules sont affichées côte à côte ; celle en gras est la formule active.",
+          "The calculated level is the V grade the climber sends half the time. Both formulas' ratings are shown side by side; the one in bold is the active formula."
+        )}
+      >
+        <Tableau lignes={classement} colonnes={colonnes} cleLigne={(g) => g.id} triInitial={{ cle: 'rang', sens: 1 }} pageTaille={25} />
+      </Carte>
+
+      <Carte
         titre={t('Progression', 'Progression')}
         sousTitre={t(
-          `Niveau estimé au fil du temps, ${MAX_SERIES} grimpeurs au maximum. Choisir qui suivre dans le tableau ci-dessous.`,
-          `Estimated level over time, ${MAX_SERIES} climbers at most. Choose who to track in the table below.`
+          `Niveau estimé au fil du temps, ${MAX_SERIES} grimpeurs au maximum. Choisir qui suivre dans le tableau ci-dessus.`,
+          `Estimated level over time, ${MAX_SERIES} climbers at most. Choose who to track in the table above.`
         )}
         actions={<BasculeVue tableau={tableau} setTableau={setTableau} />}
       >
@@ -294,16 +304,6 @@ export function VueGrimpeurs({
         ) : (
           <Courbes series={series} formatY={(v) => formaterIndex(v, langue).split(' ')[0]} />
         )}
-      </Carte>
-
-      <Carte
-        titre={t('Classement', 'Leaderboard')}
-        sousTitre={t(
-          "Le niveau calculé est la cotation V que le grimpeur envoie une fois sur deux. Les cotes des deux formules sont affichées côte à côte ; celle en gras est la formule active.",
-          "The calculated level is the V grade the climber sends half the time. Both formulas' ratings are shown side by side; the one in bold is the active formula."
-        )}
-      >
-        <Tableau lignes={classement} colonnes={colonnes} cleLigne={(g) => g.id} triInitial={{ cle: 'rang', sens: 1 }} />
       </Carte>
     </div>
   )
