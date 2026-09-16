@@ -6,6 +6,11 @@ import { useLangue } from '../langue'
 export interface Colonne<T> {
   cle: string
   titre: string
+  /**
+   * Rendu personnalise de l'en-tete (ex. un menu deroulant), affiche a la
+   * place de `titre`. `titre` reste utilise pour l'aide et le texte du tri.
+   */
+  titreRendu?: () => ReactNode
   /** Aligne a droite, chiffres alignes verticalement. */
   num?: boolean
   /** Colonne d'identite : mise en avant typographique. */
@@ -87,7 +92,7 @@ export function Tableau<T>({
                   }
                   onMouseLeave={cacher}
                 >
-                  {c.titre}
+                  {c.titreRendu ? c.titreRendu() : c.titre}
                   {tri.cle === c.cle && <span className="tri">{tri.sens === 1 ? '▲' : '▼'}</span>}
                 </th>
               ))}

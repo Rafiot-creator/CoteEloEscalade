@@ -3,6 +3,7 @@ import { ratingVersIndex } from '../../core/calibrage'
 import { FORMULES } from '../../core/formulas/registry'
 import { formaterIndex } from '../../core/cotations'
 import type { LigneGrimpeur, Resultat } from '../../core/pipeline'
+import { STYLES_BLOC } from '../../core/stylesBloc'
 import { BasculeVue } from '../charts/base'
 import { COULEURS_SERIES, Courbes, type Serie } from '../charts/Courbes'
 import { Carte, LegendeCote, Tuile } from '../components/base'
@@ -37,6 +38,12 @@ export function VueGrimpeurs({
       parGrimpeur: new Map((resultats.get(f.id)?.grimpeurs ?? []).map((g) => [g.id, g])),
     })).filter((c) => c.parGrimpeur.size > 0)
   }, [resultats])
+
+  // La ventilation par style vient toujours d'Elo bloc (cf. `elo-bloc.ts`),
+  // quelle que soit la formule active a l'ecran : Glicko ne la calcule pas.
+  const eloBloc = resultats.get('elo-bloc')
+  const eloParGrimpeur = useMemo(() => new Map((eloBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [eloBloc])
+  const [styleSelectionne, setStyleSelectionne] = useState('')
 
   // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
   const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
@@ -156,6 +163,49 @@ export function VueGrimpeurs({
         return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
       },
     })),
+    ...(eloBloc
+      ? [
+          {
+            cle: 'cote-style',
+            titre: t('Cote par style', 'Rating by style'),
+            titreRendu: () => (
+              <select
+                value={styleSelectionne}
+                onChange={(e) => setStyleSelectionne(e.currentTarget.value)}
+                onClick={(e) => e.stopPropagation()}
+                style={{ font: 'inherit', fontWeight: 400, maxWidth: 140 }}
+              >
+                <option value="">{t('Cote globale (Elo)', 'Overall rating (Elo)')}</option>
+                {STYLES_BLOC.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            ),
+            num: true,
+            aide: t(
+              "Cote Elo bloc (toujours cette formule) pour le style choisi dans le menu déroulant ; « Cote globale » montre sa cote Elo habituelle. Chaque style démarre à la cote globale du grimpeur et ne bouge qu'aux duels de ce style-là — comparez à la colonne « Elo » pour voir l'écart. Tiret si le grimpeur n'a jamais affronté ce style.",
+              "Elo boulder rating (always this formula) for the style chosen in the dropdown; “Overall rating” shows their usual Elo rating. Each style starts at the climber's overall rating and only moves on duels of that style — compare against the “Elo” column to see the gap. Dash if the climber never faced that style."
+            ),
+            valeur: (g: LigneGrimpeur) => {
+              const ligne = eloParGrimpeur.get(g.id)
+              if (!ligne) return null
+              if (!styleSelectionne) return ligne.rating
+              const e = ligne.stylesGrimpeur?.[styleSelectionne]
+              return e && e.matchs > 0 ? e.rating : null
+            },
+            rendu: (g: LigneGrimpeur) => {
+              const ligne = eloParGrimpeur.get(g.id)
+              if (!ligne) return <span className="discret">—</span>
+              if (!styleSelectionne) return <span>{nombre(ligne.rating)}</span>
+              const e = ligne.stylesGrimpeur?.[styleSelectionne]
+              if (!e || e.matchs === 0) return <span className="discret">—</span>
+              return <span>{nombre(e.rating)}</span>
+            },
+          },
+        ]
+      : []),
     {
       cle: 'meilleure',
       titre: t('Plus dur envoyé', 'Hardest sent'),

@@ -13,7 +13,8 @@ import {
   moteurElo,
 } from './formulas/lib'
 import { FORMULES } from './formulas/registry'
-import { paramsParDefaut } from './formulas/types'
+import { normaliserParams, paramsParDefaut } from './formulas/types'
+import { STYLES_BLOC } from './stylesBloc'
 import { construireDataset } from './loaders/dataset'
 import { executer } from './pipeline'
 import { chargerToutesLesSources } from './sources'
@@ -592,5 +593,63 @@ describe('ponderation du style', () => {
       .map((b) => Math.abs(b.indexCalcule - (parId.get(b.id) ?? b.indexCalcule)))
     const moyen = ecarts.reduce((s, e) => s + e, 0) / ecarts.length
     expect(moyen).toBeGreaterThan(0)
+  }, 60_000)
+})
+
+describe('cote par style', () => {
+  it('la somme des mouvements par style reconstitue exactement le mouvement de la cote globale', async () => {
+    const ds = await dataset()
+    const elo = FORMULES.find((f) => f.id === 'elo-bloc')!
+    const params = normaliserParams(elo.params, {})
+    const sortie = elo.calculer(ds, params)
+
+    const affrontements = construireDuels(ds.ascensions)
+    const amorces = amorcesGrimpeurs(
+      ds,
+      affrontements.duels,
+      params.ptsParCran as number,
+      params.ratingInitial as number,
+      params.amorceGrimpeurs as string
+    )
+
+    expect(sortie.parStyle).toBeDefined()
+    let grimpeursVerifies = 0
+    for (const g of ds.grimpeurs) {
+      const depart = amorces.get(g.id)!
+      const finGlobal = sortie.grimpeurs.get(g.id)!.rating
+      const parStyle = sortie.parStyle!.get(g.id)!
+      expect([...parStyle.keys()].sort()).toEqual([...STYLES_BLOC].sort())
+      const sommeMouvements = [...parStyle.values()].reduce((s, e) => s + (e.rating - depart), 0)
+      expect(sommeMouvements).toBeCloseTo(finGlobal - depart, 6)
+      grimpeursVerifies += 1
+    }
+    expect(grimpeursVerifies).toBe(ds.grimpeurs.length)
+  }, 60_000)
+
+  it('un style jamais affronte par un grimpeur reste exactement a son amorce', async () => {
+    const ds = await dataset()
+    const elo = FORMULES.find((f) => f.id === 'elo-bloc')!
+    const params = normaliserParams(elo.params, {})
+    const sortie = elo.calculer(ds, params)
+
+    const affrontements = construireDuels(ds.ascensions)
+    const amorces = amorcesGrimpeurs(
+      ds,
+      affrontements.duels,
+      params.ptsParCran as number,
+      params.ratingInitial as number,
+      params.amorceGrimpeurs as string
+    )
+
+    let trouve = false
+    for (const g of ds.grimpeurs) {
+      const parStyle = sortie.parStyle!.get(g.id)!
+      const styleJamaisAffronte = [...parStyle.values()].find((e) => e.matchs === 0)
+      if (!styleJamaisAffronte) continue
+      expect(styleJamaisAffronte.rating).toBe(amorces.get(g.id))
+      trouve = true
+      break
+    }
+    expect(trouve).toBe(true)
   }, 60_000)
 })

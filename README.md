@@ -898,16 +898,68 @@ distingue pas flash/réussi/échec.
 
 ### Cartes disponibles aujourd'hui
 
-- **Démo** — un plan inventé (`public/cartes/demo.svg`), huit bandes murales reprenant les huit
-  styles du jeu de données (Dalle, Toit, Devers, Arête, Cave, Traverse, Compétition, Prow). 50
-  blocs y sont placés, un échantillon proportionnel par style (méthode du plus grand reste,
-  `scripts/generer-carte-demo.mjs`) tiré des 369 du jeu de démonstration pour rester lisible ;
-  les positions ont ensuite été affinées à la main dans l'interface puis réexportées.
+- **Démo** — un plan inventé (`public/cartes/demo.svg`), neuf bandes murales reprenant les neuf
+  styles du jeu de données (`src/core/stylesBloc.ts` — Dalle/pied, Dalle/force, Dalle/doigts,
+  Coordo, Dyno, Technique/force, Technique/doigt, Dévers/force, Dévers/doigts ; huit bandes
+  géométriques jusqu'au 16 septembre 2026). 50 blocs y sont placés, un échantillon proportionnel
+  par style (méthode du plus grand reste, `scripts/generer-carte-demo.mjs`) tiré des 369 du jeu
+  de démonstration pour rester lisible ; les positions ont ensuite été affinées à la main dans
+  l'interface puis réexportées — perdues lors du passage à neuf styles (les zones ne se
+  correspondent pas d'une taxonomie à l'autre), donc à raffiner de nouveau.
 - **Rose Bloc 1** — une vraie photo du plan de la salle (`public/cartes/rose-bloc-1.jpg`),
   fournie par Raphaël et nettoyée des dates griffonnées au crayon (masquage colorimétrique +
   interpolation), sans bloc positionné pour l'instant.
 - Les autres centres du menu n'ont pas encore de carte : l'écran affiche un canevas vierge,
   cliquable en accès complet pour commencer à y placer des blocs.
+
+## La cote par style
+
+Un bloc a un **style** (`secteur` dans les données, colonne « Style » à l'affichage) : depuis le
+16 septembre 2026, un vocabulaire contrôlé de neuf valeurs déclaré dans `src/core/stylesBloc.ts`
+— Dalle/pied, Dalle/force, Dalle/doigts, Coordo, Dyno, Technique/force, Technique/doigt,
+Dévers/force, Dévers/doigts. Une valeur hors de cette liste n'est pas rejetée au chargement,
+juste signalée en avertissement (écran **Fichiers**) : elle continue de compter dans la cote
+globale, mais n'apparaît dans aucune ventilation par style.
+
+L'écran **Grimpeurs** affiche cette cote **par style** en plus de la cote globale : un menu
+déroulant en haut de la colonne dédiée du tableau **Classement**, à côté d'« Elo »/« Glicko »/
+« Mélange », propose « Cote globale (Elo) » ou l'un des neuf styles — la colonne bascule alors
+pour montrer, pour chaque grimpeur du classement, sa cote Elo bloc *pour ce style précis*
+(tiret s'il ne l'a jamais affronté). Se compare directement à la colonne « Elo » juste à côté :
+un grimpeur à 7570 en Elo qui tombe à 6421 en Dalle/pied y est sensiblement plus faible que sa
+moyenne. Le principe, choisi pour une garantie précise — **aucun effet sur les cotes globales
+des blocs ni des grimpeurs** :
+
+- Chaque style démarre au même point que la cote globale du grimpeur (l'amorce).
+- Chaque fois que la cote globale du grimpeur bouge suite à un duel, exactement le même
+  mouvement est appliqué à la cote du style du bloc affronté — sans jamais influencer la cote
+  globale en retour, ni celle du bloc.
+- Un style jamais affronté reste exactement à l'amorce.
+
+Concrètement, `moteurElo` (`src/core/formulas/lib.ts`) expose un callback optionnel
+(`observateurGrimpeur`) appelé aux deux endroits où il fait bouger la cote d'un grimpeur ; sans
+lui, le calcul est strictement identique à avant (aucune autre formule ne le fournit). Seul
+`elo-bloc.ts` le branche, pour construire cette ventilation en parallèle du calcul normal. C'est
+aussi pourquoi la cote par style vient **toujours d'Elo bloc**, quelle que soit la formule
+affichée par ailleurs sur l'écran — Glicko ne la calcule pas, et la dupliquer pour Glicko n'a
+pas semblé justifié pour un diagnostic secondaire.
+
+Conséquence vérifiable : la somme des mouvements de tous les styles d'un grimpeur reconstitue
+exactement le mouvement de sa cote globale. `core.test.ts`, describe « cote par style », vérifie
+cette identité plutôt que de la supposer.
+
+La colonne n'affiche que la cote brute (pas d'écart calculé ni de badge) : une première version
+montrait un badge coloré avec l'écart à la cote globale à côté de la cotation V du style, mais
+ça n'avait de sens que pour un petit nombre de grimpeurs choisis à la main — mauvais compromis
+une fois que la colonne s'applique à tout le classement trié. Comparer visuellement à la colonne
+« Elo » d'à côté suffit, sur le même principe que les colonnes Elo/Glicko/Mélange déjà côte à
+côte.
+
+**Le champ `style` de l'écran Carte est un système différent et non lié.** `BlocCarte.style`
+(`src/core/cartes/types.ts`) reste un texte libre, décoratif, sans effet sur aucun calcul, mais
+la valeur affichée pour le jeu de données Démo suit désormais le même vocabulaire à neuf valeurs
+que le calcul (voir « Cartes disponibles aujourd'hui » ci-dessus) — rien n'empêche d'y taper un
+nom fantaisiste (« Bat Cave ») comme avant, le champ reste libre.
 
 ## Site bilingue (français / anglais)
 
@@ -1100,6 +1152,7 @@ fait accompli.
   remplacement lui-même. Voir « Changer d'avis » dans « Enregistrer un envoi comme une vraie
   ascension » pour le compromis assumé (une seule entrée Carte par bloc, pas un historique de
   chaque clic).
+
 - Raphaël a testé sur son téléphone : les pastilles, à taille fixe, se chevauchaient sur un
   centre dense comme Démo. `RAYON` suit maintenant la largeur réelle de la carte (40 px de
   diamètre au-dessus de 420 px, 24 px en dessous) — voir « Pastilles, survol et popup »,
@@ -1163,3 +1216,49 @@ fait accompli.
   claire pour les utilisateurs — jusque-là elle n'était que dans la bulle d'aide au survol d'un
   en-tête de colonne, invisible sur tactile. `LegendeCote`, § « L'échelle : une cote V = 1000
   points = dix contre un ».
+
+### 2026-09-16
+
+- Ajout de la **cote par style** — voir « La cote par style » plus haut pour le mécanisme et la
+  garantie d'absence d'effet sur les cotes globales, discutée avec Raphaël avant de coder (c'est
+  lui qui a proposé le principe de la ventilation par mouvement observé, plus simple et plus
+  exact que la première idée — un second calcul à blocs gelés).
+- Remplacement du vocabulaire à huit valeurs du champ `secteur` (Cave, Dalle, Devers,
+  Competition, Traverse, Arete, Prow, Toit — une géométrie de mur) par les neuf nouveaux styles
+  de Raphaël (`src/core/stylesBloc.ts`). `data/blocs.csv` régénéré ; vérifié dans le diff que
+  seules les colonnes `nom`/`secteur` changent, `ascensions.csv`, `grimpeurs.csv` et
+  `scripts/verite.json` sont identiques bit à bit (le style n'influence aucun tirage aléatoire).
+- Premier passage d'affichage dans l'écran Grimpeurs : un tableau à part, limité aux quelques
+  grimpeurs suivis pour la courbe de progression, cote V muette avec un badge coloré pour
+  l'écart à la cote globale.
+- Retour de Raphaël : ni les blocs, ni les grimpeurs, ni la carte ne semblaient montrer les
+  nouveaux styles. Deux réalités différentes derrière ce retour unique :
+  - **Un vrai bug, sur la Carte** — `data/cartes/demo.json` avait bien été resynchronisé (le
+    champ `style` de chaque bloc, utilisé dans le popup et le panneau d'édition), mais les
+    **noms des huit zones étaient dessinés en dur comme texte dans `public/cartes/demo.svg`**
+    (« DALLE », « TOIT », « DEVERS »...), une image de fond jamais touchée par la migration des
+    données. Le popup d'un bloc pouvait donc afficher un style correct pendant que le mur
+    dessiné juste à côté annonçait encore l'ancienne géométrie. Corrigé en redessinant
+    `demo.svg` avec neuf bandes murales (3 sur le mur du haut pour la famille Dalle, 2 à droite
+    pour Dévers, 2 en bas pour Technique, 2 à gauche pour Coordo/Dyno) et en remettant à jour
+    `ZONES` dans `scripts/generer-carte-demo.mjs` en conséquence — le script était devenu
+    inutilisable entre-temps (`Style sans zone sur le plan`). Les positions affinées à la main
+    n'ont pas pu être conservées : l'ancienne et la nouvelle taxonomie ne se recouvrent pas
+    (un bloc « Toit » de l'ancien système n'a aucune raison de devenir un « Coordo » ou un
+    « Dévers/force » du nouveau), donc les faire correspondre aurait affiché des pastilles à
+    côté d'un mur qui ne les décrit pas. `data/cartes/demo.json` régénéré en entier — à raffiner
+    de nouveau, comme la première fois.
+  - **Les blocs et les grimpeurs étaient déjà corrects** en local au moment du retour (vérifié
+    dans le navigateur avant de coder quoi que ce soit d'autre) — probablement un test sur une
+    version pas encore relancée, ou une confusion avec le vrai bug de la Carte ci-dessus. Rien à
+    corriger de ce côté.
+- Sur suggestion de Raphaël, remplacement du tableau à part (ci-dessus) par un menu déroulant
+  directement dans l'en-tête de la colonne de cote du tableau **Classement**, à côté d'Elo/
+  Glicko/Mélange : bascule la colonne entre la cote globale et celle d'un style choisi, pour
+  *tous* les grimpeurs classés plutôt qu'une poignée choisie à la main — strictement plus
+  utile, donc le premier tableau a été retiré plutôt que gardé en double. Ajout d'un
+  `titreRendu` optionnel à `Colonne` (`src/ui/components/Tableau.tsx`) pour permettre un en-tête
+  de colonne interactif ; les autres colonnes de tout le site en gardent un simple, inchangées.
+  Le badge d'écart coloré de la première version a été abandonné avec le tableau à part : la
+  colonne affiche la cote brute, à comparer visuellement à la colonne Elo d'à côté, comme les
+  formules le font déjà entre elles.

@@ -348,6 +348,21 @@ export interface OptionsElo {
    * enchainement laborieux).
    */
   score(duel: Duel): number
+  /**
+   * Suivi en parallele du cote grimpeur, sans aucune influence sur le calcul :
+   * ni sur `eg.rating`/`eb.rating`, ni sur les autres formules qui n'y passent
+   * rien. Sert a ventiler la cote globale par style de bloc affronte
+   * (`elo-bloc.ts`) en observant exactement les memes mouvements que ceux
+   * appliques a la cote du grimpeur.
+   */
+  observateurGrimpeur?: ObservateurGrimpeur
+}
+
+export interface ObservateurGrimpeur {
+  /** Un duel compte pour la premiere fois (1re passe, evenement non neglige). */
+  compte(duel: Duel): void
+  /** La cote du grimpeur vient de bouger de `delta` points a cause de ce duel. */
+  bouge(duel: Duel, delta: number): void
 }
 
 /**
@@ -416,6 +431,7 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
           eg.rating -= rendu.grimpeur
           eb.rating -= rendu.bloc
           aRembourser.delete(cle)
+          o.observateurGrimpeur?.bouge(d, -rendu.grimpeur)
         }
       }
 
@@ -449,6 +465,7 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
 
       eg.rating += dg
       eb.rating += db
+      o.observateurGrimpeur?.bouge(d, dg)
       if (ev.type === 'defaite') aRembourser.set(cle, { grimpeur: dg, bloc: db })
 
       // Les effectifs comptent les duels qui ont *servi* : un bloc dont tous
@@ -462,6 +479,7 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
           eg.reussites += 1
           eb.reussites += 1
         }
+        o.observateurGrimpeur?.compte(d)
       }
 
       deplacement += Math.abs(dg)

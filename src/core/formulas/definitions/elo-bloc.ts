@@ -1,13 +1,16 @@
 import type { Dataset } from '../../types'
+import { STYLES_BLOC } from '../../stylesBloc'
 import {
   ECHELLE_REFERENCE,
   amorcesGrimpeurs,
   construireDuels,
   diagnosticDuels,
+  etatVide,
   moteurElo,
   type Duel,
+  type ObservateurGrimpeur,
 } from '../lib'
-import type { Formule } from '../types'
+import type { EtatRating, Formule } from '../types'
 
 /**
  * La formule de la maison.
@@ -243,16 +246,43 @@ const formule: Formule = {
     }
 
     const affrontements = construireDuels(dataset.ascensions)
+    const amorces = amorcesGrimpeurs(
+      dataset,
+      affrontements.duels,
+      p.ptsParCran as number,
+      p.ratingInitial as number,
+      p.amorceGrimpeurs as string
+    )
+
+    // Ventilation par style : chaque style d'un grimpeur demarre au meme
+    // point que sa cote globale (meme amorce), puis n'encaisse que les
+    // mouvements causes par des duels sur ce style — voir `observateurGrimpeur`
+    // ci-dessous et le commentaire sur `SortieFormule.parStyle`.
+    const blocStyle = new Map(dataset.blocs.map((b) => [b.id, b.secteur]))
+    const parStyle = new Map<string, Map<string, EtatRating>>()
+    for (const g of dataset.grimpeurs) {
+      const depart = amorces.get(g.id) ?? (p.ratingInitial as number)
+      parStyle.set(g.id, new Map(STYLES_BLOC.map((s) => [s, etatVide(depart)])))
+    }
+    const observateurGrimpeur: ObservateurGrimpeur = {
+      compte(duel) {
+        const style = blocStyle.get(duel.blocId)
+        const e = style ? parStyle.get(duel.grimpeurId)?.get(style) : undefined
+        if (!e) return
+        e.matchs += 1
+        if (duel.gagne) e.reussites += 1
+      },
+      bouge(duel, delta) {
+        const style = blocStyle.get(duel.blocId)
+        const e = style ? parStyle.get(duel.grimpeurId)?.get(style) : undefined
+        if (e) e.rating += delta
+      },
+    }
+
     const sortie = moteurElo(dataset, {
       duels: affrontements.duels,
       ecartNeglige: p.ecartNeglige as number,
-      amorcesGrimpeurs: amorcesGrimpeurs(
-        dataset,
-        affrontements.duels,
-        p.ptsParCran as number,
-        p.ratingInitial as number,
-        p.amorceGrimpeurs as string
-      ),
+      amorcesGrimpeurs: amorces,
       ratingInitial: p.ratingInitial as number,
       k: p.k as number,
       kMin: p.kMin as number,
@@ -262,8 +292,10 @@ const formule: Formule = {
       amorce: p.amorce as string,
       ptsParCran: p.ptsParCran as number,
       score,
+      observateurGrimpeur,
     })
 
+    sortie.parStyle = parStyle
     sortie.diagnostics.push(diagnosticDuels(affrontements))
     return sortie
   },

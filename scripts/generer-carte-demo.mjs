@@ -5,6 +5,9 @@
 // Pas execute par le site ni par la suite de tests : usage unique, garde ici
 // pour tracer comment le fichier a ete produit et pouvoir le regenerer si le
 // plan ou les donnees changent.
+//
+// ZONES doit rester en phase avec les bandes murales dessinees dans
+// demo.svg, et ses cles avec `src/core/stylesBloc.ts` (STYLES_BLOC).
 import { readFileSync, writeFileSync } from 'node:fs'
 
 const COULEUR_PAR_NOM = { Bleu: 'bleu', Vert: 'vert', Jaune: 'jaune', Rouge: 'rouge', Noir: 'noir' }
@@ -13,14 +16,15 @@ const COULEUR_PAR_NOM = { Bleu: 'bleu', Vert: 'vert', Jaune: 'jaune', Rouge: 'ro
 // avec une marge pour que les pastilles debordent le moins possible sur le
 // sol ou sur le mur voisin.
 const ZONES = {
-  Dalle: { x0: 25, x1: 475, y0: 25, y1: 105 },
-  Toit: { x0: 525, x1: 975, y0: 25, y1: 105 },
-  Devers: { x0: 895, x1: 975, y0: 25, y1: 325 },
-  Arete: { x0: 895, x1: 975, y0: 375, y1: 675 },
-  Cave: { x0: 525, x1: 975, y0: 595, y1: 675 },
-  Traverse: { x0: 25, x1: 475, y0: 595, y1: 675 },
-  Competition: { x0: 25, x1: 105, y0: 375, y1: 675 },
-  Prow: { x0: 25, x1: 105, y0: 25, y1: 325 },
+  'Dalle/pied': { x0: 25, x1: 308, y0: 25, y1: 105 },
+  'Dalle/force': { x0: 358, x1: 642, y0: 25, y1: 105 },
+  'Dalle/doigts': { x0: 692, x1: 975, y0: 25, y1: 105 },
+  'Dévers/force': { x0: 895, x1: 975, y0: 25, y1: 325 },
+  'Dévers/doigts': { x0: 895, x1: 975, y0: 375, y1: 675 },
+  'Technique/force': { x0: 525, x1: 975, y0: 595, y1: 675 },
+  'Technique/doigt': { x0: 25, x1: 475, y0: 595, y1: 675 },
+  Dyno: { x0: 25, x1: 105, y0: 375, y1: 675 },
+  Coordo: { x0: 25, x1: 105, y0: 25, y1: 325 },
 }
 const LARGEUR = 1000
 const HAUTEUR = 700

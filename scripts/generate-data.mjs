@@ -82,7 +82,18 @@ const PRENOMS_F = ['Camille', 'Lea', 'Maude', 'Chloe', 'Elise', 'Sarah', 'Julie'
 const PRENOMS_M = ['Thomas', 'Antoine', 'Hugo', 'Nicolas', 'Julien', 'Maxime', 'Felix', 'Olivier', 'Samuel', 'Lucas', 'Simon', 'Etienne', 'Gabriel', 'Victor', 'Adrien', 'Xavier', 'Mathis', 'Raphael']
 const NOMS = ['Bergeron', 'Tremblay', 'Gagnon', 'Roy', 'Cote', 'Bouchard', 'Fortin', 'Pelletier', 'Levesque', 'Lavoie', 'Ouellet', 'Belanger', 'Girard', 'Morin', 'Caron', 'Beaulieu', 'Cloutier', 'Dube', 'Poirier', 'Thibault', 'Nadeau', 'Boucher', 'Simard', 'Lemieux', 'Paquette', 'Desjardins']
 
-const SECTEURS = ['Cave', 'Dalle', 'Devers', 'Competition', 'Traverse', 'Arete', 'Prow', 'Toit']
+// Doit rester en phase avec `src/core/stylesBloc.ts` (STYLES_BLOC).
+const SECTEURS = [
+  'Dalle/pied',
+  'Dalle/force',
+  'Dalle/doigts',
+  'Coordo',
+  'Dyno',
+  'Technique/force',
+  'Technique/doigt',
+  'Dévers/force',
+  'Dévers/doigts',
+]
 
 /**
  * En salle, la couleur des prises suit en general une plage de cotation, avec

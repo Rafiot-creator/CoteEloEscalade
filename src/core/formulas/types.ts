@@ -85,6 +85,15 @@ export interface SortieFormule {
   /** Deplacement moyen des cotes a chaque passe : doit se stabiliser. */
   convergence: number[]
   diagnostics: Diagnostic[]
+  /**
+   * Cote de chaque grimpeur ventilee par style de bloc affronte : grimpeurId ->
+   * style -> etat. Optionnel — seule `elo-bloc.ts` le produit aujourd'hui.
+   * Chaque style demarre au meme point que la cote globale du grimpeur, et ne
+   * bouge que des mouvements de cote causes par des duels sur ce style : la
+   * somme des mouvements de tous les styles d'un grimpeur reconstitue donc
+   * exactement le mouvement de sa cote globale, sans jamais l'influencer.
+   */
+  parStyle?: Map<string, Map<string, EtatRating>>
 }
 
 export interface Formule<P extends Params = Params> {

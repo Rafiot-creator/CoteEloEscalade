@@ -1,6 +1,6 @@
 import { PARAMS_CALIBRAGE, calibrer, ratingVersIndex, type Calibrage, type PointCalibrage } from './calibrage'
 import { cotationDIndex } from './cotations'
-import { normaliserParams, type Diagnostic, type Formule, type Params, type PointHistorique } from './formulas/types'
+import { normaliserParams, type Diagnostic, type EtatRating, type Formule, type Params, type PointHistorique } from './formulas/types'
 import type { Dataset } from './types'
 
 /**
@@ -63,6 +63,11 @@ export interface LigneGrimpeur {
   meilleureCotation: string | null
   /** Salles ou le grimpeur a au moins un match compte. */
   gyms: string[]
+  /**
+   * Cote ventilee par style de bloc affronte (cf. `SortieFormule.parStyle`),
+   * absente si la formule active ne la produit pas (seule Elo bloc le fait).
+   */
+  stylesGrimpeur?: Record<string, EtatRating>
 }
 
 /**
@@ -202,6 +207,7 @@ export function executer(
       cotationNiveau: cotationDIndex(indexNiveau),
       meilleureCotation: best === undefined ? null : cotationDIndex(best),
       gyms: [...(gymsParGrimpeur.get(g.id) ?? [])].sort((x, y) => x.localeCompare(y, 'fr')),
+      stylesGrimpeur: sortie.parStyle?.has(g.id) ? Object.fromEntries(sortie.parStyle.get(g.id)!) : undefined,
     }
   })
 

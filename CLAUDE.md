@@ -113,15 +113,50 @@ pourquoi ils ne suffisaient pas est dans le README, § « La carte des blocs » 
 Tests (62) et typecheck au vert après chaque commit. Testé manuellement dans Chrome à chaque
 étape, mais **pas encore sur un vrai téléphone** au moment d'écrire ceci (prochaine étape).
 
+## État au 2026-09-16
+
+Ajout de la **cote par style** : les blocs ont désormais un style parmi une liste de neuf
+(Dalle/pied, Dalle/force, Dalle/doigts, Coordo, Dyno, Technique/force, Technique/doigt,
+Dévers/force, Dévers/doigts — `src/core/stylesBloc.ts`, remplace l'ancien vocabulaire à huit
+valeurs, une géométrie de mur). Mécanisme et détail complet dans le README, § « La cote par
+style » et journal du 2026-09-16. Tests (64) et build au vert.
+
+Un premier jet (tableau à part, limité à quelques grimpeurs) a été montré à Raphael, qui a
+signalé que les nouveaux styles n'apparaissaient nulle part (Blocs, Grimpeurs, Carte) et a
+demandé un menu déroulant dans la colonne de cote plutôt qu'un tableau séparé. Deux choses
+distinctes derrière ce retour, voir le journal pour le détail :
+
+- **Un vrai bug sur la Carte** : `public/cartes/demo.svg` (l'image de fond) avait les huit
+  anciens noms de zone dessinés en dur comme texte, jamais touchés par la mise à jour des
+  données. Corrigé — `demo.svg` redessiné avec neuf bandes murales, `ZONES` de
+  `scripts/generer-carte-demo.mjs` remis à jour, `data/cartes/demo.json` régénéré en entier
+  (les positions affinées à la main n'ont pas pu être conservées, la nouvelle taxonomie ne
+  correspond pas à l'ancienne géométrie de mur — **à raffiner de nouveau**, comme la première
+  fois).
+- **Blocs et Grimpeurs étaient déjà corrects** en local au moment du retour — probablement un
+  test sur une version pas encore relancée, ou une confusion avec le bug de la Carte ci-dessus.
+- Le tableau à part a été remplacé par un menu déroulant dans l'en-tête de la colonne de cote du
+  tableau Classement (bascule entre cote globale et cote d'un style, pour tous les grimpeurs),
+  comme demandé.
+
+Retesté par Claude dans Chrome après les deux correctifs (Carte + colonne), mais **pas encore vu
+par Raphael**.
+
 ## Prochaine étape
 
-**Tester tout l'écran Carte sur un vrai téléphone** (prévu par Raphael à la prochaine session) :
-survol/clic sur les boutons flash/réussi/échec, taille des pastilles, popup. Les correctifs de
-cette session ont été vérifiés dans Chrome (bureau) et via des simulations de largeur étroite,
-mais plusieurs bugs mobiles précédents n'avaient été repérés qu'à l'usage réel sur le téléphone
-de Raphael — s'attendre à devoir encore ajuster.
+Au choix de Raphael à la prochaine session :
 
-Autres pistes en attente si le téléphone ne révèle rien : brancher de vraies données sur un des
-centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans `DECISIONS.md`
-(§ 7) : seuil Glicko à 0,60, test d'équivalence, Glicko-2, modèle morphologique, import
-utilisateur par glisser-déposer.
+- **Retour sur ce deuxième jet** (colonne déroulante dans Grimpeurs, neuf zones sur la Carte
+  Démo) — s'attendre à des ajustements, comme pour le reste de l'écran Carte.
+- **Raffiner à la main les positions des blocs sur la Carte Démo**, perdues par la régénération
+  complète (§ ci-dessus) — comme lors de la toute première mise en place de cette carte.
+- **Tester l'écran Carte sur un vrai téléphone** (reporté depuis le 2026-09-15, Raphael a dit
+  vouloir s'en occuper plus tard) : survol/clic sur les boutons flash/réussi/échec, taille des
+  pastilles, popup. Vérifié dans Chrome (bureau) et via des simulations de largeur étroite, mais
+  plusieurs bugs mobiles précédents n'avaient été repérés qu'à l'usage réel du téléphone de
+  Raphael.
+
+Autres pistes en attente si rien de ce qui précède ne ressort : brancher de vraies données sur un
+des centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans
+`DECISIONS.md` (§ 7) : seuil Glicko à 0,60, test d'équivalence, Glicko-2, modèle morphologique,
+import utilisateur par glisser-déposer.

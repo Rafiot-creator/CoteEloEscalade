@@ -2,454 +2,454 @@
   "fond": "cartes/demo.svg",
   "blocs": [
     {
-      "id": "b0342",
-      "nom": "DA-0342",
-      "x": 0.11038394415357766,
-      "y": 0.6990261005064278,
+      "id": "b0097",
+      "nom": "DA-0097",
+      "x": 0.4724,
+      "y": 0.0405,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Dalle/force"
+    },
+    {
+      "id": "b0170",
+      "nom": "DA-0170",
+      "x": 0.5561,
+      "y": 0.1204,
       "cotation": "V2",
       "couleur": "jaune",
-      "style": "Dalle"
+      "style": "Dalle/force"
+    },
+    {
+      "id": "b0120",
+      "nom": "DA-0120",
+      "x": 0.439,
+      "y": 0.0608,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dalle/force"
+    },
+    {
+      "id": "b0379",
+      "nom": "DA-0379",
+      "x": 0.3804,
+      "y": 0.0759,
+      "cotation": "V9",
+      "couleur": "rouge",
+      "style": "Dalle/force"
+    },
+    {
+      "id": "b0297",
+      "nom": "DA-0297",
+      "x": 0.3617,
+      "y": 0.0765,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dalle/force"
+    },
+    {
+      "id": "b0138",
+      "nom": "DA-0138",
+      "x": 0.6279,
+      "y": 0.1243,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Dalle/force"
+    },
+    {
+      "id": "b0313",
+      "nom": "CO-0313",
+      "x": 0.0611,
+      "y": 0.1316,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0222",
+      "nom": "CO-0222",
+      "x": 0.0348,
+      "y": 0.3062,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0149",
+      "nom": "CO-0149",
+      "x": 0.1003,
+      "y": 0.25,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0372",
+      "nom": "CO-0372",
+      "x": 0.0725,
+      "y": 0.2739,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0281",
+      "nom": "CO-0281",
+      "x": 0.0655,
+      "y": 0.0407,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0363",
+      "nom": "CO-0363",
+      "x": 0.0801,
+      "y": 0.4484,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0232",
+      "nom": "DY-0232",
+      "x": 0.0531,
+      "y": 0.7717,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dyno"
     },
     {
       "id": "b0200",
-      "nom": "DA-0200",
-      "x": 0.16972076788830714,
-      "y": 0.1517724970783015,
+      "nom": "DY-0200",
+      "x": 0.0395,
+      "y": 0.9502,
       "cotation": "V2",
       "couleur": "jaune",
-      "style": "Dalle"
+      "style": "Dyno"
+    },
+    {
+      "id": "b0305",
+      "nom": "DY-0305",
+      "x": 0.0519,
+      "y": 0.7114,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Dyno"
+    },
+    {
+      "id": "b0205",
+      "nom": "DY-0205",
+      "x": 0.0578,
+      "y": 0.7504,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dyno"
+    },
+    {
+      "id": "b0282",
+      "nom": "DY-0282",
+      "x": 0.0483,
+      "y": 0.777,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dyno"
+    },
+    {
+      "id": "b0382",
+      "nom": "DY-0382",
+      "x": 0.0814,
+      "y": 0.8127,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dyno"
+    },
+    {
+      "id": "b0342",
+      "nom": "TE-0342",
+      "x": 0.5731,
+      "y": 0.8841,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Technique/force"
+    },
+    {
+      "id": "b0374",
+      "nom": "TE-0374",
+      "x": 0.9476,
+      "y": 0.9386,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Technique/force"
+    },
+    {
+      "id": "b0324",
+      "nom": "TE-0324",
+      "x": 0.8001,
+      "y": 0.9341,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Technique/force"
+    },
+    {
+      "id": "b0215",
+      "nom": "TE-0215",
+      "x": 0.5808,
+      "y": 0.8827,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Technique/force"
+    },
+    {
+      "id": "b0392",
+      "nom": "TE-0392",
+      "x": 0.8621,
+      "y": 0.9179,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Technique/force"
+    },
+    {
+      "id": "b0296",
+      "nom": "DA-0296",
+      "x": 0.247,
+      "y": 0.0451,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dalle/pied"
+    },
+    {
+      "id": "b0396",
+      "nom": "DA-0396",
+      "x": 0.1646,
+      "y": 0.0664,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Dalle/pied"
     },
     {
       "id": "b0260",
       "nom": "DA-0260",
-      "x": 0.10776614310645724,
-      "y": 0.571873782625633,
+      "x": 0.243,
+      "y": 0.0774,
       "cotation": "V2",
       "couleur": "jaune",
-      "style": "Dalle"
+      "style": "Dalle/pied"
     },
     {
       "id": "b0160",
       "nom": "DA-0160",
-      "x": 0.26657940663176266,
-      "y": 0.14927931437475653,
+      "x": 0.2074,
+      "y": 0.0863,
       "cotation": "V2",
       "couleur": "jaune",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0134",
-      "nom": "DA-0134",
-      "x": 0.32155322862129143,
-      "y": 0.14304635761589404,
-      "cotation": "V6",
-      "couleur": "bleu",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0392",
-      "nom": "DA-0392",
-      "x": 0.4192844677137871,
-      "y": 0.14927931437475653,
-      "cotation": "V4",
-      "couleur": "vert",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0060",
-      "nom": "DA-0060",
-      "x": 0.3712914485165794,
-      "y": 0.14553954031943903,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0286",
-      "nom": "CO-0286",
-      "x": 0.11823734729493891,
-      "y": 0.80997273081418,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Competition"
-    },
-    {
-      "id": "b0170",
-      "nom": "CO-0170",
-      "x": 0.16273996509598604,
-      "y": 0.8274250097389949,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Competition"
-    },
-    {
-      "id": "b0120",
-      "nom": "CO-0120",
-      "x": 0.11125654450261781,
-      "y": 0.7538761199844176,
-      "cotation": "V10",
-      "couleur": "noir",
-      "style": "Competition"
-    },
-    {
-      "id": "b0044",
-      "nom": "CO-0044",
-      "x": 0.10863874345549739,
-      "y": 0.6379431242695753,
-      "cotation": "V6",
-      "couleur": "rouge",
-      "style": "Competition"
-    },
-    {
-      "id": "b0220",
-      "nom": "CO-0220",
-      "x": 0.6845549738219895,
-      "y": 0.8461238800155824,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Competition"
-    },
-    {
-      "id": "b0370",
-      "nom": "CO-0370",
-      "x": 0.12085514834205933,
-      "y": 0.16423841059602648,
-      "cotation": "V10",
-      "couleur": "noir",
-      "style": "Competition"
-    },
-    {
-      "id": "b0313",
-      "nom": "TR-0313",
-      "x": 0.30410122164048864,
-      "y": 0.8261784183872224,
-      "cotation": "V3",
-      "couleur": "vert",
-      "style": "Traverse"
-    },
-    {
-      "id": "b0271",
-      "nom": "TR-0271",
-      "x": 0.38961605584642234,
-      "y": 0.8349045578496299,
-      "cotation": "V1",
-      "couleur": "jaune",
-      "style": "Traverse"
-    },
-    {
-      "id": "b0305",
-      "nom": "TR-0305",
-      "x": 0.20986038394415357,
-      "y": 0.8274250097389949,
-      "cotation": "V5",
-      "couleur": "bleu",
-      "style": "Traverse"
-    },
-    {
-      "id": "b0205",
-      "nom": "TR-0205",
-      "x": 0.34773123909249565,
-      "y": 0.8324113751460849,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Traverse"
-    },
-    {
-      "id": "b0379",
-      "nom": "TR-0379",
-      "x": 0.43237347294938916,
-      "y": 0.8423841059602649,
-      "cotation": "V9",
-      "couleur": "rouge",
-      "style": "Traverse"
-    },
-    {
-      "id": "b0021",
-      "nom": "TR-0021",
-      "x": 0.25523560209424084,
-      "y": 0.82991819244254,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Traverse"
-    },
-    {
-      "id": "b0296",
-      "nom": "AR-0296",
-      "x": 0.8861256544502618,
-      "y": 0.6416828983248929,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Arete"
-    },
-    {
-      "id": "b0222",
-      "nom": "AR-0222",
-      "x": 0.8878708551483421,
-      "y": 0.777561355668095,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Arete"
-    },
-    {
-      "id": "b0396",
-      "nom": "AR-0396",
-      "x": 0.8904886561954625,
-      "y": 0.7002726918582002,
-      "cotation": "V6",
-      "couleur": "bleu",
-      "style": "Arete"
+      "style": "Dalle/pied"
     },
     {
       "id": "b0196",
-      "nom": "AR-0196",
-      "x": 0.8843804537521816,
-      "y": 0.5245033112582781,
+      "nom": "DA-0196",
+      "x": 0.2697,
+      "y": 0.0954,
       "cotation": "V7",
       "couleur": "rouge",
-      "style": "Arete"
-    },
-    {
-      "id": "b0030",
-      "nom": "AR-0030",
-      "x": 0.5178883071553229,
-      "y": 0.8411375146084924,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Arete"
-    },
-    {
-      "id": "b0180",
-      "nom": "AR-0180",
-      "x": 0.881762652705061,
-      "y": 0.4310089598753409,
-      "cotation": "V1",
-      "couleur": "jaune",
-      "style": "Arete"
-    },
-    {
-      "id": "b0232",
-      "nom": "TO-0232",
-      "x": 0.5798429319371727,
-      "y": 0.15052590572652902,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Toit"
-    },
-    {
-      "id": "b0216",
-      "nom": "TO-0216",
-      "x": 0.6365619546247818,
-      "y": 0.17421114141020647,
-      "cotation": "V8",
-      "couleur": "rouge",
-      "style": "Toit"
-    },
-    {
-      "id": "b0374",
-      "nom": "TO-0374",
-      "x": 0.5318499127399651,
-      "y": 0.1617452278924815,
-      "cotation": "V4",
-      "couleur": "vert",
-      "style": "Toit"
-    },
-    {
-      "id": "b0282",
-      "nom": "TO-0282",
-      "x": 0.6767015706806283,
-      "y": 0.17047136735488896,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Toit"
-    },
-    {
-      "id": "b0382",
-      "nom": "TO-0382",
-      "x": 0.7613438045375218,
-      "y": 0.17047136735488896,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Toit"
-    },
-    {
-      "id": "b0324",
-      "nom": "TO-0324",
-      "x": 0.8067190226876091,
-      "y": 0.16922477600311647,
-      "cotation": "V5",
-      "couleur": "bleu",
-      "style": "Toit"
-    },
-    {
-      "id": "b0149",
-      "nom": "CA-0149",
-      "x": 0.8843804537521816,
-      "y": 0.576860148032723,
-      "cotation": "V10",
-      "couleur": "noir",
-      "style": "Cave"
-    },
-    {
-      "id": "b0151",
-      "nom": "CA-0151",
-      "x": 0.5650087260034904,
-      "y": 0.8411375146084924,
-      "cotation": "V3",
-      "couleur": "vert",
-      "style": "Cave"
-    },
-    {
-      "id": "b0201",
-      "nom": "CA-0201",
-      "x": 0.47513089005235604,
-      "y": 0.8448772886638098,
-      "cotation": "V3",
-      "couleur": "vert",
-      "style": "Cave"
-    },
-    {
-      "id": "b0059",
-      "nom": "CA-0059",
-      "x": 0.7988656195462478,
-      "y": 0.8411375146084924,
-      "cotation": "V10",
-      "couleur": "noir",
-      "style": "Cave"
-    },
-    {
-      "id": "b0367",
-      "nom": "CA-0367",
-      "x": 0.7508726003490401,
-      "y": 0.8423841059602649,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Cave"
-    },
-    {
-      "id": "b0217",
-      "nom": "CA-0217",
-      "x": 0.6321989528795812,
-      "y": 0.8423841059602649,
-      "cotation": "V8",
-      "couleur": "rouge",
-      "style": "Cave"
-    },
-    {
-      "id": "b0375",
-      "nom": "CA-0375",
-      "x": 0.856457242582897,
-      "y": 0.8423841059602649,
-      "cotation": "V6",
-      "couleur": "bleu",
-      "style": "Cave"
-    },
-    {
-      "id": "b0097",
-      "nom": "PR-0097",
-      "x": 0.21858638743455497,
-      "y": 0.14803272302298404,
-      "cotation": "V9",
-      "couleur": "noir",
-      "style": "Prow"
-    },
-    {
-      "id": "b0297",
-      "nom": "PR-0297",
-      "x": 0.10863874345549739,
-      "y": 0.4783794312426958,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Prow"
-    },
-    {
-      "id": "b0239",
-      "nom": "PR-0239",
-      "x": 0.11038394415357766,
-      "y": 0.4035839501363459,
-      "cotation": "V1",
-      "couleur": "jaune",
-      "style": "Prow"
-    },
-    {
-      "id": "b0215",
-      "nom": "PR-0215",
-      "x": 0.10951134380453752,
-      "y": 0.3425009738994936,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Prow"
-    },
-    {
-      "id": "b0281",
-      "nom": "PR-0281",
-      "x": 0.10689354275741711,
-      "y": 0.2901441371250487,
-      "cotation": "V1",
-      "couleur": "jaune",
-      "style": "Prow"
-    },
-    {
-      "id": "b0147",
-      "nom": "PR-0147",
-      "x": 0.10427574171029669,
-      "y": 0.22158161277756136,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Prow"
-    },
-    {
-      "id": "b0103",
-      "nom": "DE-0103",
-      "x": 0.8756544502617801,
-      "y": 0.2926373198285937,
-      "cotation": "V4",
-      "couleur": "bleu",
-      "style": "Devers"
-    },
-    {
-      "id": "b0177",
-      "nom": "DE-0177",
-      "x": 0.7194589877835951,
-      "y": 0.17296455005843397,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Devers"
-    },
-    {
-      "id": "b0085",
-      "nom": "DE-0085",
-      "x": 0.8538394415357766,
-      "y": 0.17421114141020647,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Devers"
-    },
-    {
-      "id": "b0353",
-      "nom": "DE-0353",
-      "x": 0.4725130890052356,
-      "y": 0.15052590572652902,
-      "cotation": "V5",
-      "couleur": "jaune",
-      "style": "Devers"
+      "style": "Dalle/pied"
     },
     {
       "id": "b0269",
-      "nom": "DE-0269",
-      "x": 0.8808900523560209,
-      "y": 0.3599532528243085,
+      "nom": "DA-0269",
+      "x": 0.1061,
+      "y": 0.0885,
       "cotation": "V9",
       "couleur": "noir",
-      "style": "Devers"
+      "style": "Dalle/pied"
+    },
+    {
+      "id": "b0103",
+      "nom": "DA-0103",
+      "x": 0.8359,
+      "y": 0.0885,
+      "cotation": "V4",
+      "couleur": "bleu",
+      "style": "Dalle/doigts"
+    },
+    {
+      "id": "b0271",
+      "nom": "DA-0271",
+      "x": 0.7619,
+      "y": 0.0963,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Dalle/doigts"
+    },
+    {
+      "id": "b0353",
+      "nom": "DA-0353",
+      "x": 0.8794,
+      "y": 0.0458,
+      "cotation": "V5",
+      "couleur": "jaune",
+      "style": "Dalle/doigts"
+    },
+    {
+      "id": "b0030",
+      "nom": "DA-0030",
+      "x": 0.909,
+      "y": 0.1498,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle/doigts"
+    },
+    {
+      "id": "b0239",
+      "nom": "DA-0239",
+      "x": 0.906,
+      "y": 0.1467,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Dalle/doigts"
+    },
+    {
+      "id": "b0021",
+      "nom": "DA-0021",
+      "x": 0.7643,
+      "y": 0.1337,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Dalle/doigts"
+    },
+    {
+      "id": "b0216",
+      "nom": "TE-0216",
+      "x": 0.1658,
+      "y": 0.8964,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Technique/doigt"
     },
     {
       "id": "b0093",
-      "nom": "DE-0093",
-      "x": 0.8782722513089005,
-      "y": 0.21908843007401635,
+      "nom": "TE-0093",
+      "x": 0.3871,
+      "y": 0.8684,
       "cotation": "V3",
       "couleur": "vert",
-      "style": "Devers"
+      "style": "Technique/doigt"
+    },
+    {
+      "id": "b0116",
+      "nom": "TE-0116",
+      "x": 0.0852,
+      "y": 0.9251,
+      "cotation": "V7",
+      "couleur": "noir",
+      "style": "Technique/doigt"
+    },
+    {
+      "id": "b0134",
+      "nom": "TE-0134",
+      "x": 0.3095,
+      "y": 0.9183,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Technique/doigt"
+    },
+    {
+      "id": "b0375",
+      "nom": "TE-0375",
+      "x": 0.4458,
+      "y": 0.9155,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Technique/doigt"
+    },
+    {
+      "id": "b0085",
+      "nom": "DÉ-0085",
+      "x": 0.9513,
+      "y": 0.1392,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dévers/force"
+    },
+    {
+      "id": "b0285",
+      "nom": "DÉ-0285",
+      "x": 0.9542,
+      "y": 0.1288,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dévers/force"
+    },
+    {
+      "id": "b0335",
+      "nom": "DÉ-0335",
+      "x": 0.9464,
+      "y": 0.3325,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dévers/force"
+    },
+    {
+      "id": "b0044",
+      "nom": "DÉ-0044",
+      "x": 0.9415,
+      "y": 0.1123,
+      "cotation": "V6",
+      "couleur": "rouge",
+      "style": "Dévers/force"
+    },
+    {
+      "id": "b0367",
+      "nom": "DÉ-0367",
+      "x": 0.9567,
+      "y": 0.2155,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dévers/force"
+    },
+    {
+      "id": "b0286",
+      "nom": "DÉ-0286",
+      "x": 0.9709,
+      "y": 0.8333,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dévers/doigts"
+    },
+    {
+      "id": "b0177",
+      "nom": "DÉ-0177",
+      "x": 0.942,
+      "y": 0.6634,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dévers/doigts"
+    },
+    {
+      "id": "b0059",
+      "nom": "DÉ-0059",
+      "x": 0.9565,
+      "y": 0.8885,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Dévers/doigts"
+    },
+    {
+      "id": "b0295",
+      "nom": "DÉ-0295",
+      "x": 0.9028,
+      "y": 0.6747,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Dévers/doigts"
+    },
+    {
+      "id": "b0386",
+      "nom": "DÉ-0386",
+      "x": 0.9506,
+      "y": 0.6818,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Dévers/doigts"
     }
   ]
 }

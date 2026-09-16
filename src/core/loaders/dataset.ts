@@ -1,4 +1,5 @@
 import type { Anomalie, Ascension, Bloc, Dataset, FichierBrut, Grimpeur } from '../types'
+import { STYLES_BLOC, estStyleConnu } from '../stylesBloc'
 import { lireCsv } from './csv'
 import { schemaAscension, schemaBloc, schemaGrimpeur } from './schemas'
 
@@ -85,6 +86,23 @@ export function construireDataset(fichiers: FichierBrut[]): Dataset {
   }
   if (fGrimpeurs) signalerDoublons(grimpeurs, fGrimpeurs.chemin)
   if (fBlocs) signalerDoublons(blocs, fBlocs.chemin)
+
+  // Style hors vocabulaire controle : n'empeche pas le calcul (la cote
+  // globale du bloc n'en depend pas), juste absent de la ventilation par
+  // style des grimpeurs (cf. `formulas/definitions/elo-bloc.ts`).
+  if (fBlocs) {
+    for (const b of blocs) {
+      if (b.secteur && !estStyleConnu(b.secteur)) {
+        anomalies.push({
+          fichier: fBlocs.chemin,
+          ligne: null,
+          champ: 'secteur',
+          message: `style hors vocabulaire controle (${STYLES_BLOC.join(', ')}) : ${b.secteur}`,
+          gravite: 'avertissement',
+        })
+      }
+    }
+  }
 
   const grimpeurParId = new Map(grimpeurs.map((g) => [g.id, g]))
   const blocParId = new Map(blocs.map((b) => [b.id, b]))
