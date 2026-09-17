@@ -275,9 +275,11 @@ export function VueBlocs({
             ))}
           </select>
         )}
-        <button className="bouton" aria-pressed={seulsDesaccords} onClick={() => setSeulsDesaccords((v) => !v)}>
-          {t('Désaccords seulement', 'Discrepancies only')}
-        </button>
+        {!simplifie && (
+          <button className="bouton" aria-pressed={seulsDesaccords} onClick={() => setSeulsDesaccords((v) => !v)}>
+            {t('Désaccords seulement', 'Discrepancies only')}
+          </button>
+        )}
         {nbFormules > 1 && (
           <span className="discret" style={{ fontSize: 12 }}>
             {t(
@@ -287,38 +289,46 @@ export function VueBlocs({
           </span>
         )}
         <span className="espace" />
-        <button
-          className="bouton"
-          onClick={() =>
-            telecharger(
-              'cotes-calculees.csv',
-              versCsv(
-                affiches.map((b) => ({
-                  id: b.id,
-                  nom: b.nom,
-                  gym: b.gym,
-                  secteur: b.secteur,
-                  couleur: b.couleur,
-                  cotation_affichee: b.cotationOfficielle,
-                  cotation_calculee: b.cotationCalculee,
-                  ...Object.fromEntries(
-                    colonnesFormules.map((c) => [
-                      simplifie ? 'cote' : `cote_${c.formule.id.replace(/-/g, '_')}`,
-                      Math.round(c.parBloc.get(b.id)?.rating ?? Number.NaN),
-                    ])
-                  ),
-                  ecart_crans: Number(b.ecart.toFixed(2)),
-                  formules_en_desaccord: avisParBloc.get(b.id) ?? 0,
-                  duels_utiles: b.matchs,
-                  taux_reussite: Number(b.tauxReussite.toFixed(3)),
-                }))
+        {!simplifie && (
+          <button
+            className="bouton"
+            onClick={() =>
+              telecharger(
+                'cotes-calculees.csv',
+                versCsv(
+                  affiches.map((b) => ({
+                    id: b.id,
+                    nom: b.nom,
+                    gym: b.gym,
+                    secteur: b.secteur,
+                    couleur: b.couleur,
+                    cotation_affichee: b.cotationOfficielle,
+                    cotation_calculee: b.cotationCalculee,
+                    ...Object.fromEntries(
+                      colonnesFormules.map((c) => [
+                        simplifie ? 'cote' : `cote_${c.formule.id.replace(/-/g, '_')}`,
+                        Math.round(c.parBloc.get(b.id)?.rating ?? Number.NaN),
+                      ])
+                    ),
+                    ecart_crans: Number(b.ecart.toFixed(2)),
+                    formules_en_desaccord: avisParBloc.get(b.id) ?? 0,
+                    duels_utiles: b.matchs,
+                    taux_reussite: Number(b.tauxReussite.toFixed(3)),
+                  }))
+                )
               )
-            )
-          }
-        >
-          {t('Exporter en CSV', 'Export as CSV')}
-        </button>
+            }
+          >
+            {t('Exporter en CSV', 'Export as CSV')}
+          </button>
+        )}
       </div>
+
+      <LegendeCote />
+
+      <Carte titre={t('Blocs', 'Boulders')}>
+        <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} pageTaille={25} />
+      </Carte>
 
       <div className="grille tuiles">
         <Tuile
@@ -354,17 +364,6 @@ export function VueBlocs({
           note={t('en valeur absolue', 'absolute value')}
         />
       </div>
-      <LegendeCote />
-
-      <Carte
-        titre={t('Tous les blocs exploitables', 'All ratable boulders')}
-        sousTitre={t(
-          "Blocs ayant assez de duels utiles pour être jugés. Un bloc ouvert la semaine dernière n'y est pas encore, ni celui que seuls des grimpeurs bien plus forts ou bien plus faibles ont touché. Le verdict résume l'avis des formules qui votent : accord avec l'ouvreur, à vérifier si l'une le conteste, confirmé si toutes le contestent. Les cotes de chaque formule sont affichées à côté : quand elles s'écartent nettement, c'est que le bloc est mal connu.",
-          "Boulders with enough useful duels to be judged. A boulder set last week isn't in yet, nor is one that only much stronger or much weaker climbers have touched. The verdict summarizes what the voting formulas say: agrees with the setter, flagged if one contests it, confirmed if all contest it. Each formula's rating is shown alongside: when they diverge sharply, the boulder is poorly documented."
-        )}
-      >
-        <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} pageTaille={25} />
-      </Carte>
 
       {isoles.length > 0 && (
         <Carte titre={t('Salles isolées', 'Isolated gyms')}>

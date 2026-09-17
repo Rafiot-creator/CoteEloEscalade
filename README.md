@@ -1539,3 +1539,9 @@ fait accompli.
   réel » plus haut pour la recommandation (base + service backend-as-a-service plutôt qu'un
   serveur écrit à la main) et les seams déjà en place pour l'accrocher. Raphaël a choisi
   d'attendre plutôt que de commencer maintenant.
+- Simplification de la présentation de l'écran **Blocs** (`VueBlocs.tsx` seul touché) : le titre
+  et le paragraphe d'explication devant le tableau (« Tous les blocs exploitables » + description)
+  remplacés par un simple « Blocs » sans sous-titre ; les quatre tuiles de statistiques
+  déplacées sous le tableau (elles étaient tout en haut de la page) ; les boutons « Désaccords
+  seulement » et « Exporter en CSV » masqués en vue visiteur, visibles seulement en accès
+  complet. Vérifié dans Chrome (accès complet et aperçu visiteur).

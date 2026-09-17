@@ -368,6 +368,18 @@ l'interface. Raphael a choisi d'attendre plutôt que de commencer maintenant —
 § « Piste envisagée, pas commencée : le multi-utilisateur en temps réel », et `DECISIONS.md` § 7
 pour le détail. **Ne pas relancer ce chantier de soi-même sans que Raphael le redemande.**
 
+Raphael a ensuite demandé de simplifier la présentation de l'écran **Blocs** :
+- Le titre/description devant le tableau (« Tous les blocs exploitables » + un paragraphe
+  d'explication) remplacé par un simple titre « Blocs », sans sous-titre.
+- Les quatre tuiles de statistiques (« Blocs en désaccord », Sous-cotés, Sur-cotés, Écart
+  médian), auparavant tout en haut de la page, déplacées sous le tableau des blocs.
+- Les boutons « Désaccords seulement » et « Exporter en CSV » masqués en vue visiteur
+  (`simplifie`) — visibles seulement en accès complet.
+`VueBlocs.tsx` seul touché ; simple réordonnancement de JSX et deux `{!simplifie && ...}`, rien
+dans le cœur de calcul. Vérifié dans Chrome (accès complet *et* aperçu visiteur) : les deux
+boutons disparaissent bien en vue visiteur, le titre est sobre, les tuiles apparaissent
+maintenant après le tableau et avant les deux graphiques. Tests (64) et build au vert.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
