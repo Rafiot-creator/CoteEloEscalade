@@ -1023,6 +1023,21 @@ aujourd'hui il n'y en a qu'un, les fichiers du dépôt. Brancher le glisser-dép
 ajouter un second provider (lecture d'un `File`, persistance IndexedDB) et à le concaténer
 dans `chargerToutesLesSources()`. Ni les parseurs, ni les formules, ni l'interface ne bougent.
 
+## Piste envisagée, pas commencée : le multi-utilisateur en temps réel
+
+Aujourd'hui, le site est statique (GitHub Pages, aucun compte — voir « Accès à deux niveaux »
+plus haut) et rien n'est partagé entre utilisateurs : les envois tapés sur la Carte sont
+persistés en `localStorage`, par appareil (`AscensionLocaleProvider`, § « La carte des blocs »).
+Discuté avec Raphaël le 17 septembre 2026 : pour que plusieurs personnes voient les mêmes
+données en temps réel, il faut à la fois une base *et* un serveur (ou un équivalent) — une base
+exposée directement au navigateur ne peut appliquer aucune règle d'accès. Piste recommandée mais
+non explorée : un service backend-as-a-service (Supabase, Firebase, PocketBase...), qui fournit
+déjà la base et la couche API/auth, plutôt qu'un serveur écrit à la main. Ça s'accrocherait aux
+mêmes seams que l'import utilisateur ci-dessus : une seconde implémentation de `SourceProvider`,
+`CarteProvider` et `AscensionLocaleProvider` qui parle au service au lieu des CSV/`localStorage`,
+sans toucher au calcul ni à l'interface. Raphaël a choisi d'attendre plutôt que de commencer
+maintenant — ne pas relancer ce chantier sans qu'il le redemande.
+
 ## Changer d'échelle de cotation
 
 L'échelle V est déclarée dans `src/core/cotations.ts` sous forme d'un simple tableau
@@ -1519,3 +1534,8 @@ fait accompli.
   Grimpeurs retrie immédiatement le tableau sur la bonne colonne (cliquer ensuite sur l'en-tête
   « Elo » retrie bien sur Elo, sans que le mécanisme de tri piloté ne s'en trouve cassé). Tests
   (64) et build au vert.
+- Raphaël a demandé ce qu'il faudrait pour que le site supporte plusieurs utilisateurs en temps
+  réel — discuté, pas codé. Voir « Piste envisagée, pas commencée : le multi-utilisateur en temps
+  réel » plus haut pour la recommandation (base + service backend-as-a-service plutôt qu'un
+  serveur écrit à la main) et les seams déjà en place pour l'accrocher. Raphaël a choisi
+  d'attendre plutôt que de commencer maintenant.

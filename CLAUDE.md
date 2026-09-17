@@ -358,6 +358,16 @@ la Carte Démo n'a aucun chevauchement ni étiquette masquée, et sélectionner 
 Grimpeurs retrie immédiatement le tableau sur cette colonne (un clic sur "Elo" ensuite retrie
 bien sur Elo, sans casser le mécanisme). Tests (64) et build au vert.
 
+Raphael a ensuite demandé ce qu'il faudrait pour que le site (statique, sans serveur ni compte)
+supporte plusieurs utilisateurs en temps réel — discuté, rien codé. Recommandation donnée : il
+faut une base *et* un serveur (ou un service qui fournit les deux, type Supabase/Firebase/
+PocketBase), une base seule exposée au navigateur ne pouvant appliquer aucune règle d'accès ; les
+interfaces déjà en place (`SourceProvider`, `CarteProvider`, `AscensionLocaleProvider`) donnent
+un bon point d'accroche pour une future implémentation réseau sans toucher au calcul ni à
+l'interface. Raphael a choisi d'attendre plutôt que de commencer maintenant — voir README,
+§ « Piste envisagée, pas commencée : le multi-utilisateur en temps réel », et `DECISIONS.md` § 7
+pour le détail. **Ne pas relancer ce chantier de soi-même sans que Raphael le redemande.**
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
@@ -372,4 +382,5 @@ Au choix de Raphael à la prochaine session :
 Autres pistes en attente si rien de ce qui précède ne ressort : brancher de vraies données sur un
 des centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans
 `DECISIONS.md` (§ 7) : seuil Glicko à 0,60, test d'équivalence, Glicko-2, modèle morphologique,
-import utilisateur par glisser-déposer.
+import utilisateur par glisser-déposer, multi-utilisateur en temps réel (mise en attente
+explicite, cf. ci-dessus — ne pas la proposer spontanément).
