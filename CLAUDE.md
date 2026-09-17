@@ -230,16 +230,31 @@ a deja ouvert le popup, basculer le refermerait aussitot. Ce risque n'existe que
 existe vraiment (`survolPossible`) ; sur tactile, rien ne l'a ouvert avant le tap. Le bascule ne
 s'applique donc que si `!survolPossible`.
 
+Tests (64) et build au vert. Pousse (commit `fde6f73`), deploiement verifie vert.
+
+Raphael a envoye une **troisieme capture** (`Cell site escalade debug 3.jpg`), bien plus
+rapprochee : le halo gris debordait toujours a l'exterieur du cercle vert, et le cercle vert
+empietait par endroits sur le chiffre. Le correctif precedent (`ECART_ANNEAU` = 2, cense faire
+correspondre l'anneau au halo existant) supposait un ordre d'empilement precis entre le
+`boxShadow` de la pastille et le `<span>` de l'anneau pose par-dessus — peu fiable en pratique
+sur mobile. Plutot que d'ajuster encore les pixels, **l'anneau separe est retire** : le
+`boxShadow` de contour que chaque pastille a deja (2px, gris par defaut, fonce si selectionnee)
+devient simplement vert quand le bloc est envoye, au lieu d'empiler un second element par-dessus.
+Un seul contour, jamais deux elements qui se disputent le meme espace — ni halo gris visible, ni
+empietement sur le chiffre possible (`box-shadow` ne peut pas deborder a l'interieur de
+l'element). `EPAISSEUR_ANNEAU`/`ECART_ANNEAU` et le `<span>` associe sont retires entierement.
+Verifie via le DOM (0 `<span>` enfant sur une pastille envoyee, `boxShadow` bien vert) et
+visuellement dans Chrome.
+
 Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** : l'anneau vert (corrigé à partir d'une vraie capture d'écran
-  cette fois — le vrai bug était le halo de 2px déjà présent sur chaque pastille, révélé par
-  l'écart introduit pour le tout premier correctif) et le rebasculement du popup au reclic.
-  Popup après pinch-zoom et menu déroulant déjà confirmés bons par Raphael.
+- **Retester sur le téléphone** l'anneau vert (troisième tentative — cette fois en éliminant le
+  risque de superposition plutôt qu'en réajustant des pixels) et le rebasculement du popup au
+  reclic. Popup après pinch-zoom et menu déroulant déjà confirmés bons par Raphael.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
   l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
   l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main

@@ -149,28 +149,6 @@ export function VueCarte({
   // compte le plus) — la legende (V-grade) reste lisible via son propre
   // minimum de police, decouple de RAYON.
   const RAYON = Math.round(Math.max(5, Math.min(20, largeurCarte * 0.018)))
-  // L'anneau "envoye" a besoin d'un ecart non nul avec la pastille, sans
-  // quoi elle semble deborder dessus (retour de Raphael sur telephone). Le
-  // bug n'etait pas que l'ecart etait trop petit sur bureau — border-box
-  // (styles.css) fait que la bordure de l'anneau mange sur l'inset : avec
-  // inset:-2 et une bordure de 2px, l'ecart reellement visible etait pile
-  // zero, a toute taille. Un premier correctif avait fait grandir l'ecart
-  // avec RAYON, mais ca gonflait l'anneau bien plus que necessaire sur
-  // bureau (jusqu'a 30 % de plus que la pastille) et rendait les pastilles
-  // "envoyees" visiblement plus grosses que les autres.
-  //
-  // Second correctif (ecart fixe de 1px) : parait toujours deborder sur
-  // telephone, en gris. Cause reelle, visible sur une capture d'ecran de
-  // Raphael : chaque pastille a deja son propre halo de 2px (boxShadow
-  // `0 0 0 2px var(--bord-fort)`, plus bas), pour lui donner un contour.
-  // Avant, l'anneau vert le recouvrait entierement en le touchant pile
-  // (ecart nul) ; l'ecart introduit pour corriger le vrai bug laissait ce
-  // halo gris deja existant apparaitre dans l'espace. ECART_ANNEAU doit donc
-  // correspondre exactement a ce halo (2px), pas etre un petit ecart
-  // arbitraire : l'anneau prend le relais pile ou le halo gris s'arrete, ni
-  // vide (gris visible) ni chevauchement.
-  const EPAISSEUR_ANNEAU = 1
-  const ECART_ANNEAU = 2
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -455,7 +433,15 @@ export function VueCarte({
                       marginTop: -RAYON,
                       borderRadius: '50%',
                       background: fondMetal(b.couleur),
-                      boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
+                      // Le contour de 2px (`0 0 0 2px`) existe pour toutes les
+                      // pastilles ; il devient vert pour signaler "envoye"
+                      // plutot que de superposer un anneau distinct par-dessus
+                      // (retour de Raphael, avec capture d'ecran : cette
+                      // superposition laissait un halo gris visible entre les
+                      // deux, et empietait par endroits sur le chiffre selon
+                      // le navigateur — un seul contour, jamais de
+                      // superposition possible, evite les deux).
+                      boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -470,16 +456,6 @@ export function VueCarte({
                     }}
                   >
                     {b.cotation.replace(/^V/i, '')}
-                    {fait && (
-                      <span
-                        style={{
-                          position: 'absolute',
-                          inset: -(ECART_ANNEAU + EPAISSEUR_ANNEAU),
-                          borderRadius: '50%',
-                          border: `${EPAISSEUR_ANNEAU}px solid var(--bon)`,
-                        }}
-                      />
-                    )}
                     {nonEssaye && (
                       // Empiete sur la pastille (inset a 0, pas negatif comme
                       // l'anneau "envoye") plutot que de deborder autour : pas

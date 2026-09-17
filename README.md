@@ -1372,3 +1372,16 @@ fait accompli.
   (`survolPossible`, `matchMedia('(hover: hover)')`) ; sur tactile, rien ne l'a ouvert avant le
   tap. Le bascule ne s'applique donc que si `!survolPossible` : retaper le même bloc le referme
   sur tactile, le comportement « toujours ouvre » reste inchangé à la souris.
+- Raphaël a envoyé une troisième capture (`Cell site escalade debug 3.jpg`), bien plus
+  rapprochée : le halo gris débordait toujours à l'extérieur du cercle vert, et le cercle vert
+  empiétait par endroits sur le chiffre. Le correctif précédent (`ECART_ANNEAU` = 2 pour faire
+  correspondre l'anneau au halo existant) supposait un ordre d'empilement précis entre le
+  `boxShadow` de la pastille et le `<span>` de l'anneau, posé par-dessus — un ordre qui s'est
+  révélé peu fiable en pratique sur mobile. Plutôt que d'ajuster encore les pixels, le anneau
+  séparé est retiré : le `boxShadow` de contour que **chaque** pastille a déjà (2px, gris par
+  défaut, foncé si sélectionnée) devient simplement **vert** quand le bloc est envoyé, au lieu
+  d'empiler un second élément par-dessus. Un seul contour, jamais deux éléments qui se disputent
+  le même espace — ni halo gris visible, ni empiètement sur le chiffre possible, puisque ce
+  contour a toujours été strictement à l'extérieur de la pastille (`box-shadow` ne peut pas
+  déborder à l'intérieur). Vérifié via le DOM (l'anneau séparé n'existe plus, 0 `<span>` enfant
+  sur une pastille envoyée) et visuellement dans Chrome.
