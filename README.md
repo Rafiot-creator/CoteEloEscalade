@@ -1545,3 +1545,9 @@ fait accompli.
   déplacées sous le tableau (elles étaient tout en haut de la page) ; les boutons « Désaccords
   seulement » et « Exporter en CSV » masqués en vue visiteur, visibles seulement en accès
   complet. Vérifié dans Chrome (accès complet et aperçu visiteur).
+- Retrait des bulles d'aide au survol des en-têtes du tableau **Blocs** en vue visiteur (`aide`
+  retiré des colonnes passées à `Tableau` quand `simplifie` est vrai, seulement pour ce tableau) :
+  ce texte s'adresse à quelqu'un qui explore le modèle de calcul, pas à la vue simplifiée. Le clic
+  pour trier fonctionne toujours, seule la bulle au survol disparaît. Vérifié dans Chrome que le
+  survol d'un en-tête ne montre plus rien en vue visiteur, et montre toujours l'aide en accès
+  complet.

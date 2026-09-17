@@ -327,7 +327,15 @@ export function VueBlocs({
       <LegendeCote />
 
       <Carte titre={t('Blocs', 'Boulders')}>
-        <Tableau lignes={affiches} colonnes={colonnes} cleLigne={(b) => b.id} triInitial={{ cle: 'ecart', sens: -1 }} pageTaille={25} />
+        <Tableau
+          lignes={affiches}
+          // Vue visiteur : pas de bulle d'aide au survol des en-têtes, ce
+          // texte s'adresse à quelqu'un qui explore le modèle de calcul.
+          colonnes={simplifie ? colonnes.map(({ aide, ...c }) => c) : colonnes}
+          cleLigne={(b) => b.id}
+          triInitial={{ cle: 'ecart', sens: -1 }}
+          pageTaille={25}
+        />
       </Carte>
 
       <div className="grille tuiles">

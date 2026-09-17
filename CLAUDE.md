@@ -380,6 +380,14 @@ dans le cœur de calcul. Vérifié dans Chrome (accès complet *et* aperçu visi
 boutons disparaissent bien en vue visiteur, le titre est sobre, les tuiles apparaissent
 maintenant après le tableau et avant les deux graphiques. Tests (64) et build au vert.
 
+Puis demandé de retirer, en vue visiteur seulement, les bulles d'aide au survol des en-têtes du
+tableau Blocs. `colonnes` passe par `colonnes.map(({ aide, ...c }) => c)` avant `Tableau` quand
+`simplifie` est vrai (seulement pour le tableau principal de cet écran, pas pour le tableau
+secondaire de la carte "Cotation calculée contre affichée") — `Tableau.tsx` n'affiche la bulle
+que si `c.aide` est défini, donc rien à y changer. Le clic pour trier continue de fonctionner
+(indépendant de `aide`). Vérifié dans Chrome : plus de bulle au survol en vue visiteur, toujours
+présente en accès complet. Tests (64) et build au vert.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
