@@ -173,7 +173,7 @@ export function VueGrimpeurs({
                 value={styleSelectionne}
                 onChange={(e) => setStyleSelectionne(e.currentTarget.value)}
                 onClick={(e) => e.stopPropagation()}
-                style={{ font: 'inherit', fontWeight: 400, maxWidth: 140 }}
+                style={{ font: 'inherit', fontWeight: 400 }}
               >
                 <option value="">{t('Cote globale (Elo)', 'Overall rating (Elo)')}</option>
                 {STYLES_BLOC.map((s) => (

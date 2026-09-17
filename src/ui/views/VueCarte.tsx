@@ -91,6 +91,23 @@ export function VueCarte({
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
   const [largeurCarte, setLargeurCarte] = useState(640)
 
+  // Echelle du pinch-zoom tactile courant (1 = pas de zoom). Le popup est en
+  // position absolue, ancre sur la pastille (cf. plus bas) : il zoome donc
+  // avec le reste de la carte, ce qui le fait grossir a l'ecran en meme temps
+  // que les blocs quand on pince pour zoomer dessus (retour de Raphael,
+  // popup "beaucoup trop gros" et hors ecran apres un pinch-zoom). Un popup
+  // devrait rester a taille lisible constante, pas suivre le zoom du contenu
+  // qu'il annote — on compense donc son rendu par l'inverse de cette echelle.
+  const [echelleZoom, setEchelleZoom] = useState(1)
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    const majEchelle = () => setEchelleZoom(vv.scale)
+    majEchelle()
+    vv.addEventListener('resize', majEchelle)
+    return () => vv.removeEventListener('resize', majEchelle)
+  }, [])
+
   // Sur un ecran tactile, un tap declenche des evenements souris simules
   // (mouseenter/mouseout compris), mais sans survol continu reel : selon le
   // navigateur, le popup pouvait se rouvrir/refermer tout seul juste apres
@@ -498,12 +515,15 @@ export function VueCarte({
                     const hautMax = Math.max(4, hauteurZone - POPUP_HAUTEUR - 4)
                     const hautVoulu = by - RAYON
                     const haut = Math.min(Math.max(4, hautVoulu), hautMax) - by
+                    const echelle = Math.max(1, echelleZoom)
                     return (
                     <div
                       className="carte-popup"
                       style={{
                         left: gauche,
                         top: haut,
+                        transform: echelle > 1 ? `scale(${1 / echelle})` : undefined,
+                        transformOrigin: aGauche ? 'top right' : 'top left',
                       }}
                     >
                       <div className="t">{b.nom || b.cotation}</div>

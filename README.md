@@ -1328,3 +1328,29 @@ fait accompli.
   l'ajout total à la taille de la pastille retombe à 4px à toute taille, comme à l'origine, tout
   en gardant un écart réel (non nul) au plancher de `RAYON` sur téléphone. Vérifié dans les deux
   cas via le DOM : 1px d'écart réel à `RAYON` = 5 comme à `RAYON` = 20.
+- Raphaël a effacé le cache et retesté sur deux téléphones différents : le débordement de
+  l'anneau et du popup persistait. Deux choses distinctes se sont révélées derrière ce retour :
+  - **Le menu déroulant de style (écran Grimpeurs) était écrasé et illisible sur mobile.** Il
+    avait un `maxWidth: 140` artificiel — aucune autre colonne du tableau n'a de contrainte de
+    largeur, le tableau défile horizontalement au besoin (`.table-enveloppe`) comme n'importe
+    quel autre tableau du site. Sur mobile, le style natif d'un `<select>` (flèche, padding du
+    système) rendait 140px trop juste pour un nom de style comme « Technique/force ». Contrainte
+    retirée.
+  - **Le popup débordait massivement de l'écran après un pinch-zoom tactile** — visible sur une
+    capture d'écran envoyée par Raphaël (`Cell site escalade debug.jpg`), qui a permis de
+    diagnostiquer le vrai problème plutôt que de deviner une troisième fois : mon correctif
+    précédent (`position: absolute`, ancré sur la pastille) faisait bien zoomer le popup *avec*
+    la carte comme prévu pour la position — mais ça veut aussi dire qu'il grossit physiquement à
+    l'écran en même temps que les blocs quand on pince pour zoomer dessus, jusqu'à dépasser
+    largement l'écran visible. Un popup devrait rester à taille lisible constante, pas suivre le
+    zoom du contenu qu'il annote. Corrigé en lisant `window.visualViewport.scale` (l'échelle du
+    pinch-zoom tactile courant, mise à jour sur son évènement `resize` — `echelleZoom`,
+    `VueCarte.tsx`) et en compensant par un `transform: scale(1 / échelle)` sur le popup, avec un
+    `transform-origin` sur le coin qui touche la pastille (en haut à gauche par défaut, à droite
+    si le popup a basculé à gauche faute de place) pour que ce coin reste ancré au bon endroit
+    pendant que le reste du popup se réduit autour de lui. Sans zoom (`echelle` = 1, le cas du
+    bureau), `transform` n'est même pas posé : comportement inchangé, vérifié dans Chrome.
+  - **Le débordement de l'anneau vert n'a pas pu être confirmé ou infirmé** sur cette capture
+    d'écran : le popup, grand ouvert, cachait la plupart des pastilles. À revérifier après ce
+    correctif — l'anneau lui-même n'a pas été retouché dans ce lot, sa correction précédente
+    reste en place (voir plus haut).

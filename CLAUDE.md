@@ -186,15 +186,41 @@ jusqu'a 30 % de plus que la pastille sur bureau (10 % avant toute cette histoire
 constantes fixes (1px), qui n'ont pas besoin de grandir avec `RAYON`, juste de ne jamais
 retomber a zero. Verifie via le DOM : 1px d'ecart reel a `RAYON` = 5 comme a `RAYON` = 20 (contre
 3px puis 4px avec la version precedente sur bureau — sensiblement moins gonfle).
+Tests (64) et build au vert. Pousse (commit `fd9de44`), deploiement verifie vert.
+
+Raphael a efface le cache et reteste sur **deux telephones differents** : le probleme
+persistait, plus un troisieme signale (menu deroulant de style ecrase et illisible sur mobile,
+ecran Grimpeurs). Raphael a envoye une **capture d'ecran reelle** (`Cell site escalade
+debug.jpg`, dans ses Downloads) — utile : mon environnement de test (Chrome bureau, meme en
+retrecissant la fenetre) ne reproduit pas fidelement le rendu mobile reel, deux tentatives de
+suite n'avaient pas suffi a corriger pour de vrai. La capture a permis de diagnostiquer le vrai
+probleme plutot que de deviner une troisieme fois :
+
+- Le menu deroulant avait un `maxWidth: 140` artificiel (aucune autre colonne du tableau n'en a,
+  le tableau defile horizontalement au besoin) — trop juste pour un nom de style avec le style
+  natif d'un `<select>` sur mobile. Retire.
+- Le popup debordait massivement de l'ecran apres un pinch-zoom tactile (visible sur la
+  capture). Mon correctif precedent (`position: absolute`, ancre sur la pastille) faisait bien
+  zoomer le popup *avec* la carte pour la position, mais ca le fait aussi grossir physiquement a
+  l'ecran avec le zoom — jusqu'a depasser l'ecran visible. Corrige en lisant
+  `window.visualViewport.scale` et en compensant par `transform: scale(1/echelle)` sur le popup
+  (`echelleZoom`, `VueCarte.tsx`), avec un `transform-origin` sur le coin ancre a la pastille.
+  Sans zoom (bureau), `transform` n'est meme pas pose : verifie dans Chrome, comportement
+  inchange.
+- **Le debordement de l'anneau vert n'a pas pu etre confirme ou infirme** sur cette capture : le
+  popup, grand ouvert, cachait la plupart des pastilles. Pas retouche dans ce lot — a revoir au
+  prochain retour de Raphael.
+
 Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** les deux correctifs ci-dessus (anneau, popup) — vérifiés dans
-  Chrome et via simulation, mais l'historique de cette carte montre que plusieurs bugs mobiles
-  n'avaient été repérés qu'à l'usage réel du téléphone de Raphael.
+- **Retester sur le téléphone** (idéalement les deux utilisés jusqu'ici) : le popup après
+  pinch-zoom en priorité (corrigé sur la base d'une vraie capture d'écran cette fois, pas d'une
+  simulation), le menu déroulant de style, et surtout **revérifier l'anneau vert** — son
+  débordement n'a toujours pas été confirmé ou infirmé sur un vrai appareil après correctif.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
   l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
   l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main
