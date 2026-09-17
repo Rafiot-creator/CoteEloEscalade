@@ -312,12 +312,24 @@ plutot que sur Elo, entierement cote UI (`VueGrimpeurs.tsx`), rien touche au coe
 
 Verifie visuellement (l'option "globale" correspond pile a la colonne Melange) et par le calcul
 (Victor Bergeron, Dalle/pied : Elo 7570 → 6421 soit -1149 ; Melange 7851 → 6702, le meme -1149).
-Tests (64) et build au vert. **Pas encore poussé.**
+Tests (64) et build au vert. Pousse (commit `b9db770`), deploiement verifie vert.
+
+**Fin de session du 2026-09-16.** Tout le lot du jour confirme fonctionnel sur telephone par
+Raphael. Une seule demande notee pour la suite, pas codee aujourd'hui : voir ci-dessous.
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
+- **Classer les grimpeurs par force selon le style choisi** (demande explicite de Raphael,
+  2026-09-16, pour la prochaine session) : aujourd'hui, sélectionner un style dans le menu
+  déroulant de la colonne "Cote par style" change les valeurs affichées mais ne retrie pas le
+  tableau — le classement (`classement`, `VueGrimpeurs.tsx`) reste toujours trié sur la formule
+  active (`rang`), et cette colonne n'est pas cliquable pour trier (le `<select>` dans son
+  en-tête intercepte le clic avec `e.stopPropagation()`, précisément pour empêcher le menu
+  d'ouvrir un tri au lieu de dérouler). À concevoir : soit rendre la colonne triable quand même
+  (zone cliquable distincte du `<select>` dans le même en-tête), soit un tri secondaire explicite
+  qui se réactive automatiquement quand un style est choisi.
 - **Retester sur le téléphone** le nouveau libellé/calcul de la colonne "Cote par style"
   (Mélange au lieu d'Elo) — changement d'affichage seulement, pas de raison de casser quoi que
   ce soit sur mobile, mais à confirmer comme le reste.

@@ -1458,3 +1458,9 @@ fait accompli.
   maintenant exactement à la colonne Mélange, et un style choisi reproduit le même écart que
   celui déjà vérifié sur Elo, simplement reporté sur la base Mélange (ex. Victor Bergeron,
   Dalle/pied : Elo 7570 → 6421, soit −1149 ; Mélange 7851 → 6702, soit le même −1149).
+- Fin de session : Raphaël a confirmé tout le lot du jour fonctionnel sur téléphone. Demande
+  notée pour la prochaine session (pas codée aujourd'hui) : pouvoir classer les grimpeurs par
+  force selon le style choisi dans le menu déroulant — aujourd'hui, choisir un style change les
+  valeurs affichées mais ne retrie pas le tableau, et la colonne n'est pas cliquable pour trier
+  (le `<select>` dans son en-tête intercepte le clic exprès, pour ne pas déclencher un tri au
+  lieu d'ouvrir le menu). Voir `CLAUDE.md`, § « Prochaine étape », pour les pistes envisagées.
