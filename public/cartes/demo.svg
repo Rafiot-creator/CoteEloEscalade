@@ -4,14 +4,6 @@
   <!-- Sol -->
   <rect x="130" y="130" width="740" height="440" rx="8" fill="#f7f7f4" stroke="#222" stroke-width="3"/>
 
-  <!-- Separations entre les neuf zones de mur : 3 sur le haut (famille Dalle),
-       2 a droite (Devers), 2 en bas (Technique), 2 a gauche (Coordo/Dyno). -->
-  <line x1="333" y1="0" x2="333" y2="130" stroke="#222" stroke-width="2"/>
-  <line x1="667" y1="0" x2="667" y2="130" stroke="#222" stroke-width="2"/>
-  <line x1="500" y1="570" x2="500" y2="700" stroke="#222" stroke-width="2"/>
-  <line x1="0" y1="350" x2="130" y2="350" stroke="#222" stroke-width="2"/>
-  <line x1="870" y1="350" x2="1000" y2="350" stroke="#222" stroke-width="2"/>
-
   <!-- Titre, dans le sol -->
   <text x="500" y="185" text-anchor="middle" font-size="32" font-weight="800" fill="#222" letter-spacing="1">COTE ELO ESCALADE</text>
   <text x="500" y="213" text-anchor="middle" font-size="17" fill="#555" letter-spacing="0.5">PLAN INVENTE — CENTRE DEMO</text>
@@ -24,24 +16,12 @@
   <rect x="420" y="500" width="160" height="40" rx="10" fill="none" stroke="#222" stroke-width="2"/>
   <text x="500" y="525" text-anchor="middle" font-size="16" fill="#333" letter-spacing="1">ACCUEIL</text>
 
-  <!-- Etiquettes des neuf styles de mur (src/core/stylesBloc.ts) -->
-  <text x="166" y="60" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5">DALLE</text>
-  <text x="166" y="82" text-anchor="middle" font-size="15" font-weight="600" fill="#555" letter-spacing="0.5">PIED</text>
-  <text x="500" y="60" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5">DALLE</text>
-  <text x="500" y="82" text-anchor="middle" font-size="15" font-weight="600" fill="#555" letter-spacing="0.5">FORCE</text>
-  <text x="833" y="60" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5">DALLE</text>
-  <text x="833" y="82" text-anchor="middle" font-size="15" font-weight="600" fill="#555" letter-spacing="0.5">DOIGTS</text>
-
-  <text x="985" y="175" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(-90 935 175)">DEVERS</text>
-  <text x="890" y="175" text-anchor="middle" font-size="15" font-weight="600" fill="#555" letter-spacing="0.5" transform="rotate(-90 935 175)">FORCE</text>
-  <text x="985" y="525" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(-90 935 525)">DEVERS</text>
-  <text x="890" y="525" text-anchor="middle" font-size="15" font-weight="600" fill="#555" letter-spacing="0.5" transform="rotate(-90 935 525)">DOIGTS</text>
-
-  <text x="250" y="628" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5">TECHNIQUE</text>
-  <text x="250" y="650" text-anchor="middle" font-size="15" font-weight="600" fill="#555" letter-spacing="0.5">DOIGT</text>
-  <text x="750" y="628" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5">TECHNIQUE</text>
-  <text x="750" y="650" text-anchor="middle" font-size="15" font-weight="600" fill="#555" letter-spacing="0.5">FORCE</text>
-
-  <text x="65" y="165" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(-90 65 165)">COORDO</text>
-  <text x="65" y="515" text-anchor="middle" font-size="18" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(-90 65 515)">DYNO</text>
+  <!-- Etiquettes des quatre styles de mur (src/core/stylesBloc.ts), dans la
+       marge de 25 unites entre le bord exterieur et les zones de placement
+       des pastilles (ZONES, generer-carte-demo.mjs) : jamais recouvertes,
+       contrairement a un premier essai centre dans la bande elle-meme. -->
+  <text x="500" y="16" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1">DALLE</text>
+  <text x="988" y="350" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 988 350)">DEVERS</text>
+  <text x="500" y="694" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1">JOKER</text>
+  <text x="13" y="350" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 13 350)">COORDO</text>
 </svg>

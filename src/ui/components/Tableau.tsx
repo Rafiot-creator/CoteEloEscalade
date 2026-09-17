@@ -33,6 +33,14 @@ interface Props<T> {
   colonnes: Colonne<T>[]
   cleLigne: (ligne: T) => string
   triInitial?: { cle: string; sens: 1 | -1 }
+  /**
+   * Tri pilote depuis l'exterieur (ex. changer le style choisi dans l'en-tete
+   * d'une colonne doit aussi retrier le tableau sur cette colonne) : quand
+   * fourni avec `onTri`, remplace l'etat interne comme source de verite. Un
+   * clic sur un en-tete continue de fonctionner, via `onTri`.
+   */
+  tri?: { cle: string; sens: 1 | -1 }
+  onTri?: (tri: { cle: string; sens: 1 | -1 }) => void
   /** Nombre de lignes affichees d'un coup. */
   pageTaille?: number
   videMessage?: string
@@ -50,10 +58,14 @@ export function Tableau<T>({
   colonnes,
   cleLigne,
   triInitial,
+  tri: triPilote,
+  onTri,
   pageTaille = 50,
   videMessage,
 }: Props<T>) {
-  const [tri, setTri] = useState(triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 })
+  const [triInterne, setTriInterne] = useState(triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 })
+  const tri = triPilote ?? triInterne
+  const changerTri = onTri ?? setTriInterne
   const [limite, setLimite] = useState(pageTaille)
   const { montrer, cacher, noeud } = useInfobulle()
   const { langue, t } = useLangue()
@@ -85,7 +97,7 @@ export function Tableau<T>({
                   key={c.cle}
                   className={[c.num ? 'num' : '', c.aide ? 'avec-aide' : ''].filter(Boolean).join(' ') || undefined}
                   onClick={() =>
-                    setTri((t) => (t.cle === c.cle ? { cle: c.cle, sens: (t.sens * -1) as 1 | -1 } : { cle: c.cle, sens: c.num ? -1 : 1 }))
+                    changerTri(tri.cle === c.cle ? { cle: c.cle, sens: (tri.sens * -1) as 1 | -1 } : { cle: c.cle, sens: c.num ? -1 : 1 })
                   }
                   onMouseMove={(e) =>
                     c.aide && montrer(e, { titre: c.titre, texte: c.aide, lignes: [['', t('Cliquer pour trier', 'Click to sort')]] })

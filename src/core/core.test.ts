@@ -626,8 +626,55 @@ describe('cote par style', () => {
     expect(grimpeursVerifies).toBe(ds.grimpeurs.length)
   }, 60_000)
 
-  it('un style jamais affronte par un grimpeur reste exactement a son amorce', async () => {
-    const ds = await dataset()
+  it('un style jamais affronte par un grimpeur reste exactement a son amorce', () => {
+    // Dataset construit a la main (pas le jeu de demonstration) : avec
+    // seulement quatre styles au vocabulaire, un grimpeur qui affronte des
+    // centaines de blocs a toutes les chances de croiser chacun d'eux au
+    // moins une fois, donc plus aucune garantie de trouver ce cas de figure
+    // dans les donnees generees. Ici il est garanti par construction.
+    const grimpeur: Grimpeur = {
+      id: 'g1',
+      nom: 'Grimpeur',
+      sexe: 'X',
+      gymPrincipal: 'Salle',
+      premiereSaison: 2024,
+      niveauDeclare: null,
+    }
+    const blocAffronte: Bloc = {
+      id: 'b1',
+      nom: 'BlocAffronte',
+      gym: 'Salle',
+      secteur: STYLES_BLOC[0],
+      couleur: 'Bleu',
+      cotationOfficielle: 'V5',
+      indexOfficiel: 5,
+      dateOuverture: '2026-01-01',
+      dateRetrait: null,
+    }
+    const blocJamaisAffronte: Bloc = {
+      id: 'b2',
+      nom: 'BlocJamaisAffronte',
+      gym: 'Salle',
+      secteur: STYLES_BLOC[1],
+      couleur: 'Bleu',
+      cotationOfficielle: 'V5',
+      indexOfficiel: 5,
+      dateOuverture: '2026-01-01',
+      dateRetrait: null,
+    }
+    const ds: Dataset = {
+      grimpeurs: [grimpeur],
+      blocs: [blocAffronte, blocJamaisAffronte],
+      ascensions: [ligne(1, 'g1', 'b1', 'reussite')],
+      grimpeurParId: new Map([['g1', grimpeur]]),
+      blocParId: new Map([
+        ['b1', blocAffronte],
+        ['b2', blocJamaisAffronte],
+      ]),
+      fichiers: [],
+      rapport: { anomalies: [], lignesLues: {}, lignesRetenues: {} },
+    }
+
     const elo = FORMULES.find((f) => f.id === 'elo-bloc')!
     const params = normaliserParams(elo.params, {})
     const sortie = elo.calculer(ds, params)
@@ -640,16 +687,11 @@ describe('cote par style', () => {
       params.ratingInitial as number,
       params.amorceGrimpeurs as string
     )
+    const depart = amorces.get('g1')!
+    const parStyle = sortie.parStyle!.get('g1')!
 
-    let trouve = false
-    for (const g of ds.grimpeurs) {
-      const parStyle = sortie.parStyle!.get(g.id)!
-      const styleJamaisAffronte = [...parStyle.values()].find((e) => e.matchs === 0)
-      if (!styleJamaisAffronte) continue
-      expect(styleJamaisAffronte.rating).toBe(amorces.get(g.id))
-      trouve = true
-      break
-    }
-    expect(trouve).toBe(true)
-  }, 60_000)
+    expect(parStyle.get(STYLES_BLOC[0])!.matchs).toBeGreaterThan(0)
+    expect(parStyle.get(STYLES_BLOC[1])!.matchs).toBe(0)
+    expect(parStyle.get(STYLES_BLOC[1])!.rating).toBe(depart)
+  })
 })

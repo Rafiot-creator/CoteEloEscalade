@@ -317,26 +317,57 @@ Tests (64) et build au vert. Pousse (commit `b9db770`), deploiement verifie vert
 **Fin de session du 2026-09-16.** Tout le lot du jour confirme fonctionnel sur telephone par
 Raphael. Une seule demande notee pour la suite, pas codee aujourd'hui : voir ci-dessous.
 
+## État au 2026-09-17
+
+Raphaël a demandé de simplifier le vocabulaire des styles de bloc, de neuf valeurs à quatre :
+**Dalle, Coordo, Dévers, Joker** (`STYLES_BLOC`, `src/core/stylesBloc.ts`), et d'en propager le
+changement partout — Blocs, Grimpeurs, Carte, données — plus la demande laissée en suspens la
+veille : que choisir un style dans le menu déroulant de la colonne "Cote par style" (écran
+Grimpeurs) retrie aussi le tableau. Détail dans le README, § « La cote par style » et
+§ « Cartes disponibles aujourd'hui ».
+
+- `STYLES_BLOC` et le générateur de données (`scripts/generate-data.mjs`, `SECTEURS`) réduits aux
+  quatre valeurs ; `data/blocs.csv` régénéré (`npm run data:generate`) — mêmes 369 blocs/55
+  grimpeurs/18 879 lignes (RNG scellé, seules les étiquettes changent), répartition quasi égale
+  entre les quatre styles (~91-99 blocs chacun).
+- Carte Démo (`public/cartes/demo.svg`, `scripts/generer-carte-demo.mjs`) redessinée à quatre
+  bandes murales (une par style, une par mur) au lieu de neuf ; `data/cartes/demo.json`
+  régénéré. Avec deux fois plus de blocs par zone qu'avant (quatre zones au lieu de neuf pour les
+  mêmes 50 blocs affichés), les bandes latérales (Coordo, Dévers) ne pouvaient plus garantir
+  `SEPARATION_MIN` en une seule colonne de pastilles — élargies de 80 à 95 unités pour permettre
+  deux colonnes ; vérifié programmatiquement (36,5 unités de séparation minimale mesurée sur les
+  50 blocs, au-dessus du seuil de 36). Étiquettes des quatre zones repositionnées dans la marge
+  de 25 unités entre le bord extérieur et la zone de placement des pastilles (jamais recouvertes,
+  contrairement à un premier essai centré dans la bande elle-même, vérifié dans Chrome) — la
+  disposition elle-même reste générée, pas affinée à la main.
+- `core.test.ts`, test « un style jamais affronté par un grimpeur reste exactement à son amorce »
+  : dépendait de trouver ce cas par chance dans le jeu de données généré, ce qui devenait trop
+  improbable avec seulement quatre styles pour des grimpeurs à des centaines de duels chacun (le
+  test échouait après le changement de vocabulaire). Réécrit sur un petit dataset construit à la
+  main (un grimpeur, deux blocs de styles différents, un seul affronté) : garanti par
+  construction plutôt que par chance, et découplé du nombre de styles.
+- **Tri du tableau Classement piloté depuis l'écran** : `Tableau.tsx` accepte désormais des props
+  optionnelles `tri`/`onTri` qui, si fournies, remplacent l'état de tri interne comme source de
+  vérité (un clic sur un en-tête continue de fonctionner, via `onTri`) — les autres usages de
+  `Tableau` (Blocs, Données, Progression) ne les passent pas et gardent leur comportement
+  inchangé. `VueGrimpeurs.tsx` s'en sert pour que choisir un style dans le menu déroulant
+  déclenche aussi `{ cle: 'cote-style', sens: -1 }`, comme un clic sur l'en-tête.
+
+Vérifié dans Chrome (accès complet) : les trois onglets affichent bien Dalle/Coordo/Dévers/Joker,
+la Carte Démo n'a aucun chevauchement ni étiquette masquée, et sélectionner un style dans
+Grimpeurs retrie immédiatement le tableau sur cette colonne (un clic sur "Elo" ensuite retrie
+bien sur Elo, sans casser le mécanisme). Tests (64) et build au vert.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Classer les grimpeurs par force selon le style choisi** (demande explicite de Raphael,
-  2026-09-16, pour la prochaine session) : aujourd'hui, sélectionner un style dans le menu
-  déroulant de la colonne "Cote par style" change les valeurs affichées mais ne retrie pas le
-  tableau — le classement (`classement`, `VueGrimpeurs.tsx`) reste toujours trié sur la formule
-  active (`rang`), et cette colonne n'est pas cliquable pour trier (le `<select>` dans son
-  en-tête intercepte le clic avec `e.stopPropagation()`, précisément pour empêcher le menu
-  d'ouvrir un tri au lieu de dérouler). À concevoir : soit rendre la colonne triable quand même
-  (zone cliquable distincte du `<select>` dans le même en-tête), soit un tri secondaire explicite
-  qui se réactive automatiquement quand un style est choisi.
-- **Retester sur le téléphone** le nouveau libellé/calcul de la colonne "Cote par style"
-  (Mélange au lieu d'Elo) — changement d'affichage seulement, pas de raison de casser quoi que
-  ce soit sur mobile, mais à confirmer comme le reste.
-- **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
-  l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
-  l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main
-  malgré tout, ou la laisser telle quelle si elle convient.
+- **Retester sur le téléphone** le nouveau vocabulaire de style (Blocs/Grimpeurs/Carte) et le tri
+  automatique sur sélection — vérifié dans Chrome bureau seulement à ce stade, pas encore sur un
+  vrai téléphone (cf. les pièges de simulation desktop documentés plus haut dans ce fichier).
+- **Retour sur le nouveau placement des pastilles** de la Carte Démo (quatre zones désormais) —
+  l'algorithme garantit l'absence de chevauchement, mais la disposition reste générée, pas
+  affinée à l'œil. Raphael peut vouloir la retoucher à la main, ou la laisser telle quelle.
 
 Autres pistes en attente si rien de ce qui précède ne ressort : brancher de vraies données sur un
 des centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans

@@ -53,6 +53,11 @@ export function VueGrimpeurs({
   const eloParGrimpeur = useMemo(() => new Map((eloBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [eloBloc])
   const melangeParGrimpeur = useMemo(() => new Map((melangeBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [melangeBloc])
   const [styleSelectionne, setStyleSelectionne] = useState('')
+  // Tri du tableau Classement, pilote depuis ici pour que choisir un style
+  // dans le menu deroulant de la colonne "Cote par style" retrie aussitot le
+  // classement sur cette colonne, sans empecher un clic manuel sur un autre
+  // en-tete (cf. `onTri` sur `Tableau`).
+  const [triClassement, setTriClassement] = useState<{ cle: string; sens: 1 | -1 }>({ cle: 'rang', sens: 1 })
 
   // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
   const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
@@ -180,7 +185,10 @@ export function VueGrimpeurs({
             titreRendu: () => (
               <select
                 value={styleSelectionne}
-                onChange={(e) => setStyleSelectionne(e.currentTarget.value)}
+                onChange={(e) => {
+                  setStyleSelectionne(e.currentTarget.value)
+                  setTriClassement({ cle: 'cote-style', sens: -1 })
+                }}
                 onClick={(e) => e.stopPropagation()}
                 // La table a `width: 100%` (styles.css) : sans min-width, le
                 // moteur de mise en page auto des tableaux comprime cette
@@ -308,7 +316,14 @@ export function VueGrimpeurs({
           "The calculated level is the V grade the climber sends half the time. Both formulas' ratings are shown side by side; the one in bold is the active formula."
         )}
       >
-        <Tableau lignes={classement} colonnes={colonnes} cleLigne={(g) => g.id} triInitial={{ cle: 'rang', sens: 1 }} pageTaille={25} />
+        <Tableau
+          lignes={classement}
+          colonnes={colonnes}
+          cleLigne={(g) => g.id}
+          tri={triClassement}
+          onTri={setTriClassement}
+          pageTaille={25}
+        />
       </Carte>
 
       <Carte

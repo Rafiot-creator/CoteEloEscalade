@@ -20,16 +20,17 @@ const COULEUR_PAR_NOM = { Bleu: 'bleu', Vert: 'vert', Jaune: 'jaune', Rouge: 'ro
 // les deux pour ne jamais empieter sur un coin deja couvert par l'autre axe
 // (sans quoi deux zones "voisines" au coin pourraient y placer des pastilles
 // l'une sur l'autre).
+// Les bandes laterales (Coordo, Devers) sont plus larges que les huit
+// anciennes (80 -> 95 unites) : avec seulement quatre zones au lieu de neuf,
+// chacune recoit environ deux fois plus de blocs (une douzaine plutot qu'une
+// demi-douzaine), et une bande etroite en une seule colonne ne suffit plus a
+// garder SEPARATION_MIN sur toute sa longueur. Elargir permet a la grille de
+// passer a deux colonnes, ce qui suffit (verifie programmatiquement).
 const ZONES = {
-  'Dalle/pied': { x0: 25, x1: 308, y0: 25, y1: 105 },
-  'Dalle/force': { x0: 358, x1: 642, y0: 25, y1: 105 },
-  'Dalle/doigts': { x0: 692, x1: 975, y0: 25, y1: 105 },
-  'Dévers/force': { x0: 895, x1: 975, y0: 105, y1: 345 },
-  'Dévers/doigts': { x0: 895, x1: 975, y0: 355, y1: 595 },
-  'Technique/force': { x0: 525, x1: 975, y0: 595, y1: 675 },
-  'Technique/doigt': { x0: 25, x1: 475, y0: 595, y1: 675 },
-  Dyno: { x0: 25, x1: 105, y0: 355, y1: 595 },
-  Coordo: { x0: 25, x1: 105, y0: 105, y1: 345 },
+  Dalle: { x0: 25, x1: 975, y0: 25, y1: 105 },
+  Dévers: { x0: 880, x1: 975, y0: 105, y1: 595 },
+  Joker: { x0: 25, x1: 975, y0: 595, y1: 675 },
+  Coordo: { x0: 25, x1: 120, y0: 105, y1: 595 },
 }
 const LARGEUR = 1000
 const HAUTEUR = 700

@@ -9,17 +9,7 @@
  * compter dans la cote globale, mais n'apparait dans aucune ventilation par
  * style.
  */
-export const STYLES_BLOC = [
-  'Dalle/pied',
-  'Dalle/force',
-  'Dalle/doigts',
-  'Coordo',
-  'Dyno',
-  'Technique/force',
-  'Technique/doigt',
-  'Dévers/force',
-  'Dévers/doigts',
-] as const
+export const STYLES_BLOC = ['Dalle', 'Coordo', 'Dévers', 'Joker'] as const
 
 export type StyleBloc = (typeof STYLES_BLOC)[number]
 

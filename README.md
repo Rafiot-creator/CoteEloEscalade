@@ -906,14 +906,14 @@ distingue pas flash/réussi/échec.
 
 ### Cartes disponibles aujourd'hui
 
-- **Démo** — un plan inventé (`public/cartes/demo.svg`), neuf bandes murales reprenant les neuf
-  styles du jeu de données (`src/core/stylesBloc.ts` — Dalle/pied, Dalle/force, Dalle/doigts,
-  Coordo, Dyno, Technique/force, Technique/doigt, Dévers/force, Dévers/doigts ; huit bandes
-  géométriques jusqu'au 16 septembre 2026). 50 blocs y sont placés, un échantillon proportionnel
-  par style (méthode du plus grand reste, `scripts/generer-carte-demo.mjs`) tiré des 369 du jeu
-  de démonstration pour rester lisible ; les positions ont ensuite été affinées à la main dans
-  l'interface puis réexportées — perdues lors du passage à neuf styles (les zones ne se
-  correspondent pas d'une taxonomie à l'autre), donc à raffiner de nouveau.
+- **Démo** — un plan inventé (`public/cartes/demo.svg`), quatre bandes murales reprenant les
+  quatre styles du jeu de données (`src/core/stylesBloc.ts` — Dalle, Coordo, Dévers, Joker ;
+  neuf bandes plus fines du 16 au 17 septembre 2026, huit avant ça). 50 blocs y sont placés, un
+  échantillon proportionnel par style (méthode du plus grand reste,
+  `scripts/generer-carte-demo.mjs`) tiré des 369 du jeu de démonstration pour rester lisible ; les
+  positions sont générées, pas affinées à la main (chaque changement de taxonomie du style a
+  jusqu'ici invalidé tout affinage précédent — les zones ne se correspondent pas d'une
+  taxonomie à l'autre).
 - **Rose Bloc 1** — une vraie photo du plan de la salle (`public/cartes/rose-bloc-1.jpg`),
   fournie par Raphaël et nettoyée des dates griffonnées au crayon (masquage colorimétrique +
   interpolation), sans bloc positionné pour l'instant.
@@ -922,18 +922,24 @@ distingue pas flash/réussi/échec.
 
 ## La cote par style
 
-Un bloc a un **style** (`secteur` dans les données, colonne « Style » à l'affichage) : depuis le
-16 septembre 2026, un vocabulaire contrôlé de neuf valeurs déclaré dans `src/core/stylesBloc.ts`
-— Dalle/pied, Dalle/force, Dalle/doigts, Coordo, Dyno, Technique/force, Technique/doigt,
-Dévers/force, Dévers/doigts. Une valeur hors de cette liste n'est pas rejetée au chargement,
-juste signalée en avertissement (écran **Fichiers**) : elle continue de compter dans la cote
-globale, mais n'apparaît dans aucune ventilation par style.
+Un bloc a un **style** (`secteur` dans les données, colonne « Style » à l'affichage) : un
+vocabulaire contrôlé déclaré dans `src/core/stylesBloc.ts` — Dalle, Coordo, Dévers, Joker depuis
+le 17 septembre 2026 (neuf valeurs plus fines du 16 au 17 septembre, huit avant ça — voir
+DECISIONS.md pour l'historique si besoin). Une valeur hors de cette liste n'est pas rejetée au
+chargement, juste signalée en avertissement (écran **Fichiers**) : elle continue de compter dans
+la cote globale, mais n'apparaît dans aucune ventilation par style.
 
 L'écran **Grimpeurs** affiche cette cote **par style** en plus de la cote globale : un menu
 déroulant en haut de la colonne dédiée du tableau **Classement**, à côté d'« Elo »/« Glicko »/
-« Mélange », propose « Cote globale (Mélange) » ou l'un des neuf styles — la colonne bascule
-alors pour montrer, pour chaque grimpeur du classement, sa cote *pour ce style précis* (tiret
-s'il ne l'a jamais affronté).
+« Mélange », propose « Cote globale (Mélange) » ou l'un des styles — la colonne bascule alors
+pour montrer, pour chaque grimpeur du classement, sa cote *pour ce style précis* (tiret s'il ne
+l'a jamais affronté). Choisir une valeur dans ce menu retrie aussitôt le tableau sur cette
+colonne (descendant), comme si on avait cliqué son en-tête — demande de Raphaël du 17 septembre
+2026, pour voir directement qui domine un style sans devoir cliquer une deuxième fois. Le tri du
+tableau **Classement** est piloté depuis `VueGrimpeurs.tsx` (`triClassement`/`setTriClassement`,
+passés à `Tableau` via ses props optionnelles `tri`/`onTri`) plutôt que laissé à l'état interne
+par défaut de `Tableau` : un clic sur un autre en-tête continue de fonctionner normalement,
+puisqu'il passe par le même callback.
 
 Le calcul par style lui-même n'existe que pour Elo bloc (voir plus bas), mais l'affichage est
 calé sur **Mélange** — la cote de référence utilisée partout ailleurs sur cet écran — plutôt que
@@ -976,9 +982,9 @@ une fois que la colonne s'applique à tout le classement trié. Comparer visuell
 
 **Le champ `style` de l'écran Carte est un système différent et non lié.** `BlocCarte.style`
 (`src/core/cartes/types.ts`) reste un texte libre, décoratif, sans effet sur aucun calcul, mais
-la valeur affichée pour le jeu de données Démo suit désormais le même vocabulaire à neuf valeurs
-que le calcul (voir « Cartes disponibles aujourd'hui » ci-dessus) — rien n'empêche d'y taper un
-nom fantaisiste (« Bat Cave ») comme avant, le champ reste libre.
+la valeur affichée pour le jeu de données Démo suit désormais le même vocabulaire que le calcul
+(voir « Cartes disponibles aujourd'hui » ci-dessus) — rien n'empêche d'y taper un nom fantaisiste
+(« Bat Cave ») comme avant, le champ reste libre.
 
 ## Site bilingue (français / anglais)
 
@@ -1464,3 +1470,52 @@ fait accompli.
   valeurs affichées mais ne retrie pas le tableau, et la colonne n'est pas cliquable pour trier
   (le `<select>` dans son en-tête intercepte le clic exprès, pour ne pas déclencher un tri au
   lieu d'ouvrir le menu). Voir `CLAUDE.md`, § « Prochaine étape », pour les pistes envisagées.
+
+### 2026-09-17
+
+- Raphaël a demandé de simplifier le vocabulaire des neuf styles de bloc (introduit la veille) à
+  quatre : **Dalle, Coordo, Dévers, Joker**. `STYLES_BLOC` (`src/core/stylesBloc.ts`) et le
+  générateur de données (`scripts/generate-data.mjs`, tableau `SECTEURS`) mis à jour ;
+  `data/blocs.csv` régénéré — mêmes 369 blocs, 55 grimpeurs et 18 879 lignes qu'avant (le RNG est
+  scellé sur une graine fixe, seules les étiquettes de style changent), répartis presque
+  également entre les quatre styles (91 à 99 blocs chacun, contre une quarantaine par style avec
+  l'ancien vocabulaire à neuf).
+- Carte Démo (`public/cartes/demo.svg`, `scripts/generer-carte-demo.mjs`) redessinée à quatre
+  bandes murales — une par style, une par mur — au lieu de neuf, et `data/cartes/demo.json`
+  régénéré. Un effet de bord géométrique inattendu : avec seulement quatre zones pour les mêmes
+  50 blocs affichés, chacune en reçoit environ deux fois plus qu'avant (une douzaine plutôt
+  qu'une demi-douzaine), et les deux bandes latérales (Coordo, Dévers — 80 unités de large,
+  contre environ 950 pour les bandes du haut et du bas) ne pouvaient plus aligner cette douzaine de
+  pastilles en une seule colonne sans passer sous `SEPARATION_MIN` (36 unités) : 33,5 mesurées
+  après une première régénération. Élargies de 80 à 95 unités (`ZONES` dans
+  `generer-carte-demo.mjs`), ce qui suffit à faire basculer la grille automatique sur deux
+  colonnes au lieu d'une : 36,5 unités de séparation minimale mesurée après coup sur les 50
+  blocs, au-dessus du seuil. Les étiquettes des quatre zones (« DALLE », « JOKER »...), posées au
+  centre de chaque bande dans un premier essai, se sont révélées partiellement recouvertes par
+  des pastilles une fois affichées dans Chrome — déplacées dans la marge de 25 unités entre le
+  bord extérieur du plan et la zone de placement des pastilles, où aucune pastille ne peut
+  jamais atterrir ; revérifié dans Chrome, plus aucun chevauchement.
+- `core.test.ts`, test « un style jamais affronté par un grimpeur reste exactement à son amorce »
+  (ajouté le 16 septembre) : échouait après ce changement — il cherchait ce cas de figure par
+  hasard dans le jeu de données généré, ce qui devient trop improbable quand il n'y a plus que
+  quatre styles pour des grimpeurs qui affrontent chacun des centaines de blocs (chacun finit
+  presque toujours par croiser les quatre). Réécrit sur un petit dataset construit à la main (un
+  grimpeur, deux blocs de styles différents, un seul réellement affronté) : le cas est garanti
+  par construction plutôt que par chance, et le test ne dépend plus du nombre de styles déclarés.
+- Raphaël a aussi demandé que choisir un style dans le menu déroulant de la colonne « Cote par
+  style » (demande laissée en suspens le 16 septembre, voir ci-dessus) retrie aussitôt le tableau
+  **Classement** sur cette colonne, sans avoir à cliquer une deuxième fois sur son en-tête.
+  `Tableau.tsx` gérait jusqu'ici son tri entièrement en interne (`useState`, jamais piloté de
+  l'extérieur) : ajout de deux props optionnelles, `tri` et `onTri`, qui quand elles sont fournies
+  remplacent l'état interne comme source de vérité — un clic sur un en-tête continue de
+  fonctionner normalement, en passant par `onTri` plutôt que par le `setState` interne. Les
+  autres usages de `Tableau` (Blocs, Données, la vue tabulaire de Progression) ne passent pas ces
+  props et gardent leur comportement inchangé. `VueGrimpeurs.tsx` lève l'état de tri
+  (`triClassement`/`setTriClassement`) et le passe à `Tableau`, et le gestionnaire `onChange` du
+  menu déroulant de style pousse désormais `{ cle: 'cote-style', sens: -1 }` en plus de mettre à
+  jour le style choisi.
+- Vérifié dans Chrome (accès complet) : Blocs/Grimpeurs/Carte affichent bien Dalle/Coordo/Dévers/
+  Joker, la Carte Démo n'a ni chevauchement ni étiquette masquée, et choisir un style dans
+  Grimpeurs retrie immédiatement le tableau sur la bonne colonne (cliquer ensuite sur l'en-tête
+  « Elo » retrie bien sur Elo, sans que le mécanisme de tri piloté ne s'en trouve cassé). Tests
+  (64) et build au vert.
