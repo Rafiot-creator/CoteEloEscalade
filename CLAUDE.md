@@ -296,14 +296,31 @@ sans toucher aux autres colonnes ni aux autres tableaux du site. Verifie via le 
 retreci a 360px programmatiquement) : le tableau deborde bien et le `<select>` garde ses 160px
 pleins.
 
+Tests (64) et build au vert. Pousse (commit `9b780e5`), deploiement verifie vert.
+
+Raphael a confirme : « ça fonctionne sur téléphone ». Puis remarque de fond (pas un bug) : la
+colonne "Cote par style" montrait toujours Elo brut, meme pour l'option "Cote globale", alors
+que Melange est la cote de reference affichee partout ailleurs sur cet ecran. Rebati sur Melange
+plutot que sur Elo, entierement cote UI (`VueGrimpeurs.tsx`), rien touche au coeur de calcul :
+
+- Option "Cote globale" : montre desormais la cote Melange du grimpeur (au lieu d'Elo).
+- Un style choisi : `cote_melange_globale + (cote_style_elo - cote_globale_elo)` — le calcul par
+  style reste base sur Elo (seule formule qui l'a, Glicko n'ayant pas de trajectoire par duel a
+  observer), mais recale sur Melange pour rester coherent avec le reste de l'ecran plutot que de
+  montrer une echelle differente. Explicitement documente comme une approximation (pas une vraie
+  cote Melange par style), discute et valide avec Raphael avant de coder.
+
+Verifie visuellement (l'option "globale" correspond pile a la colonne Melange) et par le calcul
+(Victor Bergeron, Dalle/pied : Elo 7570 → 6421 soit -1149 ; Melange 7851 → 6702, le meme -1149).
 Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** le menu déroulant de style (Grimpeurs) — la carte (contours,
-  liseré, popup, reclic) est déjà confirmée bonne par Raphael.
+- **Retester sur le téléphone** le nouveau libellé/calcul de la colonne "Cote par style"
+  (Mélange au lieu d'Elo) — changement d'affichage seulement, pas de raison de casser quoi que
+  ce soit sur mobile, mais à confirmer comme le reste.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
   l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
   l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main

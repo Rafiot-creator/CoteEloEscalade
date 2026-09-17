@@ -40,9 +40,18 @@ export function VueGrimpeurs({
   }, [resultats])
 
   // La ventilation par style vient toujours d'Elo bloc (cf. `elo-bloc.ts`),
-  // quelle que soit la formule active a l'ecran : Glicko ne la calcule pas.
+  // quelle que soit la formule active a l'ecran : Glicko ne la calcule pas
+  // (mise a jour bayesienne par periode, pas mouvement par mouvement, rien a
+  // observer de la meme facon), et Melange n'est qu'une moyenne des deux
+  // apres coup, sans trajectoire propre. La colonne affiche donc Melange —
+  // la cote de reference partout ailleurs dans l'ecran — recalee du meme
+  // ecart relatif qu'Elo a mesure pour le style : pas une vraie cote
+  // Melange par style (Glicko n'y contribue pas), mais coherente avec la
+  // cote a laquelle on se fie, plutot que de montrer Elo seul.
   const eloBloc = resultats.get('elo-bloc')
+  const melangeBloc = resultats.get('melange')
   const eloParGrimpeur = useMemo(() => new Map((eloBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [eloBloc])
+  const melangeParGrimpeur = useMemo(() => new Map((melangeBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [melangeBloc])
   const [styleSelectionne, setStyleSelectionne] = useState('')
 
   // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
@@ -163,7 +172,7 @@ export function VueGrimpeurs({
         return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
       },
     })),
-    ...(eloBloc
+    ...(eloBloc && melangeBloc
       ? [
           {
             cle: 'cote-style',
@@ -183,7 +192,7 @@ export function VueGrimpeurs({
                 // plutot que d'ecraser ce select.
                 style={{ font: 'inherit', fontWeight: 400, minWidth: 160 }}
               >
-                <option value="">{t('Cote globale (Elo)', 'Overall rating (Elo)')}</option>
+                <option value="">{t('Cote globale (Mélange)', 'Overall rating (Blend)')}</option>
                 {STYLES_BLOC.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -193,23 +202,26 @@ export function VueGrimpeurs({
             ),
             num: true,
             aide: t(
-              "Cote Elo bloc (toujours cette formule) pour le style choisi dans le menu déroulant ; « Cote globale » montre sa cote Elo habituelle. Chaque style démarre à la cote globale du grimpeur et ne bouge qu'aux duels de ce style-là — comparez à la colonne « Elo » pour voir l'écart. Tiret si le grimpeur n'a jamais affronté ce style.",
-              "Elo boulder rating (always this formula) for the style chosen in the dropdown; “Overall rating” shows their usual Elo rating. Each style starts at the climber's overall rating and only moves on duels of that style — compare against the “Elo” column to see the gap. Dash if the climber never faced that style."
+              "Cote Mélange (toujours cette formule, la référence utilisée partout ailleurs dans cet écran) pour le style choisi dans le menu déroulant. Le calcul par style n'existe que pour Elo bloc (Glicko ne s'y prête pas) : chaque style affiché ici est donc la cote Mélange globale du grimpeur, décalée du même écart qu'Elo a mesuré pour ce style-là — pas une cote Mélange indépendante, mais cohérente avec la cote affichée ailleurs. Tiret si le grimpeur n'a jamais affronté ce style.",
+              "Blend rating (always this formula, the reference used everywhere else on this screen) for the style chosen in the dropdown. The per-style breakdown only exists for Elo boulder (Glicko doesn't lend itself to it): each style shown here is therefore the climber's overall Blend rating, shifted by the same gap Elo measured for that style — not an independent Blend rating, but consistent with the rating shown elsewhere. Dash if the climber never faced that style."
             ),
             valeur: (g: LigneGrimpeur) => {
-              const ligne = eloParGrimpeur.get(g.id)
-              if (!ligne) return null
-              if (!styleSelectionne) return ligne.rating
-              const e = ligne.stylesGrimpeur?.[styleSelectionne]
-              return e && e.matchs > 0 ? e.rating : null
+              const ligneMelange = melangeParGrimpeur.get(g.id)
+              if (!ligneMelange) return null
+              if (!styleSelectionne) return ligneMelange.rating
+              const ligneElo = eloParGrimpeur.get(g.id)
+              const e = ligneElo?.stylesGrimpeur?.[styleSelectionne]
+              if (!ligneElo || !e || e.matchs === 0) return null
+              return ligneMelange.rating + (e.rating - ligneElo.rating)
             },
             rendu: (g: LigneGrimpeur) => {
-              const ligne = eloParGrimpeur.get(g.id)
-              if (!ligne) return <span className="discret">—</span>
-              if (!styleSelectionne) return <span>{nombre(ligne.rating)}</span>
-              const e = ligne.stylesGrimpeur?.[styleSelectionne]
-              if (!e || e.matchs === 0) return <span className="discret">—</span>
-              return <span>{nombre(e.rating)}</span>
+              const ligneMelange = melangeParGrimpeur.get(g.id)
+              if (!ligneMelange) return <span className="discret">—</span>
+              if (!styleSelectionne) return <span>{nombre(ligneMelange.rating)}</span>
+              const ligneElo = eloParGrimpeur.get(g.id)
+              const e = ligneElo?.stylesGrimpeur?.[styleSelectionne]
+              if (!ligneElo || !e || e.matchs === 0) return <span className="discret">—</span>
+              return <span>{nombre(ligneMelange.rating + (e.rating - ligneElo.rating))}</span>
             },
           },
         ]

@@ -931,37 +931,48 @@ globale, mais n'apparaît dans aucune ventilation par style.
 
 L'écran **Grimpeurs** affiche cette cote **par style** en plus de la cote globale : un menu
 déroulant en haut de la colonne dédiée du tableau **Classement**, à côté d'« Elo »/« Glicko »/
-« Mélange », propose « Cote globale (Elo) » ou l'un des neuf styles — la colonne bascule alors
-pour montrer, pour chaque grimpeur du classement, sa cote Elo bloc *pour ce style précis*
-(tiret s'il ne l'a jamais affronté). Se compare directement à la colonne « Elo » juste à côté :
-un grimpeur à 7570 en Elo qui tombe à 6421 en Dalle/pied y est sensiblement plus faible que sa
-moyenne. Le principe, choisi pour une garantie précise — **aucun effet sur les cotes globales
-des blocs ni des grimpeurs** :
+« Mélange », propose « Cote globale (Mélange) » ou l'un des neuf styles — la colonne bascule
+alors pour montrer, pour chaque grimpeur du classement, sa cote *pour ce style précis* (tiret
+s'il ne l'a jamais affronté).
 
-- Chaque style démarre au même point que la cote globale du grimpeur (l'amorce).
-- Chaque fois que la cote globale du grimpeur bouge suite à un duel, exactement le même
+Le calcul par style lui-même n'existe que pour Elo bloc (voir plus bas), mais l'affichage est
+calé sur **Mélange** — la cote de référence utilisée partout ailleurs sur cet écran — plutôt que
+d'afficher Elo brut : « Cote globale » montre la cote Mélange habituelle du grimpeur, et chaque
+style affiché est cette même cote Mélange, **décalée du même écart relatif qu'Elo a mesuré pour
+ce style** (`cote_mélange + (cote_style_elo − cote_globale_elo)`). Ce n'est pas une cote Mélange
+par style indépendante — Glicko ne contribue à aucun des deux termes du décalage — mais elle
+reste cohérente avec le nombre affiché ailleurs sur l'écran, plutôt que de faire cohabiter deux
+échelles différentes dans le même tableau. Demande de Raphaël : la première version affichait
+Elo brut pour les deux, ce qui faisait deux fois la même comparaison qu'avec la colonne « Elo »
+juste à côté, sans jamais toucher à Mélange.
+
+Le principe du calcul lui-même, choisi pour une garantie précise — **aucun effet sur les cotes
+globales des blocs ni des grimpeurs, d'aucune formule** :
+
+- Chaque style démarre au même point que la cote globale Elo du grimpeur (l'amorce).
+- Chaque fois que la cote globale Elo du grimpeur bouge suite à un duel, exactement le même
   mouvement est appliqué à la cote du style du bloc affronté — sans jamais influencer la cote
-  globale en retour, ni celle du bloc.
+  globale en retour, ni celle du bloc, ni aucune autre formule.
 - Un style jamais affronté reste exactement à l'amorce.
 
 Concrètement, `moteurElo` (`src/core/formulas/lib.ts`) expose un callback optionnel
 (`observateurGrimpeur`) appelé aux deux endroits où il fait bouger la cote d'un grimpeur ; sans
 lui, le calcul est strictement identique à avant (aucune autre formule ne le fournit). Seul
-`elo-bloc.ts` le branche, pour construire cette ventilation en parallèle du calcul normal. C'est
-aussi pourquoi la cote par style vient **toujours d'Elo bloc**, quelle que soit la formule
-affichée par ailleurs sur l'écran — Glicko ne la calcule pas, et la dupliquer pour Glicko n'a
-pas semblé justifié pour un diagnostic secondaire.
+`elo-bloc.ts` le branche, pour construire cette ventilation en parallèle du calcul normal. Le
+recalage sur Mélange (formule ci-dessus) se fait entièrement dans l'écran — `VueGrimpeurs.tsx`
+lit `resultats.get('elo-bloc')` pour le décalage et `resultats.get('melange')` pour la base,
+tous deux déjà calculés — sans toucher au cœur de calcul.
 
-Conséquence vérifiable : la somme des mouvements de tous les styles d'un grimpeur reconstitue
-exactement le mouvement de sa cote globale. `core.test.ts`, describe « cote par style », vérifie
-cette identité plutôt que de la supposer.
+Conséquence vérifiable sur le calcul Elo lui-même : la somme des mouvements de tous les styles
+d'un grimpeur reconstitue exactement le mouvement de sa cote globale. `core.test.ts`, describe
+« cote par style », vérifie cette identité plutôt que de la supposer.
 
-La colonne n'affiche que la cote brute (pas d'écart calculé ni de badge) : une première version
+La colonne n'affiche que la cote (pas d'écart calculé ni de badge) : une première version
 montrait un badge coloré avec l'écart à la cote globale à côté de la cotation V du style, mais
 ça n'avait de sens que pour un petit nombre de grimpeurs choisis à la main — mauvais compromis
 une fois que la colonne s'applique à tout le classement trié. Comparer visuellement à la colonne
-« Elo » d'à côté suffit, sur le même principe que les colonnes Elo/Glicko/Mélange déjà côte à
-côte.
+« Mélange » d'à côté suffit, sur le même principe que les colonnes Elo/Glicko/Mélange déjà côte
+à côte.
 
 **Le champ `style` de l'écran Carte est un système différent et non lié.** `BlocCarte.style`
 (`src/core/cartes/types.ts`) reste un texte libre, décoratif, sans effet sur aucun calcul, mais
@@ -1438,3 +1449,12 @@ fait accompli.
   ni des autres tableaux du site. Vérifié via le DOM (conteneur rétréci à 360px
   programmatiquement) : le tableau déborde bien (`scrollWidth` 848 > `clientWidth` 360) et le
   `<select>` garde ses 160px pleins plutôt que d'être écrasé.
+- Raphaël a confirmé le menu déroulant réglé sur téléphone, et fait remarquer que la colonne
+  « Cote par style » montrait toujours Elo brut, y compris pour l'option « Cote globale »,
+  alors que Mélange est la cote de référence affichée partout ailleurs sur cet écran. Rebâti sur
+  Mélange plutôt que sur Elo — voir « La cote par style » pour le détail (le calcul reste basé
+  sur Elo, Glicko n'ayant pas de trajectoire par duel à observer ; seul l'affichage se recale
+  sur Mélange, sans toucher au cœur de calcul). Vérifié : l'option « Cote globale » correspond
+  maintenant exactement à la colonne Mélange, et un style choisi reproduit le même écart que
+  celui déjà vérifié sur Elo, simplement reporté sur la base Mélange (ex. Victor Bergeron,
+  Dalle/pied : Elo 7570 → 6421, soit −1149 ; Mélange 7851 → 6702, soit le même −1149).
