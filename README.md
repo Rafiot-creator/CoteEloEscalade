@@ -1354,3 +1354,21 @@ fait accompli.
     d'écran : le popup, grand ouvert, cachait la plupart des pastilles. À revérifier après ce
     correctif — l'anneau lui-même n'a pas été retouché dans ce lot, sa correction précédente
     reste en place (voir plus haut).
+- Raphaël a confirmé le popup corrigé, et envoyé une seconde capture (`Cell site escalade debug
+  2.jpg`) pour l'anneau : du gris débordait bien autour du cercle vert. Pas le bug de l'anneau
+  lui-même — **chaque pastille a son propre halo de 2px** (`boxShadow: '0 0 0 2px
+  var(--bord-fort)'`, dans `VueCarte.tsx`, pour lui donner un contour, sélectionnée ou non).
+  Avant les correctifs de cette carte, l'anneau vert le recouvrait entièrement en le touchant
+  pile (écart nul, le tout premier bug) ; l'écart introduit pour corriger ce bug laissait ce
+  halo — qui a toujours existé, invisible jusque-là — apparaître dans l'espace resté vide.
+  `ECART_ANNEAU` passe de 1 à 2 pour correspondre exactement à ce halo : l'anneau prend le relais
+  pile où le halo gris s'arrête, ni vide ni chevauchement. Vérifié via le DOM : écart réel de
+  l'anneau à la pastille = 2px pile, correspondant au `boxShadow`.
+- Raphaël a aussi demandé que recliquer sur un bloc déjà survolé referme son popup, plutôt que de
+  devoir cliquer ailleurs sur la carte à chaque fois. `ouvrirPopup` (`VueCarte.tsx`) ouvrait
+  toujours, jamais ne basculait, pour une raison précise : sur un appareil avec une souris, le
+  clic suit en pratique un survol qui a déjà ouvert le popup (`onMouseEnter`) — basculer le
+  refermerait aussitôt. Ce risque n'existe que quand le survol existe vraiment
+  (`survolPossible`, `matchMedia('(hover: hover)')`) ; sur tactile, rien ne l'a ouvert avant le
+  tap. Le bascule ne s'applique donc que si `!survolPossible` : retaper le même bloc le referme
+  sur tactile, le comportement « toujours ouvre » reste inchangé à la souris.

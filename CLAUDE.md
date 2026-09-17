@@ -211,16 +211,35 @@ probleme plutot que de deviner une troisieme fois :
   popup, grand ouvert, cachait la plupart des pastilles. Pas retouche dans ce lot — a revoir au
   prochain retour de Raphael.
 
+Tests (64) et build au vert. Pousse (commit `af36292`), deploiement verifie vert.
+
+Raphael a confirme le popup corrige, et envoye une **seconde capture** (`Cell site escalade
+debug 2.jpg`) pour l'anneau : du gris debordait bien autour du cercle vert. Diagnostic : pas un
+bug de l'anneau en soi — **chaque pastille a deja son propre halo de 2px**
+(`boxShadow: '0 0 0 2px var(--bord-fort)'`, deja present avant toute cette histoire, pour donner
+un contour a la pastille). L'anneau vert le recouvrait entierement quand l'ecart etait nul (le
+tout premier bug) ; le corriger a laisse ce halo, jusque-la invisible, apparaitre dans l'espace.
+`ECART_ANNEAU` passe de 1 a 2 pour correspondre exactement a ce halo au lieu d'etre un ecart
+arbitraire : l'anneau prend le relais pile ou le halo s'arrete. Verifie via le DOM (ecart reel de
+l'anneau = 2px pile) et visuellement dans Chrome (zoom sur une pastille "envoyee").
+
+Raphael a aussi demande que recliquer sur un bloc referme son popup plutot que de devoir cliquer
+ailleurs sur la carte. `ouvrirPopup` (`VueCarte.tsx`) ouvrait toujours sans jamais basculer, pour
+une raison precise documentee dans le code : a la souris, le clic suit en pratique un survol qui
+a deja ouvert le popup, basculer le refermerait aussitot. Ce risque n'existe que quand le survol
+existe vraiment (`survolPossible`) ; sur tactile, rien ne l'a ouvert avant le tap. Le bascule ne
+s'applique donc que si `!survolPossible`.
+
 Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** (idéalement les deux utilisés jusqu'ici) : le popup après
-  pinch-zoom en priorité (corrigé sur la base d'une vraie capture d'écran cette fois, pas d'une
-  simulation), le menu déroulant de style, et surtout **revérifier l'anneau vert** — son
-  débordement n'a toujours pas été confirmé ou infirmé sur un vrai appareil après correctif.
+- **Retester sur le téléphone** : l'anneau vert (corrigé à partir d'une vraie capture d'écran
+  cette fois — le vrai bug était le halo de 2px déjà présent sur chaque pastille, révélé par
+  l'écart introduit pour le tout premier correctif) et le rebasculement du popup au reclic.
+  Popup après pinch-zoom et menu déroulant déjà confirmés bons par Raphael.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
   l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
   l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main

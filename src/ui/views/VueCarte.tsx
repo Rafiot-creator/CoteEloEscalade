@@ -157,11 +157,20 @@ export function VueCarte({
   // zero, a toute taille. Un premier correctif avait fait grandir l'ecart
   // avec RAYON, mais ca gonflait l'anneau bien plus que necessaire sur
   // bureau (jusqu'a 30 % de plus que la pastille) et rendait les pastilles
-  // "envoyees" visiblement plus grosses que les autres. Un petit ecart fixe
-  // suffit : il n'a pas besoin de grandir avec RAYON, juste de ne jamais
-  // retomber a zero.
+  // "envoyees" visiblement plus grosses que les autres.
+  //
+  // Second correctif (ecart fixe de 1px) : parait toujours deborder sur
+  // telephone, en gris. Cause reelle, visible sur une capture d'ecran de
+  // Raphael : chaque pastille a deja son propre halo de 2px (boxShadow
+  // `0 0 0 2px var(--bord-fort)`, plus bas), pour lui donner un contour.
+  // Avant, l'anneau vert le recouvrait entierement en le touchant pile
+  // (ecart nul) ; l'ecart introduit pour corriger le vrai bug laissait ce
+  // halo gris deja existant apparaitre dans l'espace. ECART_ANNEAU doit donc
+  // correspondre exactement a ce halo (2px), pas etre un petit ecart
+  // arbitraire : l'anneau prend le relais pile ou le halo gris s'arrete, ni
+  // vide (gris visible) ni chevauchement.
   const EPAISSEUR_ANNEAU = 1
-  const ECART_ANNEAU = 1
+  const ECART_ANNEAU = 2
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -263,9 +272,15 @@ export function VueCarte({
 
   // Ouvre le popup flash/reussi/echec au clic (plutot qu'au seul survol) :
   // necessaire des qu'il n'y a pas de souris pour survoler, par ex. sur une
-  // tablette en salle. Toujours "ouvre" plutot que "bascule" : le clic suit
-  // en pratique un survol qui a deja mis `survole` a cet id, un bascule le
-  // refermerait aussitot.
+  // tablette en salle.
+  //
+  // Sur un appareil qui peut vraiment survoler (souris), toujours "ouvre"
+  // plutot que "bascule" : le clic suit en pratique un survol qui a deja mis
+  // `survole` a cet id, un bascule le refermerait aussitot. Sur tactile en
+  // revanche (`survolPossible` faux, pas de survol du tout), rien ne l'a
+  // ouvert avant le tap : re-taper le meme bloc peut donc bien le refermer,
+  // demande de Raphael pour ne pas devoir taper ailleurs sur la carte a
+  // chaque fois.
   //
   // Le popup ne se ferme PAS en quittant la pastille au survol (pas de
   // onMouseLeave) : entre la pastille et le popup se trouve quelques pixels
@@ -275,7 +290,7 @@ export function VueCarte({
   // ouvert jusqu'a survoler un autre bloc (qui prend sa place) ou cliquer le
   // fond de la carte (cf. `ajouter`).
   const ouvrirPopup = (id: string) => {
-    setSurvole(id)
+    setSurvole((s) => (!survolPossible && s === id ? null : id))
   }
 
   const enregistrer = (id: string, type: TypeEnvoi) => (e: React.MouseEvent) => {
