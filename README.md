@@ -1385,3 +1385,23 @@ fait accompli.
   contour a toujours été strictement à l'extérieur de la pastille (`box-shadow` ne peut pas
   déborder à l'intérieur). Vérifié via le DOM (l'anneau séparé n'existe plus, 0 `<span>` enfant
   sur une pastille envoyée) et visuellement dans Chrome.
+- Raphaël, en retestant, a signalé « visuellement identique » — inattendu, puisque le mécanisme
+  avait changé. Deux précisions ont permis de trouver la vraie cause :
+  - Le contour gris est visible sur **toutes** les pastilles, même sur PC (juste plus fin) :
+    rien à voir avec les correctifs précédents, c'est le contour (`boxShadow`) que chaque
+    pastille a toujours eu. Sa vraie particularité, jamais corrigée jusque-là : il était fixe à
+    2px, comme l'était l'ancien anneau « envoyé » avant sa toute première correction, alors que
+    la pastille elle-même rétrécit avec `RAYON`. Mêmes 2px, proportionnellement bien plus épais
+    sur une petite pastille de téléphone que sur une grosse pastille de bureau — exactement le
+    même piège que `RAYON` et la taille de police suivent déjà en se calculant depuis la largeur
+    de la carte. Une constante `EPAISSEUR_CONTOUR` (`Math.max(1, Math.round(RAYON * 0.1))`)
+    remplace le 2px fixe : 2px à `RAYON` = 20 (bureau, inchangé), 1px à `RAYON` = 5 (téléphone).
+  - Le cercle vert qui « empiète sur le chiffre » n'était pas l'anneau « envoyé » (`fait`,
+    corrigé à plusieurs reprises ci-dessus, jamais fautif) mais **l'autre** liseré : celui des
+    blocs jamais essayés (`nonEssaye`), volontairement posé à l'intérieur du bord de la pastille
+    (`inset: 0`, § « Pastilles, survol et popup »). Sa bordure de 2px, elle aussi jamais rendue
+    proportionnelle, mangeait une grande partie du rayon d'une petite pastille de téléphone — le
+    vrai bug derrière chaque capture d'écran de Raphaël depuis le début, sur une piste que les
+    quatre correctifs précédents n'avaient jamais empruntée. Passée à `EPAISSEUR_CONTOUR`
+    elle aussi. Vérifié via le DOM : 1px à `RAYON` = 5 (contre 2px avant, sur un rayon de 5px —
+    c'était 40 % du rayon mangé par la seule bordure), 2px à `RAYON` = 20 (bureau, inchangé).

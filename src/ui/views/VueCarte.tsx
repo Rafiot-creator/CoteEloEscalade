@@ -149,6 +149,16 @@ export function VueCarte({
   // compte le plus) — la legende (V-grade) reste lisible via son propre
   // minimum de police, decouple de RAYON.
   const RAYON = Math.round(Math.max(5, Math.min(20, largeurCarte * 0.018)))
+  // Le contour de la pastille (boxShadow plus bas) etait fixe a 2px depuis
+  // toujours, jamais retouche pendant les correctifs precedents de l'anneau
+  // "envoye" — la cause reelle du "debordement" signale par Raphael sur
+  // telephone : ces memes 2px, fixes, deviennent proportionnellement bien
+  // plus epais sur une petite pastille (RAYON au plancher) que sur une
+  // grosse pastille de bureau, exactement comme RAYON et la taille de police
+  // ci-dessous suivent deja la largeur de la carte pour rester coherents a
+  // toute taille. Confirme par Raphael : meme contour visible sur PC, juste
+  // beaucoup plus fin.
+  const EPAISSEUR_CONTOUR = Math.max(1, Math.round(RAYON * 0.1))
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -441,7 +451,7 @@ export function VueCarte({
                       // deux, et empietait par endroits sur le chiffre selon
                       // le navigateur — un seul contour, jamais de
                       // superposition possible, evite les deux).
-                      boxShadow: `0 0 0 2px ${selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
+                      boxShadow: `0 0 0 ${EPAISSEUR_CONTOUR}px ${selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -462,12 +472,22 @@ export function VueCarte({
                       // d'agrandissement de son empreinte sur la carte. Inset a
                       // 0 pile, pas une valeur positive : sinon un fin bord de
                       // la pastille depasse quand meme le cercle par-dessous.
+                      //
+                      // Epaisseur fixe a 2px a l'origine, jamais rendue
+                      // proportionnelle a RAYON (contrairement au contour de
+                      // la pastille plus haut, corrige pour la meme raison) :
+                      // sur une petite pastille de telephone, ces 2px fixes,
+                      // poses a l'interieur, mangeaient une grande partie de
+                      // son rayon — c'etait la vraie cause du "cercle vert qui
+                      // empiete sur le chiffre" signale par Raphael, sur les
+                      // blocs jamais essayes precisement (pas sur les blocs
+                      // envoyes, qui n'ont jamais eu ce liseré).
                       <span
                         style={{
                           position: 'absolute',
                           inset: 0,
                           borderRadius: '50%',
-                          border: '2px solid rgba(12, 163, 12, 0.6)',
+                          border: `${EPAISSEUR_CONTOUR}px solid rgba(12, 163, 12, 0.6)`,
                         }}
                       />
                     )}

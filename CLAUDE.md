@@ -246,15 +246,39 @@ l'element). `EPAISSEUR_ANNEAU`/`ECART_ANNEAU` et le `<span>` associe sont retire
 Verifie via le DOM (0 `<span>` enfant sur une pastille envoyee, `boxShadow` bien vert) et
 visuellement dans Chrome.
 
+Tests (64) et build au vert. Pousse (commit `d2ec96c`), deploiement verifie vert.
+
+Raphael, en retestant : « visuellement identique » — inattendu, le mecanisme avait pourtant
+change. Deux precisions cle de Raphael ont permis de trouver la vraie cause, chacune une fois
+demandee explicitement (pas trouvee seul) :
+
+- Le contour gris est visible sur **toutes** les pastilles, meme sur PC (juste plus fin) — rien
+  a voir avec les correctifs precedents. C'est le contour (`boxShadow`) que chaque pastille a
+  toujours eu, jamais retouche jusque-la : fixe a 2px, comme l'etait l'ancien anneau "envoye"
+  avant sa toute premiere correction, alors que la pastille elle-meme retrecit avec `RAYON` —
+  memes 2px, proportionnellement bien plus epais sur telephone que sur bureau. Constante
+  `EPAISSEUR_CONTOUR` (`Math.max(1, Math.round(RAYON * 0.1))`) : 2px a `RAYON` = 20 (inchange),
+  1px a `RAYON` = 5.
+- Le cercle vert qui "empiete sur le chiffre" n'etait **pas** l'anneau "envoye" (`fait`, corrige
+  a repetition ci-dessus, jamais fautif) mais **l'autre** liseré : celui des blocs jamais
+  essayes (`nonEssaye`), pose volontairement a l'interieur du bord (`inset: 0`). Sa bordure de
+  2px, elle aussi jamais rendue proportionnelle, mangeait jusqu'a 40 % du rayon d'une petite
+  pastille de telephone — le vrai bug derriere chaque capture depuis le debut, sur une piste que
+  les quatre correctifs precedents n'avaient jamais empruntee (ils portaient tous sur `fait`).
+  Passee a `EPAISSEUR_CONTOUR` elle aussi.
+
+Verifie via le DOM aux deux extremes de `RAYON` (5 et 20) et visuellement dans Chrome.
 Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** l'anneau vert (troisième tentative — cette fois en éliminant le
-  risque de superposition plutôt qu'en réajustant des pixels) et le rebasculement du popup au
-  reclic. Popup après pinch-zoom et menu déroulant déjà confirmés bons par Raphael.
+- **Retester sur le téléphone** le contour des pastilles (cinquième tentative sur ce sujet — la
+  vraie cause, une bordure fixe à 2px sur le liseré « jamais essayé », n'a été trouvée qu'après
+  que Raphael a précisé que ce liseré-là était en cause, pas l'anneau « envoyé ») et le
+  rebasculement du popup au reclic. Popup après pinch-zoom et menu déroulant déjà confirmés bons
+  par Raphael.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
   l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
   l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main
