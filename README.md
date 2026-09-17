@@ -782,21 +782,29 @@ pour le grimpeur choisi (« Flash ⚡ » ou « Réussi ✓ » en vert, « Échou
 essayé » en gris), sa cotation affichée suivie de sa cote Elo exacte entre parenthèses (celle
 de la formule mélange, quand ce bloc existe aussi dans le jeu de données d'ascensions), son
 style, et les trois boutons flash (⚡, vert), réussi (✓, jaune), échec (✕, rouge). Ce popup est
-en `position: fixed`, pas relatif à la carte : la zone de carte a `overflow: hidden` pour ne
-pas laisser un bloc glissé déborder du plan, et un popup positionné normalement s'y serait fait
-couper près des bords.
+en `position: absolute`, ancré sur la pastille (donc sur la carte elle-même) plutôt qu'en
+`position: fixed` (relatif à la fenêtre) : un popup fixe ignore le pinch-zoom tactile sur mobile
+— sa taille en pixels CSS ne change pas avec le zoom, alors que la fenêtre visible, elle,
+rétrécit d'autant, si bien qu'il finit par déborder largement de l'écran. Sa position est bornée
+dans les limites de la carte (bascule à gauche de la pastille si la place manque à droite) pour
+ne pas se faire couper près d'un bord, sans avoir besoin d'échapper à l'`overflow: hidden` de la
+zone de carte comme le ferait un `position: fixed`. Sa taille à l'écran, elle, reste constante
+même en zoomant : compensée par un `transform: scale(1 / échelle)` à partir de
+`window.visualViewport.scale` (l'échelle du pinch-zoom courant), pour rester lisible plutôt que
+de grossir avec le contenu qu'il annote.
 
 Un bloc déjà envoyé (flash ou réussi, pas simplement tenté) par le grimpeur choisi se
-reconnaît aussi sans survoler : sa pastille passe en gris (opacité réduite + désaturation) avec
-un liseré vert épais (2 px, `var(--bon)`, juste à l'extérieur de la pastille — `inset: -2`),
-dans les deux niveaux d'accès. À l'inverse, un bloc que ce grimpeur n'a **jamais tenté** (ni
-envoi, ni échec, statut absent de `envoisConnus`) porte un liseré vert plus clair
-(`rgba(12, 163, 12, 0.6)`) qui empiète sur la pastille plutôt que de déborder autour
-(`inset: 0`, pile sur son contour — pas une valeur positive comme `2`, qui laisse un mince
-anneau de la couleur de la pastille visible entre son bord et le cercle vert) : assez épais
-pour être visible, sans agrandir pour autant l'empreinte de la pastille sur une carte déjà
-dense. Un bloc raté (« Échoué ») n'a ni l'un ni l'autre : il a
-bien été tenté, donc pas « jamais essayé », mais pas envoyé non plus.
+reconnaît aussi sans survoler : sa pastille passe en gris (opacité réduite + désaturation
+modérée) avec un contour vert (`var(--bon)`), dans les deux niveaux d'accès. Ce contour est le
+même que celui, gris, que chaque pastille aurait par défaut pour se détacher du fond de carte —
+il devient simplement vert pour ce statut, au lieu d'être un anneau séparé posé par-dessus.
+Deux versions successives d'un anneau séparé (un `<span>` à part, positionné autour de la
+pastille) se sont révélées peu fiables sur téléphone — débordement, halo visible entre les deux
+éléments, empiètement sur le chiffre selon le navigateur — avant que Raphaël ne fasse remarquer
+que ce contour par défaut (gris, présent sur toute pastille non envoyée, même sur PC) n'avait
+lui-même aucune utilité et devait simplement disparaître : retiré. Un bloc jamais tenté ou raté
+n'a donc plus aucune marque distinctive sur la carte — seul le popup au survol/clic dit encore
+« Jamais essayé » ou « Échoué ».
 
 **Ouvrir le popup au clic plutôt qu'au survol.** Le survol seul exclut les appareils sans
 souris (une tablette en salle, justement l'usage visé). En vue visiteur, cliquer un bloc ouvre
@@ -1405,3 +1413,12 @@ fait accompli.
     quatre correctifs précédents n'avaient jamais empruntée. Passée à `EPAISSEUR_CONTOUR`
     elle aussi. Vérifié via le DOM : 1px à `RAYON` = 5 (contre 2px avant, sur un rayon de 5px —
     c'était 40 % du rayon mangé par la seule bordure), 2px à `RAYON` = 20 (bureau, inchangé).
+- Toujours pas résolu après ce cinquième correctif. Raphaël a tranché : retirer les deux plutôt
+  que continuer à ajuster. Le contour gris par défaut (visible sur toute pastille, présent
+  depuis l'origine du projet, jamais lié à aucun statut) est retiré purement et simplement — il
+  n'apportait rien d'utile, seulement un risque de mauvais dosage selon l'appareil. Le liseré
+  « jamais essayé » (`nonEssaye`) est retiré entièrement lui aussi : ces blocs n'ont plus aucune
+  marque sur la pastille (seul le popup dit encore leur statut). Le contour de l'anneau
+  « envoyé » (vert) reste, lui, seul indicateur visuel qui subsiste sur la carte en dehors du
+  popup — confirmé correct par Raphaël dès la première capture d'écran. Voir « Pastilles, survol
+  et popup » pour l'état final.

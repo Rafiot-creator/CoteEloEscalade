@@ -412,7 +412,6 @@ export function VueCarte({
             return carte.blocs.map((b) => {
               const statut = envoisReels.get(b.id)
               const fait = statut === 'flash' || statut === 'reussi' || !!suivi[b.id]
-              const nonEssaye = statut === undefined && !suivi[b.id]
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
               return (
@@ -443,15 +442,25 @@ export function VueCarte({
                       marginTop: -RAYON,
                       borderRadius: '50%',
                       background: fondMetal(b.couleur),
-                      // Le contour de 2px (`0 0 0 2px`) existe pour toutes les
-                      // pastilles ; il devient vert pour signaler "envoye"
-                      // plutot que de superposer un anneau distinct par-dessus
-                      // (retour de Raphael, avec capture d'ecran : cette
-                      // superposition laissait un halo gris visible entre les
-                      // deux, et empietait par endroits sur le chiffre selon
-                      // le navigateur — un seul contour, jamais de
-                      // superposition possible, evite les deux).
-                      boxShadow: `0 0 0 ${EPAISSEUR_CONTOUR}px ${selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : 'var(--bord-fort)'}, 0 1px 4px rgba(0,0,0,0.35), inset -3px -3px 6px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.3)`,
+                      // Contour colore reserve aux etats qui comptent
+                      // (selectionne, envoye) plutot que present par defaut
+                      // sur chaque pastille : Raphael l'a signale comme un
+                      // anneau grisatre genant autour de toutes les
+                      // pastilles, sans utilite pour celles qui n'ont ni
+                      // statut ni selection. Aucun contour ajoute dans ce cas
+                      // (juste l'ombre portee normale plus bas).
+                      boxShadow: [
+                        selection === b.id
+                          ? `0 0 0 ${EPAISSEUR_CONTOUR}px var(--encre)`
+                          : fait
+                            ? `0 0 0 ${EPAISSEUR_CONTOUR}px var(--bon)`
+                            : null,
+                        '0 1px 4px rgba(0,0,0,0.35)',
+                        'inset -3px -3px 6px rgba(0,0,0,0.4)',
+                        'inset 2px 2px 4px rgba(255,255,255,0.3)',
+                      ]
+                        .filter(Boolean)
+                        .join(', '),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -466,31 +475,6 @@ export function VueCarte({
                     }}
                   >
                     {b.cotation.replace(/^V/i, '')}
-                    {nonEssaye && (
-                      // Empiete sur la pastille (inset a 0, pas negatif comme
-                      // l'anneau "envoye") plutot que de deborder autour : pas
-                      // d'agrandissement de son empreinte sur la carte. Inset a
-                      // 0 pile, pas une valeur positive : sinon un fin bord de
-                      // la pastille depasse quand meme le cercle par-dessous.
-                      //
-                      // Epaisseur fixe a 2px a l'origine, jamais rendue
-                      // proportionnelle a RAYON (contrairement au contour de
-                      // la pastille plus haut, corrige pour la meme raison) :
-                      // sur une petite pastille de telephone, ces 2px fixes,
-                      // poses a l'interieur, mangeaient une grande partie de
-                      // son rayon — c'etait la vraie cause du "cercle vert qui
-                      // empiete sur le chiffre" signale par Raphael, sur les
-                      // blocs jamais essayes precisement (pas sur les blocs
-                      // envoyes, qui n'ont jamais eu ce liseré).
-                      <span
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          borderRadius: '50%',
-                          border: `${EPAISSEUR_CONTOUR}px solid rgba(12, 163, 12, 0.6)`,
-                        }}
-                      />
-                    )}
                   </div>
 
                   {survole === b.id && (() => {

@@ -268,15 +268,25 @@ demandee explicitement (pas trouvee seul) :
   Passee a `EPAISSEUR_CONTOUR` elle aussi.
 
 Verifie via le DOM aux deux extremes de `RAYON` (5 et 20) et visuellement dans Chrome.
+Tests (64) et build au vert. Pousse (commit `6a02347`), deploiement verifie vert.
+
+Toujours pas resolu apres ce cinquieme correctif sur le sujet. Raphael a tranche : **retirer les
+deux plutot que continuer a ajuster**. Le contour gris par defaut (visible sur toute pastille,
+present depuis l'origine du projet, jamais lie a aucun statut) est retire purement et
+simplement. Le liseré "jamais essaye" (`nonEssaye`) est retire entierement lui aussi — ces blocs
+n'ont plus aucune marque sur la pastille, seul le popup dit encore leur statut. Le contour de
+l'anneau "envoye" (vert) reste : seul indicateur visuel qui subsiste sur la carte en dehors du
+popup, confirme correct par Raphael des la toute premiere capture d'ecran de cette serie de
+correctifs.
+
 Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** le contour des pastilles (cinquième tentative sur ce sujet — la
-  vraie cause, une bordure fixe à 2px sur le liseré « jamais essayé », n'a été trouvée qu'après
-  que Raphael a précisé que ce liseré-là était en cause, pas l'anneau « envoyé ») et le
+- **Retester sur le téléphone** l'absence de contour par défaut et de liseré « jamais essayé »
+  (retirés plutôt que réparés, après cinq tentatives infructueuses de les ajuster), et le
   rebasculement du popup au reclic. Popup après pinch-zoom et menu déroulant déjà confirmés bons
   par Raphael.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
