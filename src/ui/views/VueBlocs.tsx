@@ -329,11 +329,17 @@ export function VueBlocs({
       <Carte titre={t('Blocs', 'Boulders')}>
         <Tableau
           lignes={affiches}
-          // Vue visiteur : pas de bulle d'aide au survol des en-têtes, ce
-          // texte s'adresse à quelqu'un qui explore le modèle de calcul.
-          colonnes={simplifie ? colonnes.map(({ aide, ...c }) => c) : colonnes}
+          // Vue visiteur : ni Écart ni Duels utiles (des mesures d'audit, pas
+          // d'intérêt pour un visiteur), et pas de bulle d'aide au survol des
+          // en-têtes, ce texte s'adressant à quelqu'un qui explore le modèle
+          // de calcul.
+          colonnes={
+            simplifie
+              ? colonnes.filter((c) => c.cle !== 'ecart' && c.cle !== 'matchs').map(({ aide, ...c }) => c)
+              : colonnes
+          }
           cleLigne={(b) => b.id}
-          triInitial={{ cle: 'ecart', sens: -1 }}
+          triInitial={simplifie ? { cle: 'nom', sens: 1 } : { cle: 'ecart', sens: -1 }}
           pageTaille={25}
         />
       </Carte>

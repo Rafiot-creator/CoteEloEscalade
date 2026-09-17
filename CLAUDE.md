@@ -388,6 +388,14 @@ que si `c.aide` est défini, donc rien à y changer. Le clic pour trier continue
 (indépendant de `aide`). Vérifié dans Chrome : plus de bulle au survol en vue visiteur, toujours
 présente en accès complet. Tests (64) et build au vert.
 
+Puis demandé de retirer, toujours en vue visiteur et sur le même tableau, les colonnes Écart et
+Duels utiles (`cle: 'ecart'`/`'matchs'`) — des mesures d'audit sans intérêt pour un visiteur qui
+ne compare pas les formules. `colonnes.filter(...)` ajouté avant le `.map` qui retire `aide`. Le
+tri initial de la table, réglé sur Écart décroissant, n'a plus de sens une fois la colonne
+masquée (`Tableau` retombe silencieusement sur l'ordre naturel des lignes si la colonne triée
+n'existe pas) : passé au nom du bloc croissant en vue visiteur uniquement, l'accès complet garde
+le tri par écart. Vérifié dans Chrome (accès complet et visiteur). Tests (64) et build au vert.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :

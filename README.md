@@ -1551,3 +1551,8 @@ fait accompli.
   pour trier fonctionne toujours, seule la bulle au survol disparaît. Vérifié dans Chrome que le
   survol d'un en-tête ne montre plus rien en vue visiteur, et montre toujours l'aide en accès
   complet.
+- Retrait des colonnes **Écart** et **Duels utiles** du même tableau, en vue visiteur seulement —
+  des mesures d'audit, pas d'intérêt pour un visiteur qui ne compare pas les formules entre elles.
+  Le tri par défaut de la table passe de l'écart (décroissant, pour mettre en avant les blocs mal
+  cotés — toujours le cas en accès complet) au nom du bloc (croissant) en vue visiteur, puisque la
+  colonne qui servait de tri par défaut n'est plus affichée. Vérifié dans Chrome.
