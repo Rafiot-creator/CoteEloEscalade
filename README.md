@@ -904,6 +904,19 @@ meilleure ascension (voir le journal du 2026-09-15) — se corriger ou changer d
 (nom non reconnu, centre sans dataset) — un repère purement visuel, comme avant, qui ne
 distingue pas flash/réussi/échec.
 
+### Rejoindre un bloc depuis un tableau
+
+Sur tous les écrans qui listent des blocs par leur nom (Blocs, Données, Formules), ce nom est
+cliquable et bascule sur l'onglet Carte en ouvrant le popup de ce bloc précis, comme un clic ou
+un survol l'aurait fait — utile pour situer sur le plan un bloc repéré dans un tableau. `App.tsx`
+porte l'état `blocCible` (l'id du bloc visé) et la fonction `voirBlocSurCarte` qui bascule
+l'onglet et le pose ; `VueCarte` le consomme dans un effet qui ouvre le popup (`setSurvole`) et
+ramène la carte à l'écran (`scrollIntoView`). Comme cette carte n'affiche jamais qu'un
+échantillon des blocs du jeu de données (50 sur 369 pour la Démo), cliquer le nom d'un bloc qui
+n'y figure pas bascule quand même sur l'onglet — cohérent, ça montre le plan — mais n'ouvre
+aucun popup, il n'y a rien à y montrer. Ça marche identiquement en accès complet et en vue
+visiteur.
+
 ### Cartes disponibles aujourd'hui
 
 - **Démo** — un plan inventé (`public/cartes/demo.svg`), quatre bandes murales reprenant les
@@ -1556,3 +1569,12 @@ fait accompli.
   Le tri par défaut de la table passe de l'écart (décroissant, pour mettre en avant les blocs mal
   cotés — toujours le cas en accès complet) au nom du bloc (croissant) en vue visiteur, puisque la
   colonne qui servait de tri par défaut n'est plus affichée. Vérifié dans Chrome.
+- Ajout du **nom de bloc cliquable** dans tous les tableaux qui en listent (Blocs, Données,
+  Formules) : bascule sur l'onglet Carte et ouvre le popup du bloc visé — voir § « Rejoindre un
+  bloc depuis un tableau » plus haut pour le mécanisme (`blocCible`/`voirBlocSurCarte` dans
+  `App.tsx`, consommés par un effet dans `VueCarte`). Classe CSS `.lien-bloc` ajoutée
+  (`styles.css`) pour un texte cliquable discret dans une cellule de tableau, plutôt que
+  `.bouton` (bordure/fond, pensé pour une barre d'outils). Vérifié dans Chrome, accès complet et
+  vue visiteur : un bloc présent sur la carte ouvre son popup et y amène l'écran ; un bloc qui
+  n'y figure pas (la carte n'affiche qu'un échantillon) bascule quand même sur l'onglet, sans
+  popup ni erreur.

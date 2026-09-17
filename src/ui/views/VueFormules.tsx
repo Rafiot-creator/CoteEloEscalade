@@ -13,7 +13,14 @@ import type { Atelier } from '../etat'
  * Toute la colonne de gauche est generee a partir des declarations de la
  * formule choisie : cet ecran ne connait aucune formule en particulier.
  */
-export function VueFormules({ atelier }: { atelier: Atelier }) {
+export function VueFormules({
+  atelier,
+  onVoirBlocSurCarte,
+}: {
+  atelier: Atelier
+  /** Rend un nom de bloc cliquable : bascule sur l'onglet Carte et l'y montre. */
+  onVoirBlocSurCarte?: (blocId: string) => void
+}) {
   const { langue, t } = useLangue()
   const { formule, formules, params, paramsCalibrage, resultat, reference } = atelier
   if (!resultat) return null
@@ -142,7 +149,7 @@ export function VueFormules({ atelier }: { atelier: Atelier }) {
             )}
           </Carte>
 
-          {reference && <Comparaison courant={resultat} reference={reference} />}
+          {reference && <Comparaison courant={resultat} reference={reference} onVoirBlocSurCarte={onVoirBlocSurCarte} />}
         </div>
       </div>
     </div>
@@ -176,7 +183,15 @@ function TuileDiagnostic({ d, precedent }: { d: Diagnostic; precedent?: Diagnost
  * meme voie : ce tableau montre ou ils divergent le plus, ce qui est la seule
  * facon honnete de juger si un parametre "change quelque chose".
  */
-function Comparaison({ courant, reference }: { courant: Resultat; reference: { resultat: Resultat; etiquette: string } }) {
+function Comparaison({
+  courant,
+  reference,
+  onVoirBlocSurCarte,
+}: {
+  courant: Resultat
+  reference: { resultat: Resultat; etiquette: string }
+  onVoirBlocSurCarte?: (blocId: string) => void
+}) {
   const { t } = useLangue()
   const parId = new Map(reference.resultat.blocs.map((b) => [b.id, b]))
   const divergences = courant.blocs
@@ -225,7 +240,15 @@ function Comparaison({ courant, reference }: { courant: Resultat; reference: { r
           <tbody>
             {divergences.slice(0, 12).map((d) => (
               <tr key={d.v.id}>
-                <td className="principal">{d.v.nom}</td>
+                <td className="principal">
+                  {onVoirBlocSurCarte ? (
+                    <button className="lien-bloc" onClick={() => onVoirBlocSurCarte(d.v.id)}>
+                      {d.v.nom}
+                    </button>
+                  ) : (
+                    d.v.nom
+                  )}
+                </td>
                 <td>{d.v.cotationOfficielle}</td>
                 <td>{d.avant.cotationCalculee}</td>
                 <td>{d.v.cotationCalculee}</td>

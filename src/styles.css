@@ -296,6 +296,24 @@ table.donnees tbody tr:hover { background: var(--plan-creux); }
 table.donnees td.principal { font-weight: 500; }
 .tri { color: var(--encre-3); margin-left: 3px; }
 
+/* Nom de bloc cliquable dans un tableau : renvoie vers sa pastille sur la
+   Carte. Reset de bouton plutot que .bouton (trop lourd, bordure/fond, pour
+   du texte en ligne dans une cellule) ; le soulignement n'apparait qu'au
+   survol pour ne pas ecraser table.donnees td.principal en temps normal. */
+.lien-bloc {
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+.lien-bloc:hover { text-decoration-color: currentColor; }
+
 .pagination {
   display: flex;
   align-items: center;

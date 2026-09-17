@@ -396,6 +396,23 @@ masquée (`Tableau` retombe silencieusement sur l'ordre naturel des lignes si la
 n'existe pas) : passé au nom du bloc croissant en vue visiteur uniquement, l'accès complet garde
 le tri par écart. Vérifié dans Chrome (accès complet et visiteur). Tests (64) et build au vert.
 
+Enfin demandé, sur tous les écrans qui listent des blocs par leur nom (Blocs, Données,
+Formules), de rendre ce nom cliquable pour rejoindre le bloc sur la Carte. Nouvel état dans
+`App.tsx` : `blocCible` (id du bloc visé) et `voirBlocSurCarte(blocId)` qui bascule l'onglet sur
+`carte` et pose `blocCible` ; passés en prop à `VueBlocs`/`VueDonnees`/`VueFormules` (colonne
+`nom` d'un `<Tableau>`, ou cellule brute pour le tableau natif de `VueFormules`) et à `VueCarte`.
+`VueCarte` consomme `blocCible` dans un effet (`setSurvole` pour ouvrir le popup comme un survol
+l'aurait fait, `zoneRef.current?.scrollIntoView` pour ramener la carte à l'écran) — sans risque
+de ne pas se redeclencher sur un second clic vers le même bloc : ce composant n'est monté que
+sur l'onglet Carte (`{onglet === 'carte' && <VueCarte .../>}` dans `App.tsx`), donc chaque
+arrivée depuis un autre onglet est un montage frais, pas de jeton de dédoublonnage nécessaire.
+Comme la Carte n'affiche jamais qu'un échantillon des blocs (50 sur 369 pour la Démo), un bloc
+absent de la carte bascule quand même l'onglet mais n'ouvre aucun popup — pas de plantage, juste
+rien à montrer. Nouvelle classe CSS `.lien-bloc` (`styles.css`) pour un texte cliquable discret
+dans une cellule (pas `.bouton`, trop lourd visuellement pour du texte en ligne). Vérifié dans
+Chrome (accès complet et vue visiteur, bloc présent et bloc absent de la carte). Tests (64) et
+build au vert.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :

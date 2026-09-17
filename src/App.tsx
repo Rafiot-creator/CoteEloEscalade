@@ -52,6 +52,11 @@ function Contenu() {
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
   const [centreId, setCentreId] = useState<CentreId>('demo')
   const centre = CENTRES.find((c) => c.id === centreId) ?? CENTRES[0]
+  const [blocCible, setBlocCible] = useState<string | null>(null)
+  const voirBlocSurCarte = (blocId: string) => {
+    setOnglet('carte')
+    setBlocCible(blocId)
+  }
 
   useEffect(() => {
     const courant = ONGLETS.find((o) => o.id === onglet)
@@ -132,6 +137,7 @@ function Contenu() {
             grimpeurs={centreId === 'demo' ? atelier.dataset?.grimpeurs.map((g) => g.nom) : undefined}
             enregistrerAscension={centreId === 'demo' ? atelier.enregistrerAscension : undefined}
             envoisConnus={centreId === 'demo' ? atelier.envoisConnus : undefined}
+            blocCible={blocCible}
           />
         )}
 
@@ -165,13 +171,18 @@ function Contenu() {
         {onglet !== 'carte' && centre.id === 'demo' && atelier.dataset && atelier.resultat && (
           <>
             {onglet === 'blocs' && (
-              <VueBlocs resultat={atelier.resultat} resultats={atelier.resultats} simplifie={!vueComplete} />
+              <VueBlocs
+                resultat={atelier.resultat}
+                resultats={atelier.resultats}
+                simplifie={!vueComplete}
+                onVoirBlocSurCarte={voirBlocSurCarte}
+              />
             )}
             {onglet === 'grimpeurs' && (
               <VueGrimpeurs resultat={atelier.resultat} resultats={atelier.resultats} simplifie={!vueComplete} />
             )}
-            {onglet === 'formules' && <VueFormules atelier={atelier} />}
-            {onglet === 'donnees' && <VueDonnees dataset={atelier.dataset} />}
+            {onglet === 'formules' && <VueFormules atelier={atelier} onVoirBlocSurCarte={voirBlocSurCarte} />}
+            {onglet === 'donnees' && <VueDonnees dataset={atelier.dataset} onVoirBlocSurCarte={voirBlocSurCarte} />}
             {onglet === 'fichiers' && <VueFichiers dataset={atelier.dataset} />}
           </>
         )}

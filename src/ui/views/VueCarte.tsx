@@ -59,6 +59,7 @@ export function VueCarte({
   grimpeurs,
   enregistrerAscension,
   envoisConnus,
+  blocCible,
 }: {
   centreId: string
   accesComplet: boolean
@@ -79,6 +80,16 @@ export function VueCarte({
   enregistrerAscension?: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
   /** Blocs deja envoyes par un grimpeur nomme, d'apres l'ensemble du dataset. */
   envoisConnus?: (grimpeurNom: string) => Map<string, StatutEnvoi>
+  /**
+   * Bloc a rejoindre, pousse depuis un autre onglet (nom de bloc cliquable
+   * dans un tableau) : ouvre son popup et l'amene a l'ecran au montage. Sans
+   * risque de ne pas se redeclencher sur un second clic vers le meme bloc —
+   * ce composant n'est monte que sur l'onglet Carte, donc chaque arrivee ici
+   * depuis un autre onglet est un montage frais. Si ce bloc n'est pas sur la
+   * carte de ce centre (elle n'en montre qu'un echantillon), rien ne se
+   * passe au-dela du changement d'onglet, deja fait par l'appelant.
+   */
+  blocCible?: string | null
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
@@ -218,6 +229,18 @@ export function VueCarte({
   useEffect(() => {
     if (selection) editionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [selection])
+
+  // Arrivee depuis un nom de bloc cliquable ailleurs sur le site : ouvre son
+  // popup comme un survol/clic normal l'aurait fait, et amene la carte a
+  // l'ecran (le montage de cet onglet peut se produire plus bas que la
+  // fenetre visible). Attend que `carte` soit chargee avant de chercher le
+  // bloc dedans.
+  useEffect(() => {
+    if (!blocCible || !carte) return
+    if (!carte.blocs.some((b) => b.id === blocCible)) return
+    setSurvole(blocCible)
+    zoneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [blocCible, carte])
 
   if (!carte) return <p className="vide">{t('Chargement de la carte…', 'Loading the map…')}</p>
 

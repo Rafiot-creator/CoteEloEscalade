@@ -18,12 +18,15 @@ export function VueBlocs({
   resultat,
   resultats,
   simplifie = false,
+  onVoirBlocSurCarte,
 }: {
   resultat: Resultat
   /** Toutes les formules, pour afficher leurs cotes cote a cote. */
   resultats: Map<string, Resultat>
   /** Vue visiteur : une seule colonne de cote (le melange), appelee simplement "Cote". */
   simplifie?: boolean
+  /** Rend le nom du bloc cliquable : bascule sur l'onglet Carte et l'y montre. */
+  onVoirBlocSurCarte?: (blocId: string) => void
 }) {
   const { langue, t } = useLangue()
   const [gym, setGym] = useState('tous')
@@ -114,6 +117,13 @@ export function VueBlocs({
         "Identifiant du bloc au mur, tel qu'il figure sur son étiquette.",
         'The boulder\'s identifier on the wall, as it appears on its tag.'
       ),
+      rendu: onVoirBlocSurCarte
+        ? (b) => (
+            <button className="lien-bloc" onClick={() => onVoirBlocSurCarte(b.id)}>
+              {b.nom}
+            </button>
+          )
+        : undefined,
     },
     ...(plusieursSalles
       ? [

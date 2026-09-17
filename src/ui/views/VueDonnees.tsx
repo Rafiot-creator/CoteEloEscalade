@@ -9,7 +9,14 @@ import { useLangue } from '../langue'
 type Onglet = 'grimpeurs' | 'blocs' | 'ascensions'
 
 /** Les donnees telles qu'elles sont, apres validation : filtrables et exportables. */
-export function VueDonnees({ dataset }: { dataset: Dataset }) {
+export function VueDonnees({
+  dataset,
+  onVoirBlocSurCarte,
+}: {
+  dataset: Dataset
+  /** Rend un nom de bloc cliquable : bascule sur l'onglet Carte et l'y montre. */
+  onVoirBlocSurCarte?: (blocId: string) => void
+}) {
   const { t } = useLangue()
   const [onglet, setOnglet] = useState<Onglet>('blocs')
   const [recherche, setRecherche] = useState('')
@@ -85,7 +92,19 @@ export function VueDonnees({ dataset }: { dataset: Dataset }) {
   ]
 
   const colBlocs: Colonne<(typeof blocs)[number]>[] = [
-    { cle: 'nom', titre: t('Bloc', 'Boulder'), principal: true, valeur: (b) => b.nom },
+    {
+      cle: 'nom',
+      titre: t('Bloc', 'Boulder'),
+      principal: true,
+      valeur: (b) => b.nom,
+      rendu: onVoirBlocSurCarte
+        ? (b) => (
+            <button className="lien-bloc" onClick={() => onVoirBlocSurCarte(b.id)}>
+              {b.nom}
+            </button>
+          )
+        : undefined,
+    },
     { cle: 'gym', titre: t('Salle', 'Gym'), valeur: (b) => b.gym },
     { cle: 'secteur', titre: t('Style', 'Style'), valeur: (b) => b.secteur, aide: t('Type de mur ou de mouvement.', 'Wall type or movement style.') },
     {
@@ -131,7 +150,18 @@ export function VueDonnees({ dataset }: { dataset: Dataset }) {
       aide: t('Jour de la séance. Une ligne par séance, pas par essai.', 'Day of the session. One row per session, not per attempt.'),
     },
     { cle: 'grimpeur', titre: t('Grimpeur', 'Climber'), principal: true, valeur: (a) => a.grimpeur },
-    { cle: 'bloc', titre: t('Bloc', 'Boulder'), valeur: (a) => a.bloc },
+    {
+      cle: 'bloc',
+      titre: t('Bloc', 'Boulder'),
+      valeur: (a) => a.bloc,
+      rendu: onVoirBlocSurCarte
+        ? (a) => (
+            <button className="lien-bloc" onClick={() => onVoirBlocSurCarte(a.blocId)}>
+              {a.bloc}
+            </button>
+          )
+        : undefined,
+    },
     { cle: 'gym', titre: t('Salle', 'Gym'), valeur: (a) => a.gym },
     { cle: 'cotation', titre: t('Cotation', 'Grade'), valeur: (a) => a.cotation, aide: t('Cotation affichée du bloc ce jour-là.', "The boulder's displayed grade on that day.") },
     {
