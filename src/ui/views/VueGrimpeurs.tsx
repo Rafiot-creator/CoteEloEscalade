@@ -173,7 +173,15 @@ export function VueGrimpeurs({
                 value={styleSelectionne}
                 onChange={(e) => setStyleSelectionne(e.currentTarget.value)}
                 onClick={(e) => e.stopPropagation()}
-                style={{ font: 'inherit', fontWeight: 400 }}
+                // La table a `width: 100%` (styles.css) : sans min-width, le
+                // moteur de mise en page auto des tableaux comprime cette
+                // colonne pour faire tenir toutes les autres dans cette
+                // largeur, au lieu de laisser le tableau deborder et
+                // defiler horizontalement (`.table-enveloppe`) comme prevu —
+                // illisible sur un ecran etroit (retour de Raphael sur
+                // telephone). Un min-width force le tableau a deborder
+                // plutot que d'ecraser ce select.
+                style={{ font: 'inherit', fontWeight: 400, minWidth: 160 }}
               >
                 <option value="">{t('Cote globale (Elo)', 'Overall rating (Elo)')}</option>
                 {STYLES_BLOC.map((s) => (

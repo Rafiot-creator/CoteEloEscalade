@@ -279,16 +279,31 @@ l'anneau "envoye" (vert) reste : seul indicateur visuel qui subsiste sur la cart
 popup, confirme correct par Raphael des la toute premiere capture d'ecran de cette serie de
 correctifs.
 
+Tests (64) et build au vert. Pousse (commit `621eed5`), deploiement verifie vert.
+
+Raphael a confirme la Carte reglee (« ça fonctionne ! »), et signale un probleme du meme ordre
+sur un **autre** ecran : le menu deroulant de style de Grimpeurs se compresse et devient
+illisible sur telephone, malgre le retrait du `maxWidth: 140` artificiel quelques correctifs
+plus tot. Cause differente cette fois : `table.donnees` (`styles.css`) a `width: 100%`, qui
+empeche le tableau de depasser son conteneur meme quand son contenu l'exige — sur ecran etroit,
+le moteur de mise en page en tableau comprime chaque colonne (dont le `<select>`) pour tout
+faire tenir, au lieu de laisser le tableau deborder et defiler horizontalement
+(`.table-enveloppe { overflow-x: auto }`, deja en place mais jamais reellement declenche pour ce
+tableau). Un `min-width: 160` sur le `<select>` force sa colonne a refuser de retrecir sous ce
+seuil : la somme des largeurs minimales des colonnes depasse alors les 100 % declares, et la
+table deborde plutot que de continuer a comprimer — le defilement horizontal prend le relais,
+sans toucher aux autres colonnes ni aux autres tableaux du site. Verifie via le DOM (conteneur
+retreci a 360px programmatiquement) : le tableau deborde bien et le `<select>` garde ses 160px
+pleins.
+
 Tests (64) et build au vert. **Pas encore poussé.**
 
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** l'absence de contour par défaut et de liseré « jamais essayé »
-  (retirés plutôt que réparés, après cinq tentatives infructueuses de les ajuster), et le
-  rebasculement du popup au reclic. Popup après pinch-zoom et menu déroulant déjà confirmés bons
-  par Raphael.
+- **Retester sur le téléphone** le menu déroulant de style (Grimpeurs) — la carte (contours,
+  liseré, popup, reclic) est déjà confirmée bonne par Raphael.
 - **Retour sur le nouveau placement des pastilles** de la Carte Démo — l'algorithme garantit
   l'absence de chevauchement, mais la disposition reste générée, pas affinée à l'œil comme
   l'était la toute première version de cette carte. Raphael peut vouloir la retoucher à la main

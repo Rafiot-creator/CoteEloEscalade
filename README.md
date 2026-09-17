@@ -1422,3 +1422,19 @@ fait accompli.
   « envoyé » (vert) reste, lui, seul indicateur visuel qui subsiste sur la carte en dehors du
   popup — confirmé correct par Raphaël dès la première capture d'écran. Voir « Pastilles, survol
   et popup » pour l'état final.
+- Raphaël a confirmé la Carte réglée, et signalé un problème du même ordre mais sur un autre
+  écran : le menu déroulant de style de l'écran **Grimpeurs** (§ « La cote par style ») se
+  compresse et devient illisible sur téléphone, malgré le retrait du `maxWidth: 140` artificiel
+  quelques correctifs plus tôt (§ ci-dessus, 2026-09-16). Cause réelle, différente cette fois :
+  `table.donnees` (`styles.css`) a `width: 100%`, ce qui empêche le tableau de dépasser son
+  conteneur même quand son contenu l'exige — sur un écran étroit, le moteur de mise en page en
+  tableau comprime alors chaque colonne (dont le `<select>`) pour toutes les faire tenir dans
+  cette largeur fixe, au lieu de laisser le tableau déborder et défiler horizontalement
+  (`.table-enveloppe { overflow-x: auto }`, déjà en place mais jamais réellement déclenché pour
+  ce tableau). Un `min-width: 160` sur le `<select>` force sa colonne à refuser de rétrécir
+  sous ce seuil : la somme des largeurs minimales des colonnes dépasse alors les 100 % déclarés,
+  et la spécification CSS impose au tableau de déborder plutôt que de continuer à comprimer — le
+  défilement horizontal prend enfin le relais, sans toucher au comportement des autres colonnes
+  ni des autres tableaux du site. Vérifié via le DOM (conteneur rétréci à 360px
+  programmatiquement) : le tableau déborde bien (`scrollWidth` 848 > `clientWidth` 360) et le
+  `<select>` garde ses 160px pleins plutôt que d'être écrasé.
