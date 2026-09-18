@@ -31,6 +31,7 @@ const PALETTE_COULEURS = [
   { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#ffef00', texte: '#111' },
   { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#ff5800', texte: '#111' },
   { id: 'rouge', fr: 'Rouge', en: 'Red', fond: '#ff0800', texte: '#fff' },
+  { id: 'rose', fr: 'Rose', en: 'Pink', fond: '#fe28a2', texte: '#111' },
   { id: 'noir', fr: 'Noir', en: 'Black', fond: '#100c08', texte: '#fff' },
   { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#fefefa', texte: '#111' },
 ] as const
