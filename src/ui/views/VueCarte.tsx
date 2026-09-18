@@ -27,6 +27,7 @@ const BRILLANT = 'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.75), rgb
 const PALETTE_COULEURS = [
   { id: 'mauve', fr: 'Mauve', en: 'Purple', fond: '#9b30ff', texte: '#fff' },
   { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: '#0000ff', texte: '#fff' },
+  { id: 'turquoise', fr: 'Turquoise', en: 'Turquoise', fond: '#7fffd4', texte: '#111' },
   { id: 'vert', fr: 'Vert', en: 'Green', fond: '#55dd33', texte: '#111' },
   { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#ffef00', texte: '#111' },
   { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#ff5800', texte: '#111' },
