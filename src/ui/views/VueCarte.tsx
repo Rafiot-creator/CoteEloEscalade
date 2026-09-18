@@ -29,7 +29,7 @@ const PALETTE_COULEURS = [
   { id: 'bleu', fr: 'Bleu', en: 'Blue', fond: '#0000ff', texte: '#fff' },
   { id: 'vert', fr: 'Vert', en: 'Green', fond: '#55dd33', texte: '#111' },
   { id: 'jaune', fr: 'Jaune', en: 'Yellow', fond: '#ffef00', texte: '#111' },
-  { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#ff7a1a', texte: '#111' },
+  { id: 'orange', fr: 'Orange', en: 'Orange', fond: '#ff5800', texte: '#111' },
   { id: 'rouge', fr: 'Rouge', en: 'Red', fond: '#ff0800', texte: '#fff' },
   { id: 'noir', fr: 'Noir', en: 'Black', fond: '#242428', texte: '#fff' },
   { id: 'blanc', fr: 'Blanc', en: 'White', fond: '#e6e6e6', texte: '#111' },
