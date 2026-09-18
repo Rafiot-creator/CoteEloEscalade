@@ -460,19 +460,44 @@ accès complet, une pastille testee a chaque fois) avant de commit/push — ce f
 a aucun calcul, tests (64) et build systematiquement au vert. Dix commits distincts au total
 (un par couleur), tous pousses et deployes avec succes.
 
+## État au 2026-09-18
+
+- Tentative de remplacer la photo brute de Rose Bloc 1 par une carte vectorielle tracee sur ses
+  contours de murs (style Carte Demo) — faite, verifiee par superposition en fondu avec la photo
+  dans Chrome, mais **rejetee par Raphael** (« c'est moins bien qu'avant ») et **revert immediat**
+  (commit `ec63706`). Rose Bloc 1 affiche de nouveau la photo. Ne pas relancer ce chantier sans
+  que Raphael le redemande explicitement — s'il revient dessus, demander ce qui n'allait pas avant
+  de retenter, plutot que de redeviner a l'aveugle.
+- Longue discussion (rien code) sur l'uniformisation des cotes entre centres une fois qu'il y en
+  aura plusieurs avec de vraies donnees — deux pistes retenues, une ecartee en cours de route.
+  Voir README § « Piste envisagee, pas commencee : uniformiser les cotes entre centres » et
+  `DECISIONS.md` § 7 pour le detail. Ne pas coder sans que Raphael relance le sujet, meme logique
+  que le multi-utilisateur temps reel.
+- Ajout d'un histogramme **Distribution des grimpeurs** sous le tableau Classement (ecran
+  Grimpeurs), en reutilisant le composant `Histogramme` de l'ecran Blocs plutot que d'en ecrire un
+  second. A rendu son etiquette d'axe Y configurable (`uniteY`) et corrige son positionnement dans
+  `src/ui/charts/base.tsx`, qui tronquait un mot plus long que « blocs » (le defaut). Verifie que
+  l'ecran Blocs n'a pas change visuellement. Tests (64) et build au vert. Pousse (commit
+  `b69a094`), deploiement GitHub Pages verifie vert.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
 
-- **Retester sur le téléphone** le nouveau vocabulaire de style (Blocs/Grimpeurs/Carte) et le tri
-  automatique sur sélection — vérifié dans Chrome bureau seulement à ce stade, pas encore sur un
-  vrai téléphone (cf. les pièges de simulation desktop documentés plus haut dans ce fichier).
-- **Retour sur le nouveau placement des pastilles** de la Carte Démo (quatre zones désormais) —
-  l'algorithme garantit l'absence de chevauchement, mais la disposition reste générée, pas
-  affinée à l'œil. Raphael peut vouloir la retoucher à la main, ou la laisser telle quelle.
+- **Retester sur le téléphone** le vocabulaire de style (Blocs/Grimpeurs/Carte) et le tri
+  automatique sur sélection, introduits le 17 septembre — vérifié dans Chrome bureau seulement à
+  ce stade, pas encore sur un vrai téléphone (cf. les pièges de simulation desktop documentés
+  plus haut dans ce fichier).
+- **Retour sur le nouveau placement des pastilles** de la Carte Démo (quatre zones depuis le 17
+  septembre) — l'algorithme garantit l'absence de chevauchement, mais la disposition reste
+  générée, pas affinée à l'œil. Raphael peut vouloir la retoucher à la main, ou la laisser telle
+  quelle.
+- **Rose Bloc 1** reste sur sa photo brute comme fond de carte — pas une tâche en attente (essayé
+  et refusé le 18 septembre), seulement à reconsidérer si Raphael relance le sujet lui-même, avec
+  plus de précision sur ce qui n'allait pas cette fois.
 
 Autres pistes en attente si rien de ce qui précède ne ressort : brancher de vraies données sur un
 des centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans
 `DECISIONS.md` (§ 7) : seuil Glicko à 0,60, test d'équivalence, Glicko-2, modèle morphologique,
-import utilisateur par glisser-déposer, multi-utilisateur en temps réel (mise en attente
-explicite, cf. ci-dessus — ne pas la proposer spontanément).
+import utilisateur par glisser-déposer, multi-utilisateur en temps réel, uniformisation des cotes
+entre centres (ces deux dernières en attente explicite — ne pas les proposer spontanément).

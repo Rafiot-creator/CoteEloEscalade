@@ -685,7 +685,7 @@ site soit utile.
 | Écran | Ce qu'on y fait |
 |---|---|
 | **Blocs** | Le verdict : combien de blocs contredisent leur étiquette, lesquels, de combien. Cote Elo, nuage calculé/affiché, distribution des écarts, tableau exportable. Un filtre par salle apparaît s'il y en a plusieurs. |
-| **Grimpeurs** | Classement avec cote Elo, niveau calculé (la cotation V envoyée une fois sur deux), courbes de progression. |
+| **Grimpeurs** | Classement avec cote Elo, niveau calculé (la cotation V envoyée une fois sur deux), distribution des grimpeurs par niveau, courbes de progression. |
 | **Carte** | Plan du centre choisi, blocs positionnés en pastilles colorées. Ajouter, déplacer, modifier ou supprimer un bloc et exporter la carte sont réservés à l'accès complet. Survoler un bloc propose trois boutons — flash, réussi, échec — pour enregistrer un envoi ; quand le centre a un jeu de données connecté (aujourd'hui, Démo) et que le nom saisi correspond à un grimpeur connu, c'est une vraie ascension qui s'ajoute au calcul, pas un simple repère visuel. Détails plus bas, « La carte des blocs ». |
 | **Formules** *(accès complet)* | Choix de la formule, réglage des paramètres, diagnostics, convergence, comparaison A/B de deux réglages. |
 | **Données** *(accès complet)* | Les tables après validation, filtrables, exportables — y compris toutes les lignes repliées dans les duels. |
@@ -1074,6 +1074,27 @@ mêmes seams que l'import utilisateur ci-dessus : une seconde implémentation de
 `CarteProvider` et `AscensionLocaleProvider` qui parle au service au lieu des CSV/`localStorage`,
 sans toucher au calcul ni à l'interface. Raphaël a choisi d'attendre plutôt que de commencer
 maintenant — ne pas relancer ce chantier sans qu'il le redemande.
+
+## Piste envisagée, pas commencée : uniformiser les cotes entre centres
+
+Discuté avec Raphaël le 18 septembre 2026, en prévision du jour où plusieurs centres auront de
+vraies données (voir « Plusieurs centres d'escalade » ci-dessus) : chaque centre aurait alors son
+propre écosystème de cotes, sans lien entre eux a priori. Deux pistes complémentaires envisagées
+pour les relier via les grimpeurs qui visitent plusieurs centres, détaillées dans
+`DECISIONS.md` § 7 :
+
+- **Grimpeurs-ponts à cote figée hors de leur centre habituel** : leurs duels ailleurs
+  influencent les blocs visités sans faire bouger leur propre cote (analogue au « common-person
+  equating » en psychométrie). Pondérer l'effet d'un pont par l'incertitude déjà présente sur sa
+  cote d'origine plutôt qu'imposer une liste de priorité manuelle entre centres — une liste figée
+  jette du signal réel et vieillit mal.
+- **Comparaison des distributions de grimpeurs entre centres**, en complément plutôt qu'en
+  remplacement : ne distingue pas une échelle mal calibrée d'une population réellement
+  différente, mais sert de validation croisée si elle converge avec l'estimation par grimpeurs-
+  ponts.
+
+Rien codé ; ne pas relancer ce chantier sans que Raphaël le redemande, comme pour le
+multi-utilisateur ci-dessus.
 
 ## Changer d'échelle de cotation
 
@@ -1625,3 +1646,32 @@ fait accompli.
   dix couleurs en tout désormais. Chaque changement vérifié dans Chrome (panneau « Modifier le
   bloc », accès complet) avant commit — tests et build au vert à chaque fois, ce fichier ne
   touchant à aucun calcul.
+
+### 2026-09-18
+
+- Raphaël a demandé de remplacer la photo brute de Rose Bloc 1 (`public/cartes/rose-bloc-1.jpg`,
+  utilisée telle quelle comme fond de carte, § « Cartes disponibles aujourd'hui ») par une carte
+  vectorielle qui en calque les contours de murs, dans le style de la carte Démo. Fait : tracé au
+  pixel près (superposition en fondu avec la photo, vérifiée section par section dans Chrome)
+  d'un `rose-bloc-1.svg` reprenant les murs (Titanic/Le Rose/La Proue en anneau, Bat Cave/Dalle
+  en zigzag, La Baleine, Kilter's Homies, Vendetta Wall...), avec la palette déjà en place sur la
+  Carte. Raphaël, après l'avoir vue en place : « c'est moins bien qu'avant » — revert immédiat
+  (`git revert`) plutôt que d'essayer de deviner quoi corriger sans plus de précision. La photo
+  reste le fond de Rose Bloc 1 ; le SVG tracé reste récupérable dans l'historique git si le sujet
+  revient, mais rien ne le référence plus.
+- Discussion (rien codé) sur la question de fond : quand plusieurs centres auront de vraies
+  données, comment uniformiser leurs cotes entre eux via les grimpeurs qui les fréquentent tous
+  les deux. Voir « Piste envisagée, pas commencée : uniformiser les cotes entre centres » plus
+  haut et `DECISIONS.md` § 7 pour le détail des deux pistes retenues (grimpeurs-ponts à cote
+  figée pondérée par incertitude, comparaison de distributions en validation croisée) et de celle
+  écartée en cours de route (liste de priorité manuelle entre centres).
+- Ajout d'un histogramme **Distribution des grimpeurs** (niveau calculé) sous le tableau
+  Classement de l'écran Grimpeurs, juste au-dessus de Progression — réutilise le composant
+  `Histogramme` déjà en place pour la distribution des écarts sur l'écran Blocs, plutôt que d'en
+  écrire un second. Au passage, l'étiquette de l'axe Y de ce composant partagé était codée en dur
+  sur « blocs » (texte ancré à droite dans une marge de quelques pixels, dimensionnée pour ce
+  mot-là) : devenue un prop `uniteY` optionnel, et son positionnement dans `Cadre`
+  (`src/ui/charts/base.tsx`) changé d'un ancrage à droite dans la marge gauche à un ancrage à
+  gauche juste après l'axe, pour ne plus tronquer un mot plus long comme « grimpeurs ». Vérifié
+  dans Chrome que l'écran Blocs (qui utilise la valeur par défaut) n'a pas bougé. Tests (64) et
+  build au vert.
