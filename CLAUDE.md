@@ -413,6 +413,36 @@ dans une cellule (pas `.bouton`, trop lourd visuellement pour du texte en ligne)
 Chrome (accès complet et vue visiteur, bloc présent et bloc absent de la carte). Tests (64) et
 build au vert.
 
+Demande suivante, en deux parties : retirer la colonne Duels utiles du tableau Classement
+(écran Grimpeurs) en vue visiteur, et faire suivre le style choisi dans le menu déroulant par
+les colonnes a droite de la cote (Plus dur envoye, Duels utiles, Duels gagnes), dans toutes les
+vues.
+
+- Duels utiles retiree en vue visiteur : meme traitement que sur l'ecran Blocs plus haut
+  (colonne entiere enveloppee dans `...(simplifie ? [] : [...])`).
+- Duels utiles et Duels gagnes suivent le style choisi via `stylesGrimpeur[style]` (deja calcule
+  par Elo bloc pour la colonne de cote elle-meme) : `matchs`/`reussites` du style au lieu des
+  totaux tous styles confondus. Tiret sur Duels gagnes si le grimpeur n'a jamais affronte ce
+  style (division par zero sinon) ; Duels utiles montre 0 (un compte, pas une cote — un zero y
+  est deja parlant).
+- Plus dur envoye n'avait pas d'equivalent par style nulle part dans le calcul (`stylesGrimpeur`
+  ne retient que rating/matchs/reussites, aucune cotation V). Ajoute au niveau du pipeline plutot
+  que dans l'ecran : `LigneGrimpeur.meilleureCotationParStyle` (`src/core/pipeline.ts`), calcule
+  dans la meme boucle sur les ascensions brutes que `meilleureCotation` (deja existant), juste
+  filtre par le style du bloc en plus du resultat. Independant de toute formule (comme
+  `meilleureCotation`), donc disponible quelle que soit la formule active — pas besoin qu'Elo
+  bloc soit la formule affichee pour que la colonne fonctionne.
+- Les trois en-tetes se completent du nom du style choisi (ex. "Duels gagnes (Dalle)") pour que
+  le changement de sens des colonnes ne passe pas inaperçu — sans ca, une colonne "Duels gagnes"
+  qui se met a montrer un chiffre different sans rien signaler aurait ete trompeur.
+- Sans style choisi ("Cote globale"), les trois colonnes retombent sur leurs totaux habituels :
+  aucun changement de comportement pour qui n'utilise pas le menu deroulant.
+
+Verifie dans Chrome (accès complet et vue visiteur) : choisir "Dalle" met a jour les trois
+colonnes et leurs titres pour tous les grimpeurs affiches, revenir a "Cote globale" restaure les
+totaux (confirme sur Victor Bergeron : 57 % de duels gagnes tous styles, 92 % en Dalle
+specifiquement). Tests (64) et build au vert.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :

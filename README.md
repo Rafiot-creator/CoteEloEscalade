@@ -954,6 +954,26 @@ passés à `Tableau` via ses props optionnelles `tri`/`onTri`) plutôt que laiss
 par défaut de `Tableau` : un clic sur un autre en-tête continue de fonctionner normalement,
 puisqu'il passe par le même callback.
 
+Les trois colonnes à droite de « Cote par style » — **Plus dur envoyé**, **Duels utiles**,
+**Duels gagnés** — suivent elles aussi le style choisi dans le menu déroulant (leur titre se
+complète alors du nom du style, ex. « Duels gagnés (Dalle) »), plutôt que de continuer à montrer
+des totaux tous styles confondus à côté d'une colonne de cote qui, elle, ne parle que d'un seul
+style — demande de Raphaël du 17 septembre 2026, pour que la ligne entière reste cohérente une
+fois un style choisi. « Duels utiles » et « Duels gagnés » viennent de la même ventilation
+qu'Elo bloc pour la cote elle-même (`stylesGrimpeur[style].matchs`/`.reussites`, cf. plus bas) —
+tiret si le grimpeur n'a jamais affronté ce style, comme pour la cote. « Plus dur envoyé » vient
+en revanche d'un calcul différent, indépendant de toute formule
+(`LigneGrimpeur.meilleureCotationParStyle`, `src/core/pipeline.ts`) : une pure agrégation sur les
+ascensions brutes filtrées par style du bloc, sur le même principe que `meilleureCotation`
+(la version tous styles confondus, déjà existante) — nécessaire parce qu'aucune formule ne
+retient la cotation V la plus dure envoyée, seulement des cotes numériques. Sans style choisi,
+les trois colonnes retombent sur leurs totaux habituels.
+
+**Duels utiles** est en outre absente de la vue visiteur (même logique que le retrait des
+colonnes Écart et Duels utiles de l'écran Blocs, journal du 17 septembre 2026) : une mesure
+d'audit, pas d'intérêt pour un visiteur qui ne cherche pas à juger la fiabilité statistique d'un
+chiffre.
+
 Le calcul par style lui-même n'existe que pour Elo bloc (voir plus bas), mais l'affichage est
 calé sur **Mélange** — la cote de référence utilisée partout ailleurs sur cet écran — plutôt que
 d'afficher Elo brut : « Cote globale » montre la cote Mélange habituelle du grimpeur, et chaque
@@ -1578,3 +1598,16 @@ fait accompli.
   vue visiteur : un bloc présent sur la carte ouvre son popup et y amène l'écran ; un bloc qui
   n'y figure pas (la carte n'affiche qu'un échantillon) bascule quand même sur l'onglet, sans
   popup ni erreur.
+- Retrait de la colonne **Duels utiles** du tableau Classement (écran Grimpeurs) en vue visiteur
+  — même logique que pour l'écran Blocs plus haut, une mesure d'audit sans intérêt pour un
+  visiteur.
+- Les trois colonnes à droite de « Cote par style » (**Plus dur envoyé**, **Duels utiles**,
+  **Duels gagnés**) suivent désormais le style choisi dans le menu déroulant plutôt que de
+  montrer des totaux tous styles confondus à côté d'une cote qui, elle, ne parle que d'un seul
+  style — voir § « La cote par style » plus haut pour le détail (nouveau champ
+  `LigneGrimpeur.meilleureCotationParStyle` dans `src/core/pipeline.ts` pour « Plus dur envoyé »,
+  une pure agrégation sur les ascensions brutes indépendante de toute formule ; « Duels utiles »
+  et « Duels gagnés » réutilisent la ventilation par style déjà calculée par Elo bloc). Vérifié
+  dans Chrome (accès complet et vue visiteur) : sélectionner un style met à jour les trois
+  colonnes et leur titre (ex. « Duels gagnés (Dalle) ») ; revenir à « Cote globale » restaure les
+  totaux habituels. Tests (64) et build au vert.

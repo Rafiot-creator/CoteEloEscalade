@@ -59,6 +59,17 @@ export function VueGrimpeurs({
   // en-tete (cf. `onTri` sur `Tableau`).
   const [triClassement, setTriClassement] = useState<{ cle: string; sens: 1 | -1 }>({ cle: 'rang', sens: 1 })
 
+  /**
+   * Duels/reussites d'un grimpeur pour le style choisi, pour les colonnes a
+   * droite de "Cote par style" (Plus dur envoye, Duels utiles, Duels gagnes) :
+   * les faire suivre le style choisi plutot que de toujours montrer les
+   * totaux tous styles confondus, incoherent une fois qu'on regarde une seule
+   * colonne "par style". Meme source qu'Elo bloc pour la colonne de cote
+   * elle-meme (`stylesGrimpeur`), absente si aucun style n'est choisi.
+   */
+  const enStyle = (g: LigneGrimpeur) =>
+    styleSelectionne ? eloParGrimpeur.get(g.id)?.stylesGrimpeur?.[styleSelectionne] : undefined
+
   // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
   const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
 
@@ -236,33 +247,59 @@ export function VueGrimpeurs({
       : []),
     {
       cle: 'meilleure',
-      titre: t('Plus dur envoyé', 'Hardest sent'),
-      aide: t(
-        "La cotation *affichée* la plus dure qu'il ait réellement envoyée. Elle dépasse souvent le niveau calculé, qui vise la cotation réussie une fois sur deux et non le record.",
-        "The hardest *displayed* grade they actually sent. It often exceeds the calculated level, which targets the grade sent half the time, not their personal record."
-      ),
-      valeur: (g) => g.meilleureCotation,
+      titre: styleSelectionne ? t(`Plus dur envoyé (${styleSelectionne})`, `Hardest sent (${styleSelectionne})`) : t('Plus dur envoyé', 'Hardest sent'),
+      aide: styleSelectionne
+        ? t(
+            `La cotation *affichée* la plus dure qu'il ait réellement envoyée dans le style "${styleSelectionne}" — tiret s'il ne l'a jamais affronté. Choisir "Cote globale" dans le menu déroulant de la colonne "Cote par style" revient aux tous styles confondus.`,
+            `The hardest *displayed* grade they actually sent in the "${styleSelectionne}" style — dash if they never faced it. Pick "Overall rating" in the "Cote par style" column's dropdown to go back to all styles combined.`
+          )
+        : t(
+            "La cotation *affichée* la plus dure qu'il ait réellement envoyée. Elle dépasse souvent le niveau calculé, qui vise la cotation réussie une fois sur deux et non le record.",
+            "The hardest *displayed* grade they actually sent. It often exceeds the calculated level, which targets the grade sent half the time, not their personal record."
+          ),
+      valeur: (g) => (styleSelectionne ? (g.meilleureCotationParStyle[styleSelectionne] ?? null) : g.meilleureCotation),
     },
-    {
-      cle: 'matchs',
-      titre: t('Duels utiles', 'Useful duels'),
-      num: true,
-      aide: t(
-        "Nombre de blocs qu'il a affrontés et dont l'issue a compté. Les blocs largement hors de sa portée, dans un sens comme dans l'autre, n'y figurent pas.",
-        "Number of boulders they faced whose outcome counted. Boulders far out of their reach either way are excluded."
-      ),
-      valeur: (g) => g.matchs,
-    },
+    ...(simplifie
+      ? []
+      : [
+          {
+            cle: 'matchs',
+            titre: styleSelectionne ? t(`Duels utiles (${styleSelectionne})`, `Useful duels (${styleSelectionne})`) : t('Duels utiles', 'Useful duels'),
+            num: true,
+            aide: styleSelectionne
+              ? t(
+                  `Nombre de blocs de style "${styleSelectionne}" qu'il a affrontés et dont l'issue a compté.`,
+                  `Number of "${styleSelectionne}"-style boulders they faced whose outcome counted.`
+                )
+              : t(
+                  "Nombre de blocs qu'il a affrontés et dont l'issue a compté. Les blocs largement hors de sa portée, dans un sens comme dans l'autre, n'y figurent pas.",
+                  "Number of boulders they faced whose outcome counted. Boulders far out of their reach either way are excluded."
+                ),
+            valeur: (g: LigneGrimpeur) => (styleSelectionne ? (enStyle(g)?.matchs ?? 0) : g.matchs),
+          },
+        ]),
     {
       cle: 'taux',
-      titre: t('Duels gagnés', 'Duels won'),
+      titre: styleSelectionne ? t(`Duels gagnés (${styleSelectionne})`, `Duels won (${styleSelectionne})`) : t('Duels gagnés', 'Duels won'),
       num: true,
-      aide: t(
-        "Part de ces blocs qu'il a fini par envoyer. Un taux élevé signale surtout quelqu'un qui choisit des blocs à sa portée, pas nécessairement un bon grimpeur.",
-        "Share of those boulders they eventually sent. A high rate mostly signals someone who picks boulders within reach, not necessarily a strong climber."
-      ),
-      valeur: (g) => g.tauxReussite,
-      rendu: (g) => pourcent(g.tauxReussite),
+      aide: styleSelectionne
+        ? t(
+            `Part des blocs de style "${styleSelectionne}" qu'il a fini par envoyer — tiret s'il ne l'a jamais affronté.`,
+            `Share of "${styleSelectionne}"-style boulders they eventually sent — dash if they never faced it.`
+          )
+        : t(
+            "Part de ces blocs qu'il a fini par envoyer. Un taux élevé signale surtout quelqu'un qui choisit des blocs à sa portée, pas nécessairement un bon grimpeur.",
+            "Share of those boulders they eventually sent. A high rate mostly signals someone who picks boulders within reach, not necessarily a strong climber."
+          ),
+      valeur: (g) => {
+        const e = enStyle(g)
+        return styleSelectionne ? (e && e.matchs ? e.reussites / e.matchs : 0) : g.tauxReussite
+      },
+      rendu: (g) => {
+        const e = enStyle(g)
+        if (!styleSelectionne) return pourcent(g.tauxReussite)
+        return e && e.matchs ? pourcent(e.reussites / e.matchs) : <span className="discret">—</span>
+      },
     },
     {
       cle: 'suivi',

@@ -1,6 +1,7 @@
 import { PARAMS_CALIBRAGE, calibrer, ratingVersIndex, type Calibrage, type PointCalibrage } from './calibrage'
 import { cotationDIndex } from './cotations'
 import { normaliserParams, type Diagnostic, type EtatRating, type Formule, type Params, type PointHistorique } from './formulas/types'
+import { estStyleConnu } from './stylesBloc'
 import type { Dataset } from './types'
 
 /**
@@ -61,6 +62,13 @@ export interface LigneGrimpeur {
   cotationNiveau: string
   /** Cotation affichee la plus dure reellement envoyee. */
   meilleureCotation: string | null
+  /**
+   * Meme donnee que `meilleureCotation`, ventilee par style de bloc affronte
+   * (secteur -> cotation). Un style absent de l'objet n'a jamais ete envoye
+   * par ce grimpeur. Agregation pure sur les ascensions brutes : disponible
+   * quelle que soit la formule active, contrairement a `stylesGrimpeur`.
+   */
+  meilleureCotationParStyle: Record<string, string>
   /** Salles ou le grimpeur a au moins un match compte. */
   gyms: string[]
   /**
@@ -177,6 +185,11 @@ export function executer(
 
   // --- Grimpeurs --------------------------------------------------------------
   const meilleure = new Map<string, number>()
+  // Meme calcul que `meilleure`, ventile par style (cf. `LigneGrimpeur.meilleureCotationParStyle`) :
+  // pure agregation sur les ascensions brutes, independante de toute formule —
+  // contrairement a `SortieFormule.parStyle` (Elo bloc uniquement), disponible
+  // quelle que soit la formule active.
+  const meilleureParStyle = new Map<string, Map<string, number>>()
   const gymsParGrimpeur = new Map<string, Set<string>>()
   for (const a of dataset.ascensions) {
     const b = dataset.blocParId.get(a.blocId)
@@ -186,6 +199,12 @@ export function executer(
     if (a.resultat !== 'reussite') continue
     const courant = meilleure.get(a.grimpeurId)
     if (courant === undefined || b.indexOfficiel > courant) meilleure.set(a.grimpeurId, b.indexOfficiel)
+    if (estStyleConnu(b.secteur)) {
+      if (!meilleureParStyle.has(a.grimpeurId)) meilleureParStyle.set(a.grimpeurId, new Map())
+      const parStyle = meilleureParStyle.get(a.grimpeurId)!
+      const courantStyle = parStyle.get(b.secteur)
+      if (courantStyle === undefined || b.indexOfficiel > courantStyle) parStyle.set(b.secteur, b.indexOfficiel)
+    }
   }
 
   const grimpeurs: LigneGrimpeur[] = dataset.grimpeurs.map((g) => {
@@ -206,6 +225,9 @@ export function executer(
       indexNiveau,
       cotationNiveau: cotationDIndex(indexNiveau),
       meilleureCotation: best === undefined ? null : cotationDIndex(best),
+      meilleureCotationParStyle: Object.fromEntries(
+        [...(meilleureParStyle.get(g.id) ?? new Map())].map(([style, idx]) => [style, cotationDIndex(idx)])
+      ),
       gyms: [...(gymsParGrimpeur.get(g.id) ?? [])].sort((x, y) => x.localeCompare(y, 'fr')),
       stylesGrimpeur: sortie.parStyle?.has(g.id) ? Object.fromEntries(sortie.parStyle.get(g.id)!) : undefined,
     }
