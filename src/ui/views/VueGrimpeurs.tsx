@@ -6,6 +6,7 @@ import type { LigneGrimpeur, Resultat } from '../../core/pipeline'
 import { STYLES_BLOC } from '../../core/stylesBloc'
 import { BasculeVue } from '../charts/base'
 import { COULEURS_SERIES, Courbes, type Serie } from '../charts/Courbes'
+import { Histogramme } from '../charts/Histogramme'
 import { Carte, LegendeCote, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { dateCourte, nombre, pourcent } from '../format'
@@ -360,6 +361,20 @@ export function VueGrimpeurs({
           tri={triClassement}
           onTri={setTriClassement}
           pageTaille={25}
+        />
+      </Carte>
+
+      <Carte
+        titre={t('Distribution des grimpeurs', 'Climber distribution')}
+        sousTitre={t(
+          'Nombre de grimpeurs classés par niveau calculé (la cotation envoyée une fois sur deux).',
+          'Number of ranked climbers by calculated level (the grade sent half the time).'
+        )}
+      >
+        <Histogramme
+          valeurs={classement.map((g) => g.indexNiveau)}
+          uniteX={t('cote V', 'V grade')}
+          uniteY={t('grimpeurs', 'climbers')}
         />
       </Carte>
 

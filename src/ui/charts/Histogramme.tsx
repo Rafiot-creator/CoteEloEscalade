@@ -15,17 +15,20 @@ export function Histogramme({
   largeurClasse = 0.5,
   hauteur = 220,
   uniteX,
+  uniteY,
   couleur = 'var(--serie-1)',
 }: {
   valeurs: number[]
   largeurClasse?: number
   hauteur?: number
   uniteX?: string
+  uniteY?: string
   couleur?: string
 }) {
   const { montrer, cacher, noeud } = useInfobulle()
   const { t } = useLangue()
   const unite = uniteX ?? t('cote', 'grade')
+  const uniteEffectif = uniteY ?? t('blocs', 'boulders')
 
   return (
     <Enveloppe>
@@ -58,7 +61,7 @@ export function Histogramme({
                 x={x}
                 formatY={(v) => nombre(v)}
                 formatX={(v) => signe(v, Math.abs(v) < 1 ? 1 : 0)}
-                titreY={t('blocs', 'boulders')}
+                titreY={uniteEffectif}
               />
 
               {classes.map((n, i) => {
@@ -84,7 +87,7 @@ export function Histogramme({
                             `${signe(min + i * largeurClasse, 1)} à ${signe(min + (i + 1) * largeurClasse, 1)} ${unite}`,
                             `${signe(min + i * largeurClasse, 1)} to ${signe(min + (i + 1) * largeurClasse, 1)} ${unite}`
                           ),
-                          lignes: [[t('Blocs', 'Boulders'), nombre(n)]],
+                          lignes: [[uniteEffectif[0].toUpperCase() + uniteEffectif.slice(1), nombre(n)]],
                         })
                       }
                       onMouseLeave={cacher}

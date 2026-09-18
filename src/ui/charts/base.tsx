@@ -135,7 +135,7 @@ export function Cadre({
         </text>
       ))}
       {titreY && (
-        <text className="axe-texte" x={MARGE.gauche - 7} y={MARGE.haut - 6} textAnchor="end">
+        <text className="axe-texte" x={MARGE.gauche} y={MARGE.haut - 6} textAnchor="start">
           {titreY}
         </text>
       )}

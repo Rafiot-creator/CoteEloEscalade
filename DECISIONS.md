@@ -240,3 +240,25 @@ est un changement dans `src/core/sources/` et nulle part ailleurs.
   envisagée, pas commencée »). Il faut une base *et* un serveur (ou un service qui fournit les
   deux, ex. Supabase) — une base seule, exposée au navigateur, ne peut appliquer aucune règle
   d'accès. Raphaël a choisi d'attendre plutôt que de commencer.
+- **Uniformiser les cotes entre centres** une fois qu'il y en aura plusieurs avec de vraies
+  données, discuté le 18 septembre 2026. Deux pistes complémentaires, aucune codée :
+  - *Grimpeurs-ponts avec cote figée à l'exterieur* : un grimpeur qui visite un centre autre que
+    le sien voit ses duels là-bas influencer les blocs visités, sans que ses propres duels
+    ailleurs ne fassent bouger sa cote d'origine (evite qu'un petit echantillon hors de son
+    centre habituel la deregle) — analogue au « common-person equating » en psychometrie, ou la
+    capacite de la personne-pont est traitee comme connue et fixe pendant la liaison. Piste
+    ecartee : une liste de priorite manuelle entre centres (centre A calibre B, jamais
+    l'inverse) — jette du signal reel plutot que de le ponderer, et une liste figee vieillit mal
+    a mesure que les centres murissent. Preferee : ponderer l'effet d'un grimpeur-pont par
+    l'incertitude (RD Glicko) deja presente sur sa cote d'origine au moment de la visite, plutot
+    qu'imposer un ordre — un pont peu etabli chez lui influence peu le centre visite, un pont
+    tres etabli influence plus, et ca s'ajuste seul avec le temps.
+  - *Comparaison des distributions de grimpeurs entre centres* (equipercentile equating) :
+    complementaire, pas un remplacement — ne distingue pas « meme population, echelle mal
+    calibree » de « populations reellement differentes » (une salle plus technique ou plus
+    orientee entrainement peut reellement attirer un profil different, ce qui imiterait un
+    decalage de cotation dans les donnees). Les grimpeurs-ponts ont leur propre biais inverse
+    (probablement plus motives/forts que la moyenne, pas un echantillon representatif). Usage
+    envisage : comparer les deux estimations de decalage (ponts vs distributions) comme
+    validation croisee plutot que de se fier a une seule ; les comparer sur les medianes/quantiles
+    plutot que la moyenne, la distribution des grimpeurs etant probablement asymetrique.
