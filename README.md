@@ -747,9 +747,13 @@ calcul — voir plus bas pourquoi ça ne suffisait plus.
 ### Pastilles, survol et popup
 
 Les blocs sont des pastilles rondes à fond métallique (dégradé + reflet), la cotation V
-affichée au centre. La couleur de fond suit la couleur réelle des prises (bleu, vert, jaune,
-orange, rouge, noir, blanc, mauve — `PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte
-clair ou foncé choisi pour rester lisible sur chaque fond.
+affichée au centre. La couleur de fond suit la couleur réelle des prises (dix valeurs au
+17 septembre 2026 — mauve, bleu, turquoise, vert, jaune, orange, rouge, rose, noir, blanc ;
+`PALETTE_COULEURS` dans `VueCarte.tsx`), avec un texte clair ou foncé choisi pour rester
+lisible sur chaque fond. Les huit couleurs d'origine ont été remplacées par des hex précis
+fournis par Raphaël un par un (rouge, jaune, vert, bleu, orange, noir, blanc — mauve gardé tel
+quel), puis rose et turquoise ajoutés aux deux mêmes valeurs — voir le journal du 17 septembre
+2026 pour le détail de chaque échange.
 
 **Taille des pastilles.** Leur rayon (`RAYON` dans `VueCarte.tsx`) suit la largeur réelle de la
 carte selon une échelle continue plutôt qu'un seuil fixe : `RAYON = largeur × 1,8 %`, borné
@@ -1611,3 +1615,13 @@ fait accompli.
   dans Chrome (accès complet et vue visiteur) : sélectionner un style met à jour les trois
   colonnes et leur titre (ex. « Duels gagnés (Dalle) ») ; revenir à « Cote globale » restaure les
   totaux habituels. Tests (64) et build au vert.
+- Palette des pastilles de la Carte (`PALETTE_COULEURS`, `VueCarte.tsx`) précisée couleur par
+  couleur, Raphaël fournissant un hex exact à chaque fois plutôt qu'une teinte choisie au jugé :
+  rouge `#FF0800`, jaune `#FFEF00`, vert `#55DD33`, bleu `#0000FF`, orange `#FF5800`, noir
+  `#100C08`, blanc `#FEFEFA` (mauve gardé tel quel, sur demande explicite). Le vert, nettement
+  plus clair qu'avant, a fait perdre son contraste au texte blanc du chiffre : basculé au texte
+  foncé (`#111`), comme le jaune/l'orange/le blanc. Deux couleurs ajoutées ensuite, toujours en
+  hex exact : **rose** `#FE28A2` (après rouge) et **turquoise** `#7FFFD4` (entre bleu et vert),
+  dix couleurs en tout désormais. Chaque changement vérifié dans Chrome (panneau « Modifier le
+  bloc », accès complet) avant commit — tests et build au vert à chaque fois, ce fichier ne
+  touchant à aucun calcul.

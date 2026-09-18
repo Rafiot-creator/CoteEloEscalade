@@ -443,6 +443,23 @@ colonnes et leurs titres pour tous les grimpeurs affiches, revenir a "Cote globa
 totaux (confirme sur Victor Bergeron : 57 % de duels gagnes tous styles, 92 % en Dalle
 specifiquement). Tests (64) et build au vert.
 
+**Fin de session : palette des pastilles precisee couleur par couleur.** Raphael a fourni un hex
+exact pour chaque couleur existante de `PALETTE_COULEURS` (`VueCarte.tsx`), un message par
+couleur, plutot que de choisir une teinte au jugé : rouge `#FF0800`, jaune `#FFEF00`, vert
+`#55DD33`, bleu `#0000FF`, orange `#FF5800`, noir `#100C08`, blanc `#FEFEFA`. Mauve laisse tel
+quel sur demande explicite ("On garde le mauve"). Puis deux couleurs ajoutees, toujours en hex
+exact : rose `#FE28A2` (nouvelle entree apres rouge) et turquoise `#7FFFD4` (nouvelle entree
+entre bleu et vert) — dix couleurs en tout desormais.
+
+Seul ajustement fait de ma propre initiative (pas demande explicitement, mais necessaire pour
+rester lisible) : le vert `#55DD33` est nettement plus clair que l'ancien `#16a34a`, le texte
+blanc du chiffre y perdait tout contraste — bascule au texte fonce (`#111`), comme le
+jaune/l'orange/le blanc/le rose/le turquoise (meme logique de contraste appliquee a chaque
+nouvelle couleur claire). Chaque changement verifie dans Chrome (panneau "Modifier le bloc" en
+accès complet, une pastille testee a chaque fois) avant de commit/push — ce fichier ne touchant
+a aucun calcul, tests (64) et build systematiquement au vert. Dix commits distincts au total
+(un par couleur), tous pousses et deployes avec succes.
+
 ## Prochaine étape
 
 Au choix de Raphael à la prochaine session :
