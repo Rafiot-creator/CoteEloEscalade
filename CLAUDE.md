@@ -480,9 +480,61 @@ a aucun calcul, tests (64) et build systematiquement au vert. Dix commits distin
   l'ecran Blocs n'a pas change visuellement. Tests (64) et build au vert. Pousse (commit
   `b69a094`), deploiement GitHub Pages verifie vert.
 
+## État au 2026-10-19
+
+Raphaël a relancé le sujet d'une carte précise de Rose Bloc 1 (vectorielle, pas la photo brute),
+en demandant explicitement ce qui n'allait pas le 18 septembre et si une autre IA aiderait.
+Diagnostic demandé à Raphaël plutôt que redeviné : **formes inexactes**, confirmé par lui — pas
+un problème de style ou d'infos manquantes. Cause identifiée : la tentative du 18 septembre
+traçait des `<polygon points="...">` à l'œil à partir de la photo (coordonnées devinées) ; une
+autre IA ferait la même estimation à l'œil, pas mieux. Un modèle d'image serait pire (inventerait
+une salle plausible). Ce qu'il faut, ce ne sont pas de meilleures estimations mais des
+coordonnées exactes.
+
+Trois pistes proposées, par ordre de rentabilité : (1) demander le fichier source du plan au
+propriétaire de Rose Bloc — la grille pointillée et les polygones nets du plan suggèrent un
+dessin vectoriel d'origine, probablement récupérable directement ; (2) un outil de traçage où
+Raphaël clique les contours sur la photo (coordonnées exactes par construction, pas une
+estimation) ; (3) un seuillage automatique en accélérateur du (2), jamais seul. **Raphaël a
+choisi de tenter (1) d'abord** — message au propriétaire en cours. Si ça échoue, retour à (2).
+
+En attendant la réponse du propriétaire, l'outil (2) a été construit et vérifié, mais **laissé en
+réserve** (décision explicite de Raphaël). Gardé hors Git jusqu'au 2026-10-22, puis commité et
+poussé ce jour-là à la demande de Raphaël, avant son changement d'ordinateur :
+
+- `outils/tracer.html` — page de traçage (canevas, clic = sommet, fermeture sur Entrée/double-clic,
+  accrochage aux sommets déjà posés pour les murs mitoyens, redressement de perspective optionnel
+  par homographie à partir de 4 coins cliqués, export JSON en coordonnées 0–1 comme `BlocCarte`).
+  Servie uniquement par `npm run dev` (`http://localhost:5173/outils/tracer.html?image=...`) —
+  absente de `dist/`, vérifié après `npm run build`.
+- `vite.config.ts` — ajout d'un plugin `tracerPlan` (`configureServer`, donc dev uniquement) qui
+  écrit le JSON exporté directement dans `data/cartes/`, avec un garde-fou sur le nom de fichier
+  (pas de séparateur de chemin ni de `..`).
+- Vérifié dans Chrome : traçage d'un polygone à 6 sommets, renommage en direct, écriture réelle
+  dans le dépôt, redressement de perspective vérifié par le calcul (coins = les 4 coins de l'image
+  elle-même → ratio et coordonnées retrouvés à 0,0013 près, écart imputable à l'imprécision du
+  clic, pas à une erreur du solveur). Tests (64) et build au vert. Fichier de test généré pendant
+  la vérification supprimé après coup (`data/cartes/rose-bloc-1.murs.json`).
+
+**Problème repéré en examinant la photo actuelle avant de proposer de tracer dessus** :
+`public/cartes/rose-bloc-1.jpg` coupe le plan sur son bord gauche — Campus Board, Kilter's
+Homies, Vendetta Wall et Workshop sont tronqués par le cadrage, leurs murs continuent hors image.
+Tracer dessus produirait une carte amputée. **Si on en vient à l'option (2) : il faut d'abord une
+nouvelle photo du plan entier, bien en face, les 4 coins de la feuille visibles** (sert aussi au
+redressement de perspective) — pas la peine de tracer avant ça.
+
 ## Prochaine étape
 
-Au choix de Raphael à la prochaine session :
+En tête de liste : **attendre la réponse de Rose Bloc** sur un éventuel fichier source du plan
+(demande en cours depuis le 19 octobre). Si un fichier arrive : l'utiliser directement, pas besoin
+de tracer. Si la réponse est négative ou ne vient pas : reprendre l'outil `outils/tracer.html`
+(déjà construit et vérifié, en réserve, commité le 2026-10-22) — d'abord demander à Raphaël une photo du
+plan entier bien en face (la photo actuelle est tronquée à gauche, voir § 2026-10-19 ci-dessus),
+puis tracer, puis écrire le script qui transforme le JSON exporté en SVG (style aligné sur la
+Carte Démo, étiquettes orientées sur l'axe principal de chaque mur — pas encore écrit, volontairement
+laissé pour quand il y aura un vrai tracé à lui donner).
+
+Autres pistes, au choix de Raphael si celle-ci n'avance pas :
 
 - **Retester sur le téléphone** le vocabulaire de style (Blocs/Grimpeurs/Carte) et le tri
   automatique sur sélection, introduits le 17 septembre — vérifié dans Chrome bureau seulement à
@@ -492,9 +544,6 @@ Au choix de Raphael à la prochaine session :
   septembre) — l'algorithme garantit l'absence de chevauchement, mais la disposition reste
   générée, pas affinée à l'œil. Raphael peut vouloir la retoucher à la main, ou la laisser telle
   quelle.
-- **Rose Bloc 1** reste sur sa photo brute comme fond de carte — pas une tâche en attente (essayé
-  et refusé le 18 septembre), seulement à reconsidérer si Raphael relance le sujet lui-même, avec
-  plus de précision sur ce qui n'allait pas cette fois.
 
 Autres pistes en attente si rien de ce qui précède ne ressort : brancher de vraies données sur un
 des centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans

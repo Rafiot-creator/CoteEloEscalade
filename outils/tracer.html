@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracer un plan de salle — CoteEloEscalade</title>
+<!--
+  Outil de developpement, jamais deploye : `npm run build` ne construit que
+  index.html, donc cette page n'existe que sous `npm run dev`
+  (http://localhost:5173/outils/tracer.html).
+
+  Raison d'etre : une carte vectorielle de salle tracee "a l'oeil" par un
+  modele a partir d'une photo donne des formes inexactes (essaye le
+  2026-09-18, rejete — voir CLAUDE.md). Ici les coordonnees viennent des clics
+  de Raphael sur la photo : exactes au pixel pres. L'outil ne produit que le
+  trace des murs ; le placement des blocs existe deja dans le site lui-meme
+  (ecran Carte en acces complet).
+-->
+<style>
+  :root {
+    --fond: #1b1d21;
+    --panneau: #24272c;
+    --bord: #383c43;
+    --texte: #e8e6e3;
+    --doux: #9aa0a8;
+    --accent: #4ea1ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr 300px;
+    grid-template-areas: "barre barre" "toile panneau";
+    font: 14px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: var(--fond);
+    color: var(--texte);
+  }
+  header {
+    grid-area: barre;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 8px 12px;
+    background: var(--panneau);
+    border-bottom: 1px solid var(--bord);
+  }
+  button, select, input {
+    font: inherit;
+    color: var(--texte);
+    background: #2e3238;
+    border: 1px solid var(--bord);
+    border-radius: 6px;
+    padding: 5px 9px;
+  }
+  button { cursor: pointer; }
+  button:hover { background: #3a3f46; }
+  button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #0b1220; font-weight: 600; }
+  #zoneToile { grid-area: toile; position: relative; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+  canvas.naviguer { cursor: grab; }
+  aside {
+    grid-area: panneau;
+    display: flex; flex-direction: column;
+    background: var(--panneau);
+    border-left: 1px solid var(--bord);
+    overflow: hidden;
+  }
+  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--doux); margin: 14px 12px 6px; }
+  #liste { flex: 1; overflow-y: auto; padding: 0 10px 10px; }
+  .item { border: 1px solid var(--bord); border-radius: 8px; padding: 7px; margin-bottom: 7px; background: #2a2e34; }
+  .item.actif { border-color: var(--accent); }
+  .item .ligne { display: flex; gap: 5px; align-items: center; }
+  .item input[type=text] { flex: 1; min-width: 0; }
+  .item .meta { color: var(--doux); font-size: 12px; margin-top: 4px; }
+  .mini { padding: 4px 7px; font-size: 12px; }
+  #aide { padding: 10px 12px; border-top: 1px solid var(--bord); color: var(--doux); font-size: 12px; }
+  #aide kbd { background: #343941; border: 1px solid var(--bord); border-radius: 4px; padding: 0 4px; color: var(--texte); }
+  #etatTexte { color: var(--doux); margin-left: auto; }
+  .bloc-enreg { padding: 10px 12px; border-top: 1px solid var(--bord); display: flex; flex-direction: column; gap: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <strong>Tracer un plan</strong>
+  <button id="modeNaviguer" aria-pressed="true">Naviguer</button>
+  <button id="modeMur">Tracer un mur</button>
+  <button id="modeCoins">Coins du plan</button>
+  <span style="width:12px"></span>
+  <button id="ajuster">Ajuster a l'ecran</button>
+  <span id="etatTexte"></span>
+</header>
+
+<div id="zoneToile"><canvas id="toile" class="naviguer"></canvas></div>
+
+<aside>
+  <h2>Murs et zones</h2>
+  <div id="liste"></div>
+  <div class="bloc-enreg">
+    <label style="color:var(--doux);font-size:12px">Enregistrer dans <code>data/cartes/</code></label>
+    <input type="text" id="nomFichier" value="rose-bloc-1.murs.json">
+    <div style="display:flex;gap:6px">
+      <button id="enregistrer" style="flex:1">Enregistrer</button>
+      <button id="telecharger" class="mini">Telecharger</button>
+    </div>
+  </div>
+  <div id="aide">
+    <b>Tracer un mur</b> : un clic par sommet, <kbd>Entree</kbd> ou double-clic pour fermer.
+    <kbd>Retour</kbd> annule le dernier point, <kbd>Echap</kbd> le polygone entier.
+    Les sommets s'accrochent a ceux deja poses, pour que deux murs mitoyens partagent
+    exactement le meme coin.<br><br>
+    <b>Naviguer</b> : glisser pour deplacer la vue, molette pour zoomer. Glisser un sommet le
+    deplace, <kbd>Suppr</kbd> efface le mur selectionne.<br><br>
+    <b>Coins du plan</b> (facultatif) : clique les 4 coins de la feuille, dans le sens horaire
+    en partant du haut-gauche, pour corriger la perspective de la photo a l'export.
+  </div>
+</aside>
+
+<script>
+(() => {
+  'use strict'
+
+  const toile = document.getElementById('toile')
+  const ctx = toile.getContext('2d')
+  const parametres = new URLSearchParams(location.search)
+  // Chemin servi par Vite depuis public/ ; surchargeable en ?image=cartes/autre.jpg
+  const IMAGE = parametres.get('image') || 'cartes/rose-bloc-1.jpg'
+  const CLE_SAUVEGARDE = 'tracer:' + IMAGE
+  const RAYON_ACCROCHE = 10 // px ecran
+  const COULEUR_MUR = '#ffb648'
+  const COULEUR_ZONE = '#7fffd4'
+  const COULEUR_COINS = '#ff5f8d'
+
+  const etat = {
+    img: null,
+    echelle: 1, dx: 0, dy: 0,
+    mode: 'naviguer',
+    murs: [],       // { nom, type: 'mur'|'zone', points: [[x,y], ...] en pixels image }
+    encours: [],
+    coins: [],      // 4 coins de la feuille, pour le redressement facultatif
+    selection: -1,
+    glisse: null,   // { mur, sommet } pendant un deplacement de sommet
+  }
+  let pan = null
+
+  /* ---------- reperes ---------- */
+
+  const versEcran = (p) => [p[0] * etat.echelle + etat.dx, p[1] * etat.echelle + etat.dy]
+  const versImage = (x, y) => [(x - etat.dx) / etat.echelle, (y - etat.dy) / etat.echelle]
+
+  function positionSouris(e) {
+    const r = toile.getBoundingClientRect()
+    return [e.clientX - r.left, e.clientY - r.top]
+  }
+
+  /** Sommet (tous murs confondus) a moins de RAYON_ACCROCHE px ecran du point donne. */
+  function sommetProche(x, y, ignorerEncours) {
+    let meilleur = null
+    let meilleureDist = RAYON_ACCROCHE
+    etat.murs.forEach((m, iM) => {
+      m.points.forEach((p, iP) => {
+        const [sx, sy] = versEcran(p)
+        const d = Math.hypot(sx - x, sy - y)
+        if (d < meilleureDist) { meilleureDist = d; meilleur = { mur: iM, sommet: iP, point: p } }
+      })
+    })
+    if (!ignorerEncours) {
+      etat.encours.forEach((p, iP) => {
+        const [sx, sy] = versEcran(p)
+        const d = Math.hypot(sx - x, sy - y)
+        if (d < meilleureDist) { meilleureDist = d; meilleur = { mur: -1, sommet: iP, point: p } }
+      })
+    }
+    return meilleur
+  }
+
+  const centre = (pts) => [
+    pts.reduce((s, p) => s + p[0], 0) / pts.length,
+    pts.reduce((s, p) => s + p[1], 0) / pts.length,
+  ]
+
+  /* ---------- rendu ---------- */
+
+  function dessiner() {
+    const r = toile.getBoundingClientRect()
+    const densite = window.devicePixelRatio || 1
+    if (toile.width !== Math.round(r.width * densite) || toile.height !== Math.round(r.height * densite)) {
+      toile.width = Math.round(r.width * densite)
+      toile.height = Math.round(r.height * densite)
+    }
+    ctx.setTransform(densite, 0, 0, densite, 0, 0)
+    ctx.clearRect(0, 0, r.width, r.height)
+    if (!etat.img) return
+
+    ctx.save()
+    ctx.translate(etat.dx, etat.dy)
+    ctx.scale(etat.echelle, etat.echelle)
+    ctx.drawImage(etat.img, 0, 0)
+    ctx.restore()
+
+    // Polygones fermes. Traces en coordonnees ecran pour que l'epaisseur des
+    // traits et la taille des sommets ne changent pas avec le zoom.
+    etat.murs.forEach((m, i) => {
+      const couleur = m.type === 'zone' ? COULEUR_ZONE : COULEUR_MUR
+      const actif = i === etat.selection
+      cheminPolygone(m.points)
+      ctx.closePath()
+      ctx.fillStyle = couleur + (actif ? '44' : '22')
+      ctx.fill()
+      ctx.strokeStyle = couleur
+      ctx.lineWidth = actif ? 3 : 2
+      ctx.stroke()
+      if (actif) m.points.forEach((p) => poserSommet(versEcran(p), couleur))
+      etiquette(m, couleur)
+    })
+
+    // Polygone en cours de trace
+    if (etat.encours.length) {
+      cheminPolygone(etat.encours)
+      ctx.strokeStyle = '#4ea1ff'
+      ctx.lineWidth = 2
+      ctx.stroke()
+      etat.encours.forEach((p) => poserSommet(versEcran(p), '#4ea1ff'))
+    }
+
+    // Coins de la feuille
+    etat.coins.forEach((p, i) => {
+      const [x, y] = versEcran(p)
+      poserSommet([x, y], COULEUR_COINS)
+      ctx.fillStyle = COULEUR_COINS
+      ctx.font = 'bold 13px system-ui'
+      ctx.fillText(String(i + 1), x + 9, y - 7)
+    })
+    if (etat.coins.length === 4) {
+      cheminPolygone(etat.coins)
+      ctx.closePath()
+      ctx.strokeStyle = COULEUR_COINS
+      ctx.setLineDash([6, 5])
+      ctx.lineWidth = 2
+      ctx.stroke()
+      ctx.setLineDash([])
+    }
+  }
+
+  function cheminPolygone(points) {
+    ctx.beginPath()
+    points.forEach((p, k) => {
+      const [x, y] = versEcran(p)
+      if (k === 0) ctx.moveTo(x, y)
+      else ctx.lineTo(x, y)
+    })
+  }
+
+  function poserSommet([x, y], couleur) {
+    ctx.beginPath()
+    ctx.arc(x, y, 4.5, 0, Math.PI * 2)
+    ctx.fillStyle = '#12141a'
+    ctx.fill()
+    ctx.strokeStyle = couleur
+    ctx.lineWidth = 2
+    ctx.stroke()
+  }
+
+  function etiquette(m, couleur) {
+    if (!m.nom || m.points.length < 3) return
+    const [x, y] = versEcran(centre(m.points))
+    ctx.font = 'bold 12px system-ui'
+    ctx.textAlign = 'center'
+    const largeur = ctx.measureText(m.nom).width
+    ctx.fillStyle = 'rgba(12,14,18,0.78)'
+    ctx.fillRect(x - largeur / 2 - 5, y - 10, largeur + 10, 19)
+    ctx.fillStyle = couleur
+    ctx.fillText(m.nom, x, y + 4)
+    ctx.textAlign = 'start'
+  }
+
+  /* ---------- interactions ---------- */
+
+  toile.addEventListener('wheel', (e) => {
+    e.preventDefault()
+    const [x, y] = positionSouris(e)
+    const avant = versImage(x, y)
+    const facteur = Math.exp(-e.deltaY * 0.0015)
+    etat.echelle = Math.min(40, Math.max(0.02, etat.echelle * facteur))
+    const apres = versImage(x, y)
+    etat.dx += (apres[0] - avant[0]) * etat.echelle
+    etat.dy += (apres[1] - avant[1]) * etat.echelle
+    dessiner()
+  }, { passive: false })
+
+  toile.addEventListener('mousedown', (e) => {
+    const [x, y] = positionSouris(e)
+    if (etat.mode === 'mur') {
+      // Un clic = un sommet. L'accrochage aux sommets deja poses garantit que
+      // deux murs mitoyens partagent exactement le meme point, plutot que deux
+      // points a un pixel l'un de l'autre.
+      const proche = sommetProche(x, y)
+      etat.encours.push(proche ? proche.point.slice() : versImage(x, y))
+    } else if (etat.mode === 'coins') {
+      if (etat.coins.length >= 4) etat.coins = []
+      etat.coins.push(versImage(x, y))
+      sauvegarder()
+      majEtat()
+    } else {
+      const proche = sommetProche(x, y, true)
+      if (proche) {
+        etat.selection = proche.mur
+        etat.glisse = proche
+        majListe()
+      } else {
+        pan = { x, y, dx: etat.dx, dy: etat.dy }
+      }
+    }
+    dessiner()
+  })
+
+  window.addEventListener('mousemove', (e) => {
+    if (etat.glisse) {
+      const [x, y] = positionSouris(e)
+      etat.murs[etat.glisse.mur].points[etat.glisse.sommet] = versImage(x, y)
+      dessiner()
+    } else if (pan) {
+      const [x, y] = positionSouris(e)
+      etat.dx = pan.dx + (x - pan.x)
+      etat.dy = pan.dy + (y - pan.y)
+      dessiner()
+    }
+  })
+
+  window.addEventListener('mouseup', () => {
+    if (etat.glisse) sauvegarder()
+    etat.glisse = null
+    pan = null
+  })
+
+  toile.addEventListener('dblclick', (e) => {
+    e.preventDefault()
+    if (etat.mode !== 'mur') return
+    // Le second clic du double-clic a deja ajoute un sommet en doublon.
+    etat.encours.pop()
+    fermerPolygone()
+  })
+
+  window.addEventListener('keydown', (e) => {
+    const cible = e.target.tagName
+    if (cible === 'INPUT' || cible === 'SELECT' || cible === 'TEXTAREA') return
+    if (e.key === 'Enter') { fermerPolygone(); e.preventDefault() }
+    else if (e.key === 'Escape') { etat.encours = []; dessiner() }
+    else if (e.key === 'Backspace') { etat.encours.pop(); dessiner(); e.preventDefault() }
+    else if (e.key === 'Delete' && etat.selection >= 0) {
+      etat.murs.splice(etat.selection, 1)
+      etat.selection = -1
+      majListe(); sauvegarder(); dessiner()
+    }
+  })
+
+  function fermerPolygone() {
+    if (etat.encours.length < 3) return
+    etat.murs.push({ nom: 'Mur ' + (etat.murs.length + 1), type: 'mur', points: etat.encours })
+    etat.encours = []
+    etat.selection = etat.murs.length - 1
+    majListe(); sauvegarder(); dessiner()
+    const champ = document.querySelector('.item.actif input[type=text]')
+    if (champ) { champ.focus(); champ.select() }
+  }
+
+  /* ---------- panneau lateral ---------- */
+
+  function majListe() {
+    const liste = document.getElementById('liste')
+    liste.innerHTML = ''
+    etat.murs.forEach((m, i) => {
+      const div = document.createElement('div')
+      div.className = 'item' + (i === etat.selection ? ' actif' : '')
+      const ligne = document.createElement('div')
+      ligne.className = 'ligne'
+
+      const nom = document.createElement('input')
+      nom.type = 'text'
+      nom.value = m.nom
+      nom.addEventListener('input', () => { m.nom = nom.value; sauvegarder(); dessiner() })
+
+      const type = document.createElement('select')
+      for (const [valeur, libelle] of [['mur', 'Mur'], ['zone', 'Zone']]) {
+        const o = document.createElement('option')
+        o.value = valeur
+        o.textContent = libelle
+        if (m.type === valeur) o.selected = true
+        type.appendChild(o)
+      }
+      type.addEventListener('change', () => { m.type = type.value; sauvegarder(); dessiner() })
+
+      const suppr = document.createElement('button')
+      suppr.className = 'mini'
+      suppr.textContent = '✕'
+      suppr.title = 'Supprimer'
+      suppr.addEventListener('click', () => {
+        etat.murs.splice(i, 1)
+        if (etat.selection === i) etat.selection = -1
+        majListe(); sauvegarder(); dessiner()
+      })
+
+      ligne.append(nom, type, suppr)
+      const meta = document.createElement('div')
+      meta.className = 'meta'
+      meta.textContent = m.points.length + ' sommets'
+      div.append(ligne, meta)
+      div.addEventListener('click', (e) => {
+        if (e.target === nom || e.target === type || e.target === suppr) return
+        etat.selection = i
+        majListe(); dessiner()
+      })
+      liste.appendChild(div)
+    })
+    majEtat()
+  }
+
+  function majEtat() {
+    document.getElementById('etatTexte').textContent =
+      etat.murs.length + ' trace(s) · ' +
+      (etat.coins.length === 4
+        ? 'perspective corrigee'
+        : 'perspective brute (' + etat.coins.length + '/4 coins)')
+  }
+
+  /* ---------- redressement de perspective ---------- */
+
+  /** Resout A.x = b par elimination de Gauss avec pivot partiel. */
+  function resoudre(A, b) {
+    const n = b.length
+    const M = A.map((ligne, i) => [...ligne, b[i]])
+    for (let col = 0; col < n; col++) {
+      let pivot = col
+      for (let l = col + 1; l < n; l++) if (Math.abs(M[l][col]) > Math.abs(M[pivot][col])) pivot = l
+      const tampon = M[col]; M[col] = M[pivot]; M[pivot] = tampon
+      const p = M[col][col]
+      if (Math.abs(p) < 1e-12) throw new Error('coins degeneres')
+      for (let c = col; c <= n; c++) M[col][c] /= p
+      for (let l = 0; l < n; l++) {
+        if (l === col) continue
+        const f = M[l][col]
+        if (!f) continue
+        for (let c = col; c <= n; c++) M[l][c] -= f * M[col][c]
+      }
+    }
+    return M.map((ligne) => ligne[n])
+  }
+
+  /**
+   * Homographie envoyant les 4 coins cliques sur le carre unite.
+   *
+   * Appliquer cette transformation aux sommets traces revient exactement a
+   * avoir trace sur une photo redressee, sans avoir a reechantillonner l'image.
+   */
+  function homographie(coins) {
+    const d = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1])
+    const largeur = (d(coins[0], coins[1]) + d(coins[3], coins[2])) / 2
+    const hauteur = (d(coins[0], coins[3]) + d(coins[1], coins[2])) / 2
+    const cible = [[0, 0], [1, 0], [1, 1], [0, 1]]
+    const A = []
+    const b = []
+    for (let i = 0; i < 4; i++) {
+      const x = coins[i][0], y = coins[i][1], u = cible[i][0], v = cible[i][1]
+      A.push([x, y, 1, 0, 0, 0, -u * x, -u * y]); b.push(u)
+      A.push([0, 0, 0, x, y, 1, -v * x, -v * y]); b.push(v)
+    }
+    const h = resoudre(A, b)
+    h.push(1)
+    return { h, ratio: largeur / hauteur }
+  }
+
+  function appliquer(H, p) {
+    const h = H.h
+    const w = h[6] * p[0] + h[7] * p[1] + h[8]
+    return [
+      (h[0] * p[0] + h[1] * p[1] + h[2]) / w,
+      (h[3] * p[0] + h[4] * p[1] + h[5]) / w,
+    ]
+  }
+
+  /* ---------- export ---------- */
+
+  function exporter() {
+    const L = etat.img.naturalWidth
+    const H = etat.img.naturalHeight
+    const homo = etat.coins.length === 4 ? homographie(etat.coins) : null
+    const vers01 = (p) => (homo ? appliquer(homo, p) : [p[0] / L, p[1] / H])
+    return {
+      image: IMAGE,
+      largeurImage: L,
+      hauteurImage: H,
+      redresse: !!homo,
+      // Rapport largeur/hauteur du plan une fois redresse : donne le viewBox du
+      // SVG genere. Sans redressement, celui de la photo elle-meme.
+      ratio: +(homo ? homo.ratio : L / H).toFixed(4),
+      coins: etat.coins.map((p) => [Math.round(p[0]), Math.round(p[1])]),
+      murs: etat.murs.map((m) => ({
+        nom: m.nom,
+        type: m.type,
+        points: m.points.map((p) => vers01(p).map((v) => +v.toFixed(5))),
+      })),
+    }
+  }
+
+  document.getElementById('enregistrer').addEventListener('click', async () => {
+    const bouton = document.getElementById('enregistrer')
+    const fichier = document.getElementById('nomFichier').value.trim()
+    try {
+      const reponse = await fetch('/__tracer/enregistrer', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ fichier, contenu: exporter() }),
+      })
+      const resultat = await reponse.json()
+      bouton.textContent = resultat.ok ? 'Enregistre ✓' : 'Echec : ' + resultat.erreur
+    } catch (e) {
+      bouton.textContent = 'Echec : ' + e.message
+    }
+    setTimeout(() => { bouton.textContent = 'Enregistrer' }, 2500)
+  })
+
+  document.getElementById('telecharger').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(exporter(), null, 2)], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = document.getElementById('nomFichier').value.trim() || 'trace.json'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  })
+
+  /* ---------- sauvegarde locale ---------- */
+
+  function sauvegarder() {
+    try {
+      localStorage.setItem(CLE_SAUVEGARDE, JSON.stringify({ murs: etat.murs, coins: etat.coins }))
+    } catch (e) { /* navigation privee, quota : le travail reste en memoire */ }
+  }
+
+  function recharger() {
+    try {
+      const brut = localStorage.getItem(CLE_SAUVEGARDE)
+      if (!brut) return
+      const d = JSON.parse(brut)
+      etat.murs = d.murs || []
+      etat.coins = d.coins || []
+    } catch (e) { /* sauvegarde illisible : on repart a vide */ }
+  }
+
+  /* ---------- modes et cadrage ---------- */
+
+  const boutons = {
+    naviguer: document.getElementById('modeNaviguer'),
+    mur: document.getElementById('modeMur'),
+    coins: document.getElementById('modeCoins'),
+  }
+  for (const mode of Object.keys(boutons)) {
+    boutons[mode].addEventListener('click', () => {
+      etat.mode = mode
+      etat.encours = []
+      for (const m of Object.keys(boutons)) boutons[m].setAttribute('aria-pressed', String(m === mode))
+      toile.classList.toggle('naviguer', mode === 'naviguer')
+      dessiner()
+    })
+  }
+
+  function ajuster() {
+    if (!etat.img) return
+    const r = toile.getBoundingClientRect()
+    etat.echelle = Math.min(r.width / etat.img.naturalWidth, r.height / etat.img.naturalHeight) * 0.96
+    etat.dx = (r.width - etat.img.naturalWidth * etat.echelle) / 2
+    etat.dy = (r.height - etat.img.naturalHeight * etat.echelle) / 2
+    dessiner()
+  }
+  document.getElementById('ajuster').addEventListener('click', ajuster)
+
+  // ResizeObserver est throttle sur un onglet sans focus : l'evenement resize
+  // suffit ici et reste fiable.
+  window.addEventListener('resize', dessiner)
+
+  const img = new Image()
+  img.onload = () => { etat.img = img; recharger(); majListe(); ajuster() }
+  img.onerror = () => { document.getElementById('etatTexte').textContent = 'Image introuvable : ' + IMAGE }
+  img.src = '/' + IMAGE
+})()
+</script>
+</body>
+</html>
