@@ -18,7 +18,7 @@ export const schemaGrimpeur = z
   .object({
     id: texte,
     nom: texte,
-    sexe: z.enum(['F', 'M', 'X'], { errorMap: () => ({ message: 'sexe attendu : F, M ou X' }) }),
+    sexe: z.enum(['F', 'M', 'X'], { error: 'sexe attendu : F, M ou X' }),
     gym_principal: z.string().trim().default(''),
     premiere_saison: z.coerce.number().int().min(1900).max(2100),
     // Facultatif : beaucoup de salles ne demandent rien a l'inscription.
@@ -64,9 +64,7 @@ export const schemaAscension = z
     date: dateIso,
     grimpeur_id: texte,
     bloc_id: texte,
-    resultat: z.enum(['reussite', 'echec'], {
-      errorMap: () => ({ message: 'resultat attendu : reussite ou echec' }),
-    }),
+    resultat: z.enum(['reussite', 'echec'], { error: 'resultat attendu : reussite ou echec' }),
     // Note par les salles, ignore par les formules (cf. types.ts).
     essais: z.coerce.number().int().min(1).max(999).optional().default(1),
   })
