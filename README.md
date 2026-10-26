@@ -1676,6 +1676,30 @@ fait accompli.
   dans Chrome que l'écran Blocs (qui utilise la valeur par défaut) n'a pas bougé. Tests (64) et
   build au vert.
 
+### 2026-10-19
+
+- Retour sur une carte vectorielle précise de Rose Bloc 1, rejetée le 18 septembre. Raphaël a
+  confirmé que le problème venait des **formes inexactes**, pas du style ni d'informations
+  manquantes. Cause : les `<polygon>` avaient été tracés à l'œil à partir de la photo, avec des
+  coordonnées devinées. Une autre IA ferait la même estimation, et un modèle d'image inventerait
+  une salle plausible. Il faut des coordonnées exactes, pas de meilleures estimations.
+- Trois pistes, par ordre de rentabilité : (1) demander le fichier source du plan au
+  propriétaire de Rose Bloc (sa grille pointillée et ses polygones nets suggèrent un dessin
+  vectoriel d'origine) ; (2) un outil où Raphaël clique les contours sur la photo ; (3) un
+  seuillage automatique, seulement pour accélérer la (2). Raphaël a choisi de tenter (1) d'abord,
+  et la demande au propriétaire est en cours.
+- En attendant, l'outil (2) a été construit et vérifié, puis laissé en réserve (commité le
+  2026-10-22) : `outils/tracer.html` (clic = sommet, fermeture sur Entrée ou double-clic,
+  accrochage aux sommets déjà posés pour les murs mitoyens, redressement de perspective optionnel
+  par homographie à partir de 4 coins, export JSON en coordonnées 0–1 comme `BlocCarte`). Le
+  plugin `tracerPlan` de `vite.config.ts` écrit ce JSON dans `data/cartes/`, avec un garde-fou
+  sur le nom de fichier. Les deux n'existent qu'avec `npm run dev`
+  (`http://localhost:5173/outils/tracer.html?image=...`) : ils sont absents de `dist/`.
+- Problème repéré sur la photo actuelle (`public/cartes/rose-bloc-1.jpg`) : le plan est coupé à
+  gauche (Campus Board, Kilter's Homies, Vendetta Wall et Workshop sont tronqués). Avant de
+  tracer quoi que ce soit, il faudra une nouvelle photo du plan entier, prise bien en face, avec
+  les 4 coins de la feuille visibles (ils servent aussi au redressement de perspective).
+
 ### 2026-10-26
 
 Maintenance des dépendances, sur un nouvel ordinateur. `npm audit` signalait 8 failles
