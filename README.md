@@ -175,7 +175,7 @@ défaut. À utiliser pour vérifier une intuition, pas comme réglage permanent.
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test               # 62 tests sur le cœur de calcul
+npm test               # 64 tests sur le cœur de calcul
 npm run build          # site statique dans dist/
 npm run data:generate  # régénère le jeu de données de démonstration
 ```
@@ -1111,7 +1111,7 @@ fichiers. GitHub Pages suffit, et le dépôt contient déjà tout ce qu'il faut.
 **Ce qui est en place :**
 
 - `.github/workflows/deploy.yml` — à chaque poussée sur `main`, GitHub vérifie les types,
-  lance les 62 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
+  lance les 64 tests, construit le site et le publie. Un site qui ne compile pas, ou dont le
   cœur de calcul est cassé, n'est jamais mis en ligne.
 - `base: './'` dans `vite.config.ts` — les chemins d'assets sont relatifs, donc le site
   fonctionne quel que soit le nom du dépôt, sans configuration à ajuster.
@@ -1675,3 +1675,19 @@ fait accompli.
   gauche juste après l'axe, pour ne plus tronquer un mot plus long comme « grimpeurs ». Vérifié
   dans Chrome que l'écran Blocs (qui utilise la valeur par défaut) n'a pas bougé. Tests (64) et
   build au vert.
+
+### 2026-10-26
+
+Maintenance des dépendances, sur un nouvel ordinateur. `npm audit` signalait 8 failles
+(2 critiques, 3 élevées, 3 modérées). Aucune ne touchait vraiment le site publié : les critiques
+venaient de `tinypool` (lanceur de tests), les modérées du serveur de dev (`esbuild`/`vite`), et
+la seule bibliothèque livrée dans le site, zod, n'exposait qu'un risque de saturation mémoire sur
+un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm audit` à 0 :
+
+- vitest 2 → 5, vite 5 → 8 et `@vitejs/plugin-react` 4 → 6, montés ensemble (vitest 5 exige
+  vite ≥ 6.4, plugin-react 6 exige vite 8). `package-lock.json` régénéré de zéro. vitest 5
+  demande Node ≥ 22.12.
+- zod 3 → 4 : `errorMap` devient `error` dans `src/core/loaders/schemas.ts`, seul changement de
+  code. L'ancien et le nouveau schéma ont été comparés sur 26 lignes CSV piégées : mêmes lignes
+  acceptées ou refusées, mêmes valeurs. Seul le texte anglais des messages d'erreur par défaut de
+  zod change ; les messages en français écrits pour ce projet sont inchangés.

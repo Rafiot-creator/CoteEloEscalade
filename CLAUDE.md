@@ -24,17 +24,22 @@ rejetées). Ne pas ré-expliquer ce qui y est déjà écrit.**
 
 ## Environnement (machine Windows de Raphael)
 
-- Ni Git ni Node.js n'étaient installés au départ ; les deux ont été installés via winget le
-  2026-09-13 (Git 2.55, Node 24.19 LTS, npm 11.17).
-- Dépôt cloné dans `C:\Users\Raphael\Projets\CoteEloEscalade`.
-- `npm install` fait, `npm test` passe (62 tests) au 2026-09-13.
+- **Nouvel ordinateur depuis fin octobre 2026.** Dépôt dans
+  `C:\Users\Admin\Projets\CoteEloEscalade` (Git 2.56, Node 24.22, npm 11.19 au 2026-10-26).
+- Identité Git réglée **pour ce dépôt seulement** (`git config user.name/user.email`, pas
+  `--global`) le 2026-10-26, reprise des commits précédents : `Raphael <raph.rebelo@gmail.com>`.
+- Push HTTPS via le gestionnaire d'identifiants Git (pas de `gh` installé) : la connexion GitHub
+  a été faite par Raphael lui-même (`! git push`) le 2026-10-26 ; un push depuis Claude devrait
+  désormais passer sans invite.
+- Ancien ordinateur, pour mémoire : Git et Node installés via winget le 2026-09-13, dépôt dans
+  `C:\Users\Raphael\Projets\CoteEloEscalade`.
 
 ## Commandes utiles
 
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test                # 62 tests sur le cœur de calcul
+npm test                # 64 tests sur le cœur de calcul
 npm run build           # site statique dans dist/
 npm run data:generate   # régénère le jeu de données de démonstration
 ```
@@ -522,6 +527,30 @@ Homies, Vendetta Wall et Workshop sont tronqués par le cadrage, leurs murs cont
 Tracer dessus produirait une carte amputée. **Si on en vient à l'option (2) : il faut d'abord une
 nouvelle photo du plan entier, bien en face, les 4 coins de la feuille visibles** (sert aussi au
 redressement de perspective) — pas la peine de tracer avant ça.
+
+## État au 2026-10-26
+
+Session de maintenance sur le nouvel ordinateur : `npm audit` signalait 8 failles (2 critiques,
+3 élevées, 3 modérées), aucune dans le comportement du site publié lui-même (outils de test et
+serveur de dev, plus zod, sans vrai risque pour un site sans serveur). Toutes corrigées,
+`npm audit` à 0 :
+
+- `npm audit fix` (sans changement de version majeure) : `source-map-js`.
+- **vitest 2 → 5, vite 5 → 8, `@vitejs/plugin-react` 4 → 6** (commit `dcca352`), en une seule
+  montée : vitest 5 exige vite ≥ 6.4, et plugin-react 6 exige vite 8. `package-lock.json`
+  régénéré de zéro, l'ancien figeait esbuild 0.21, incompatible avec vite 8 (npm refusait de
+  résoudre sinon). vitest 5 demande Node ≥ 22.12 : la CI (`node-version: 22`) suffit. Vérifié :
+  tests, build, serveur de dev, `outils/tracer.html` et son écriture via `/__tracer/enregistrer`
+  (garde-fou `..` toujours actif).
+- **zod 3 → 4** (commit `4673448`) : seul changement de code, `errorMap` → `error` sur les deux
+  `z.enum` de `src/core/loaders/schemas.ts`. Comparé v3/v4 (via `zod/v3`, encore livré dans
+  zod 4) sur 26 lignes CSV piégées : mêmes lignes acceptées/refusées, mêmes valeurs produites.
+  Seul le libellé anglais des messages d'erreur par défaut de zod change (« Too small: expected
+  number to be >=1900 » au lieu de « Number must be greater than or equal to 1900 ») ; les
+  messages français personnalisés sont inchangés.
+
+Tests (64) et build au vert, poussé, déploiement GitHub Pages vérifié vert. **Pas vérifié à
+l'œil dans un navigateur** après le passage à vite 8 — à faire au prochain lancement.
 
 ## Prochaine étape
 
