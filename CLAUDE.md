@@ -549,8 +549,23 @@ serveur de dev, plus zod, sans vrai risque pour un site sans serveur). Toutes co
   number to be >=1900 » au lieu de « Number must be greater than or equal to 1900 ») ; les
   messages français personnalisés sont inchangés.
 
-Tests (64) et build au vert, poussé, déploiement GitHub Pages vérifié vert. **Pas vérifié à
-l'œil dans un navigateur** après le passage à vite 8 — à faire au prochain lancement.
+Tests (64) et build au vert, poussé, déploiement GitHub Pages vérifié vert.
+
+Site en ligne vérifié ensuite après le passage à vite 8 : Raphaël a regardé lui-même (« il a
+l'air bien »), puis visite de chaque onglet en accès complet par Chrome headless piloté par
+`puppeteer-core` (installé dans le scratchpad, pas dans le projet — l'extension Claude in Chrome
+n'était pas connectée) : 0 anomalie de chargement, aucune erreur JS, Carte et bascule FR/EN OK.
+Bureau seulement, pas sur téléphone.
+
+Ajout d'une **icône d'onglet** (commit `cef351d`), qui supprime le seul 404 du site
+(`favicon.ico`, jamais fourni) : `public/favicon.svg`, pastille rouge `#FF0800` avec le même
+reflet que les pastilles de la Carte (`BRILLANT`, `VueCarte.tsx`) et un « V » blanc, validée par
+Raphaël sur aperçu avant publication. Plus `public/apple-touch-icon.png` (180 px, fond `#fafaf7`,
+rendu depuis le SVG) pour l'écran d'accueil iOS, qui ne lit pas le SVG. Liens dans `index.html`
+en `/favicon.svg` : Vite les réécrit en `./` au build (`base: './'`), vérifié dans `dist/`.
+Déploiement vérifié vert, les deux fichiers répondent 200 en ligne.
+
+Entrée du 2026-10-19 ajoutée au journal du README (elle n'existait que dans ce fichier).
 
 ## Prochaine étape
 

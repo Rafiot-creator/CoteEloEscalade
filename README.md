@@ -1715,3 +1715,9 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   code. L'ancien et le nouveau schéma ont été comparés sur 26 lignes CSV piégées : mêmes lignes
   acceptées ou refusées, mêmes valeurs. Seul le texte anglais des messages d'erreur par défaut de
   zod change ; les messages en français écrits pour ce projet sont inchangés.
+- Site en ligne revérifié après ces mises à jour, onglet par onglet en accès complet : données
+  chargées sans anomalie, aucune erreur JavaScript.
+- Ajout d'une icône d'onglet (`public/favicon.svg`) : une pastille rouge au reflet brillant,
+  dans le style des pastilles de la Carte, avec un « V » blanc. Une version PNG
+  (`public/apple-touch-icon.png`) sert à l'écran d'accueil des iPhone, qui ne lisent pas le SVG.
+  Le site n'avait jamais eu d'icône, ce qui provoquait la seule erreur 404 de chaque visite.
