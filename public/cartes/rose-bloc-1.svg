@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 772" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="520" height="772" fill="#ffffff"/>
+  <!-- Bâtiment (face intérieure des murs porteurs) -->
+  <polygon points="492.5,13.3 492.5,726.3 13.2,726.3 13.2,13.3" fill="#f7f7f4" stroke="#222" stroke-width="5"/>
+  <polygon points="451.7,680.2 360,704.7 373.7,757.7 387.6,754.1 390.7,765.4 455.3,748.6 452.4,737.1 464.9,733.2 451.7,680.2" fill="#f7f7f4" stroke="#222" stroke-width="3"/>
+  <!-- Pièces hors grimpe -->
+  <polygon points="13.2,13.3 13.2,157 105.6,156.8 109.9,156.1 114.2,154.6 119.7,151.5 124.3,146.9 126.7,143.6 128.1,140.7 130.1,134.2 130.3,13.3" fill="#eceae3" stroke="#222" stroke-width="1.5"/>
+  <polygon points="318.7,591.4 318.7,726.3 31.2,726.3 31.2,591.4" fill="#eceae3" stroke="#222" stroke-width="1.5"/>
+  <polygon points="474.9,627.4 474.9,641.8 390.2,641.3 386.6,640.9 382.8,639.6 377.5,636.8 372.5,632.2 371.7,630.5 370.1,628.6 368.4,624.8 367.2,619.5 366.9,615.2 367.9,609.9 370.3,603.6 372.5,600.3 375.3,597.4 377.5,595.5 384.9,591.9 390.5,590.9 396.5,590.9 396.7,586.6 470.4,586.6 470.6,590.9 474.9,590.9 474.9,605.3 465.8,605.3 465.8,596.2 447.8,596.2 447.8,605.3 420.7,605.3 420.7,596.2 411.1,596.2 411.1,605.3 388.8,605.6 386.4,606.8 383,610.1 381.3,614.2 381.3,617.1 382.1,620.7 384,623.1 384.2,624 388.8,626.7 391.4,627.2 428.4,627.4 428.4,636.5 428.9,636.5 428.9,627.4 458.1,627.4 458.1,636.5 458.6,636.5 458.6,627.4" fill="#eceae3" stroke="#222" stroke-width="1.5"/>
+  <!-- Structures de grimpe -->
+  <polygon points="339.1,32.5 282.7,46.8 283.2,47.3 271.7,55 167,55 167,96.5 385.2,96.5 416.9,126.5 414.2,231.2 418.5,295.7 370.1,352.1 350.4,456.5 378.2,535.5 422.4,562.1 456.7,559.7 450,523.7 431.7,524.5 422.1,518.7 408.5,413.3 468.9,302.7 459.3,227.3 481.7,169.7 492.5,169.7 492.5,36.5 481.7,36.5 481.4,70.4 443.7,32.5" fill="#dedcd4" stroke="#222" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="13.2,157 13.7,217 15.1,217.5 29,253.7 24.7,312.1 37.4,345.2 41,440.2 74.9,492.5 70.1,512 50.9,525.9 22.5,536.9 21.8,535 22.5,539.1 13.2,540.5 13.2,571.5 36.2,571.3 102.2,545.6 121.7,461.6 81.8,359.3 76.5,228.8 61.4,157" fill="#dedcd4" stroke="#222" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M201.1,173.3 L122.6,237.9 L112.5,273.9 L129.1,309.9 L166.8,354.1 L192.2,445.3 L212.1,487.7 L284.6,487.5 L299,481 L304.5,451.7 L305,375.4 L327.3,330.8 L345.6,232.6 L305.3,184.1 Z M217.2,250.9 L195.1,273.4 L207.8,294.1 L208.1,346.4 L210.2,350.2 L217.9,374.2 L237.1,452.7 L253.4,455.3 L261.1,451.5 L261.1,373.3 L285.1,325.7 L280.8,291.9 L292.3,269.3 L282.2,257.6 Z" fill-rule="evenodd" fill="#dedcd4" stroke="#222" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Secteurs (noms repris de l'affiche du centre) -->
+  <text x="266" y="64" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#333" letter-spacing="0.5">LE FIN FOND</text>
+  <text x="428" y="72" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#333" letter-spacing="0.5">BAT CAVE</text>
+  <text x="442" y="257" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(90 442 257)">DALLE</text>
+  <text x="387" y="475" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(90 387 475)">LA BALEINE</text>
+  <text x="248" y="217" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="700" fill="#333" letter-spacing="0.5">TITANIC + LE 35°</text>
+  <text x="284" y="408" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(90 284 408)">LE ROSE</text>
+  <text x="177" y="331" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(90 177 331)">LA PROUE</text>
+  <text x="37" y="204" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(90 37 204)">CAMPUS BOARD</text>
+  <text x="54" y="272" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(90 54 272)">KILTER'S HOMIES</text>
+  <text x="65" y="396" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(90 65 396)">VENDETTA WALL</text>
+  <text x="46" y="548" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="700" fill="#333" letter-spacing="0.5" transform="rotate(-28 46 548)">WORKSHOP</text>
+  <text x="72" y="76" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#666" letter-spacing="0.5">ZONE</text>
+  <text x="72" y="92" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#666" letter-spacing="0.5">MUSCULATION</text>
+  <text x="175" y="659" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#666" letter-spacing="0.5">VESTIAIRES</text>
+  <text x="416" y="670" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#666" letter-spacing="0.5">ACCUEIL</text>
+</svg>

@@ -931,9 +931,13 @@ visiteur.
   positions sont générées, pas affinées à la main (chaque changement de taxonomie du style a
   jusqu'ici invalidé tout affinage précédent — les zones ne se correspondent pas d'une
   taxonomie à l'autre).
-- **Rose Bloc 1** — une vraie photo du plan de la salle (`public/cartes/rose-bloc-1.jpg`),
-  fournie par Raphaël et nettoyée des dates griffonnées au crayon (masquage colorimétrique +
-  interpolation), sans bloc positionné pour l'instant.
+- **Rose Bloc 1** — une carte vectorielle (`public/cartes/rose-bloc-1.svg`) tirée du plan
+  d'origine du centre, un PDF exporté d'Adobe Illustrator fourni par Raphaël le 2026-10-28. Les
+  contours des structures de grimpe et du bâtiment sont les coordonnées exactes du PDF, pas un
+  calque à l'œil. Carte tournée d'un quart de tour par rapport au PDF pour suivre l'affiche du
+  centre (accueil et vestiaires en bas). Les noms de secteurs, absents du PDF, sont repris de
+  l'ancienne photo et placés à l'œil ; les limites entre secteurs ne sont pas dessinées. Sans
+  bloc positionné pour l'instant.
 - Les autres centres du menu n'ont pas encore de carte : l'écran affiche un canevas vierge,
   cliquable en accès complet pour commencer à y placer des blocs.
 
@@ -1721,3 +1725,23 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   dans le style des pastilles de la Carte, avec un « V » blanc. Une version PNG
   (`public/apple-touch-icon.png`) sert à l'écran d'accueil des iPhone, qui ne lisent pas le SVG.
   Le site n'avait jamais eu d'icône, ce qui provoquait la seule erreur 404 de chaque visite.
+
+### 2026-10-28
+
+- Le propriétaire de Rose Bloc a fourni les plans des deux salles (`Plan RB1.pdf`,
+  `Plan RB2.pdf`, dans les téléchargements de Raphaël, pas dans le dépôt).
+- **Rose Bloc 1** : PDF exporté d'Illustrator, entièrement vectoriel (aucune image), donc
+  exactement ce qu'on espérait le 19 octobre : pas besoin de l'outil de traçage. Tracés extraits
+  avec pdfjs (dans un dossier temporaire, rien ajouté aux dépendances du projet) et regroupés par
+  style de trait. Les structures de grimpe sont les quatre contours fermés à trait de 0,5 pt
+  (bande le long du mur, anneau de l'îlot et son creux, bande du bas). Le PDF les découpe en
+  marches d'environ 0,5 unité, ramenées à 14–27 sommets par Douglas-Peucker (tolérance 0,6) sans
+  perte de forme visible. Le contour du bâtiment est redessiné en simple rectangle : les murs du
+  PDF sont découpés autour de chaque porte et fenêtre. `public/cartes/rose-bloc-1.svg` remplace
+  la photo (`rose-bloc-1.jpg`, retirée) ; vérifié par superposition avec la totalité des tracés
+  d'origine. Le PDF est couché (accueil à droite) alors que l'affiche du centre est en hauteur
+  (accueil en bas) : la carte suit l'affiche, ce qui convient aussi mieux à un téléphone.
+- **Rose Bloc 2** : PDF exporté d'Adobe Express qui ne contient qu'une image JPEG de 1080 × 1080
+  px. Pas de coordonnées exactes à extraire, mais un plan complet, vu de dessus et sans
+  déformation : cas idéal pour `outils/tracer.html`, sans redressement de perspective. Pas encore
+  commencé.

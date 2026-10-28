@@ -567,16 +567,31 @@ Déploiement vérifié vert, les deux fichiers répondent 200 en ligne.
 
 Entrée du 2026-10-19 ajoutée au journal du README (elle n'existait que dans ce fichier).
 
+## État au 2026-10-28
+
+Rose Bloc a fourni les plans des deux salles (`Plan RB1.pdf`, `Plan RB2.pdf`, dans
+`C:\Users\Admin\Downloads`, pas dans le dépôt). Détail dans le README, journal du 2026-10-28.
+
+- **Rose Bloc 1 fait** : PDF Illustrator 100 % vectoriel, contours extraits exactement (pdfjs et
+  puppeteer-core dans le scratchpad, rien ajouté au projet). `public/cartes/rose-bloc-1.svg`
+  remplace la photo (`.jpg` supprimé). Validé par Raphaël sur aperçu avant intégration
+  (« parfait »). Orientation de l'affiche du centre (accueil en bas, PDF tourné d'un quart de tour
+  horaire). Noms de secteurs repris de l'ancienne photo, placés à l'œil ; limites entre secteurs
+  non dessinées. Le script d'assemblage n'est pas commité (dépend du PDF hors dépôt et de pdfjs) :
+  pour retoucher la carte, éditer directement le SVG. Vérifié dans Chrome headless (bureau et
+  390 px, pas de défilement horizontal, aucune erreur), tests (64) et build au vert.
+- **Rose Bloc 2** : le PDF (Adobe Express) ne contient qu'une image JPEG de 1080 × 1080 px, pas
+  de vecteurs. Plan complet et vu de dessus : à tracer avec `outils/tracer.html`, sans
+  redressement de perspective. Déjà dans le menu des centres (`rose-bloc-2`, `src/App.tsx`), sans
+  carte ni données : il lui faudra aussi un `data/cartes/rose-bloc-2.json`.
+
 ## Prochaine étape
 
-En tête de liste : **attendre la réponse de Rose Bloc** sur un éventuel fichier source du plan
-(demande en cours depuis le 19 octobre). Si un fichier arrive : l'utiliser directement, pas besoin
-de tracer. Si la réponse est négative ou ne vient pas : reprendre l'outil `outils/tracer.html`
-(déjà construit et vérifié, en réserve, commité le 2026-10-22) — d'abord demander à Raphaël une photo du
-plan entier bien en face (la photo actuelle est tronquée à gauche, voir § 2026-10-19 ci-dessus),
-puis tracer, puis écrire le script qui transforme le JSON exporté en SVG (style aligné sur la
-Carte Démo, étiquettes orientées sur l'axe principal de chaque mur — pas encore écrit, volontairement
-laissé pour quand il y aura un vrai tracé à lui donner).
+En tête de liste : **la carte de Rose Bloc 2**. Copier l'image du PDF (`Plan RB2.pdf`, une
+seule image JPEG 1080 × 1080) dans le dépôt, la tracer avec `outils/tracer.html` (aucune
+perspective à corriger), puis écrire le script qui transforme le JSON exporté en SVG dans le style
+de Rose Bloc 1 (`public/cartes/rose-bloc-1.svg` sert de modèle). Retours éventuels de Raphaël
+sur la carte de Rose Bloc 1 (noms de secteurs, sens) à traiter en priorité s'il y en a.
 
 Autres pistes, au choix de Raphael si celle-ci n'avance pas :
 
