@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 30 2510 2470" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect x="40" y="30" width="2510" height="2470" fill="#ffffff"/>
+  <!-- Bâtiment : face intérieure des murs porteurs, façade vitrée mesurée sur le trait orange du plan -->
+  <polygon points="96.1,123.6 2484,123.6 2484,2446 739.2,2446" fill="#f7f7f4" stroke="#222" stroke-width="24" stroke-linejoin="miter"/>
+  <!-- Pièces hors grimpe -->
+  <polygon points="614.3,1995 1270,1995 1270,2446 739.2,2446" fill="#eceae3" stroke="#222" stroke-width="7"/>
+  <polygon points="1684,1960 2484,1960 2484,2446 1684,2446" fill="#eceae3" stroke="#222" stroke-width="7"/>
+  <line x1="1684" y1="2334" x2="2484" y2="2334" stroke="#222" stroke-width="5"/>
+  <line x1="2084" y1="2334" x2="2084" y2="2446" stroke="#222" stroke-width="5"/>
+  <!-- Rangement de prises : ouvert à gauche sur le plan, fermé ici (demande de Raphaël) -->
+  <polygon points="1668,980 2378.4,980 2378.4,1153.2 2374.8,1156.8 1668,1152" fill="#eceae3" stroke="#222" stroke-width="7"/>
+  <!-- Training center (rôles donnés par Raphaël) : musculation, matelas du spraywall -->
+  <polygon points="261.6,698.4 706.8,700.8 709.2,1028.4 362.4,1028.4 360,1023.6 352.8,1023.6" fill="#eceae3" stroke="#bbb" stroke-width="4"/>
+  <polygon points="722.4,744 1261.2,744 1261.2,1030.8 1212,1030.8 1212,934.8 1208.4,932.4 752.4,932.4 750,934.8 750,1028.4 724.8,1028.4" fill="#efede7" stroke="#bbb" stroke-width="4"/>
+  <!-- Mur de vitesse, spraywall, board -->
+  <polygon points="2169.6,141.6 2451.6,141.6 2451.6,337.2 2169.6,337.2" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <polygon points="765.6,948 1196.4,948 1196.4,1030.8 765.6,1028.4" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <polygon points="1844.4,937.2 1924.8,937.2 1924.8,970.8 1684.8,970.8 1684.8,938.4" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Structures de grimpe (validées par Raphaël : zones entre le mur ou le cadre noir et le premier trait gris) -->
+  <polygon points="230.4,139.2 2067.6,139.2 2067.6,172.8 1896,171.6 1873.2,207.6 1837.2,274.8 1659.6,274.8 1652.4,286.8 1606.8,404.4 897.6,404.4 880.8,358.8 876,354 688.8,354 636,237.6 628.8,229.2 458.4,229.2 411.6,158.4 230.4,159.6" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <polygon points="2438.4,500.4 2468.4,500.4 2468.4,973.2 2410.8,973.2 2408.4,970.8 2016,970.8 2016,931.2 2276.4,931.2 2431.2,764.4 2438.4,756" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <polygon points="376.8,1044 1261.2,1046.4 1261.2,1119.6 1160.4,1119.6 1006.8,1254 906,1189.2 718.8,1189.2 552,1443.6 553.2,1459.2 567.6,1508.4 501.6,1525.2 504,1522.8 504,1506 492,1496.4 492,1489.2 487.2,1479.6 487.2,1472.4 427.2,1263.6 417.6,1221.6 415.2,1220.4 410.4,1195.2 408,1194 391.2,1126.8 381.6,1099.2 381.6,1092 374.4,1074 372,1063.2 376.8,1057.2" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <polygon points="2378.4,987.6 2468.4,988.8 2468.4,1040.4 2466,1042.8 2466,1057.2 2468.4,1058.4 2468.4,1506 2466,1508.4 2466,1521.6 2468.4,1524 2468.4,1864.8 1668,1864.8 1668,1826.4 1898.4,1826.4 2131.2,1752 2138.4,1754.4 2218.8,1756.8 2305.2,1569.6 2304,1554 2238,1329.6 1989.6,1275.6 1668,1268.4 1668,1152 2374.8,1156.8 2378.4,1153.2" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <polygon points="975.6,1780.8 986.4,1783.2 1028.4,1783.2 1036.8,1785.6 1261.2,1795.2 1261.2,1867.2 590.4,1866 583.2,1843.2 583.2,1840.8 770.4,1840.8" fill="#dedcd4" stroke="#222" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Zones (noms et positions repris du plan) -->
+  <text x="1236" y="244" text-anchor="middle" dominant-baseline="middle" font-size="52" font-weight="700" fill="#333" letter-spacing="2">COMP WALL</text>
+  <text x="1454" y="652" text-anchor="middle" dominant-baseline="middle" font-size="52" font-weight="700" fill="#333" letter-spacing="2">TRAINING CENTER</text>
+  <text x="1394" y="1534" text-anchor="middle" dominant-baseline="middle" font-size="52" font-weight="700" fill="#333" letter-spacing="2">MAIN ROOM</text>
+  <text x="2311" y="214" text-anchor="middle" dominant-baseline="middle" font-size="34" font-weight="700" fill="#333" letter-spacing="2">MUR DE</text>
+  <text x="2311" y="262" text-anchor="middle" dominant-baseline="middle" font-size="34" font-weight="700" fill="#333" letter-spacing="2">VITESSE</text>
+  <text x="981" y="990" text-anchor="middle" dominant-baseline="middle" font-size="34" font-weight="700" fill="#333" letter-spacing="2">SPRAYWALL</text>
+  <text x="1805" y="895" text-anchor="middle" dominant-baseline="middle" font-size="34" font-weight="700" fill="#333" letter-spacing="2">BOARD</text>
+  <text x="485" y="865" text-anchor="middle" dominant-baseline="middle" font-size="40" fill="#666" letter-spacing="2">MUSCULATION</text>
+  <text x="2023" y="1068" text-anchor="middle" dominant-baseline="middle" font-size="34" fill="#666" letter-spacing="2">RANGEMENT DE PRISES</text>
+  <text x="985" y="2220" text-anchor="middle" dominant-baseline="middle" font-size="44" fill="#666" letter-spacing="2">MAGASIN</text>
+  <text x="1477" y="2200" text-anchor="middle" dominant-baseline="middle" font-size="44" fill="#666" letter-spacing="2">ACCUEIL</text>
+  <text x="2084" y="2147" text-anchor="middle" dominant-baseline="middle" font-size="44" fill="#666" letter-spacing="2">VESTIAIRES</text>
+  <text x="1884" y="2392" text-anchor="middle" dominant-baseline="middle" font-size="36" fill="#666" letter-spacing="2">SAUNA</text>
+  <text x="2284" y="2392" text-anchor="middle" dominant-baseline="middle" font-size="36" fill="#666" letter-spacing="2">SAUNA</text>
+</svg>

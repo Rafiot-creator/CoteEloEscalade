@@ -938,6 +938,13 @@ visiteur.
   centre (accueil et vestiaires en bas). Les noms de secteurs, absents du PDF, sont repris de
   l'ancienne photo et placés à l'œil ; les limites entre secteurs ne sont pas dessinées. Sans
   bloc positionné pour l'instant.
+- **Rose Bloc 2** — une carte vectorielle (`public/cartes/rose-bloc-2.svg`) tirée du plan du
+  centre, un PDF d'Adobe Express qui ne contient qu'une image : les contours ont été détectés
+  automatiquement sur cette image, au pixel près (voir le journal du 2026-10-28). Même sens que
+  le plan (accueil en bas), même style que Rose Bloc 1. Noms de zones repris du plan (Comp Wall,
+  Training Center, Main Room, Accueil, Vestiaires, Sauna) ou donnés par Raphaël (mur de vitesse,
+  spraywall, board, musculation, rangement de prises, magasin). Sans bloc positionné pour
+  l'instant.
 - Les autres centres du menu n'ont pas encore de carte : l'écran affiche un canevas vierge,
   cliquable en accès complet pour commencer à y placer des blocs.
 
@@ -1743,5 +1750,21 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   (accueil en bas) : la carte suit l'affiche, ce qui convient aussi mieux à un téléphone.
 - **Rose Bloc 2** : PDF exporté d'Adobe Express qui ne contient qu'une image JPEG de 1080 × 1080
   px. Pas de coordonnées exactes à extraire, mais un plan complet, vu de dessus et sans
-  déformation : cas idéal pour `outils/tracer.html`, sans redressement de perspective. Pas encore
-  commencé.
+  déformation. Plutôt que de le tracer à la main avec `outils/tracer.html`, ses régions ont été
+  détectées automatiquement (script dans un dossier temporaire, rien ajouté au projet) : image
+  rendue dans Chrome, seuillage des traits, dilatation de 3 pixels pour fermer les petits jours,
+  étiquetage des régions fermées, contour de chacune simplifié par Douglas-Peucker. Quatre
+  « raccords » tracés à la main ferment des traits qui s'arrêtent juste avant leur voisin. Les
+  grands titres peints dans l'image sont masqués avant le seuillage ; un premier jet avait des
+  rectangles de masque à la mauvaise échelle, qui effaçaient des bouts de murs et faisaient fuir
+  les régions dans le sol (trouvé grâce à une image de contrôle des régions). La façade vitrée
+  (oblique) est une droite ajustée sur le trait orange du plan, à 3,6 unités près au pire.
+  Lecture des murs d'escalade validée par Raphaël : la zone entre le mur (ou le cadre noir) et le
+  premier trait gris. Il a corrigé la bande du bas à gauche de la Main Room, dont le trait noir
+  s'interrompt (espace de rangement derrière le mur) : un raccord prolonge ce trait. Raphaël a
+  aussi nommé les éléments sans légende du plan : mur de vitesse (en haut à droite), spraywall et
+  son matelas, board, espace de musculation, magasin (à gauche de l'accueil) et rangement de
+  prises (entre la Main Room et le Training Center, ouvert à gauche sur le plan, fermé sur la
+  carte à sa demande). Le script d'assemblage n'est pas commité (il dépend du PDF hors dépôt) :
+  pour retoucher la carte, éditer directement le SVG. `data/cartes/rose-bloc-2.json` créé, sans
+  bloc.

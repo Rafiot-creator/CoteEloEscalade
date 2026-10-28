@@ -580,18 +580,20 @@ Rose Bloc a fourni les plans des deux salles (`Plan RB1.pdf`, `Plan RB2.pdf`, da
   non dessinées. Le script d'assemblage n'est pas commité (dépend du PDF hors dépôt et de pdfjs) :
   pour retoucher la carte, éditer directement le SVG. Vérifié dans Chrome headless (bureau et
   390 px, pas de défilement horizontal, aucune erreur), tests (64) et build au vert.
-- **Rose Bloc 2** : le PDF (Adobe Express) ne contient qu'une image JPEG de 1080 × 1080 px, pas
-  de vecteurs. Plan complet et vu de dessus : à tracer avec `outils/tracer.html`, sans
-  redressement de perspective. Déjà dans le menu des centres (`rose-bloc-2`, `src/App.tsx`), sans
-  carte ni données : il lui faudra aussi un `data/cartes/rose-bloc-2.json`.
+- **Rose Bloc 2 fait** : le PDF (Adobe Express) ne contient qu'une image JPEG de 1080 × 1080 px.
+  Pas tracé à la main : régions détectées automatiquement sur l'image (seuillage, étiquetage,
+  Douglas-Peucker, dans le scratchpad), `public/cartes/rose-bloc-2.svg` +
+  `data/cartes/rose-bloc-2.json` (sans bloc). Lecture des murs d'escalade et noms des éléments
+  sans légende (mur de vitesse, spraywall, board, musculation, rangement de prises, magasin)
+  donnés par Raphaël, aperçu validé (« C'est bon ! »). Script non commité : éditer le SVG
+  directement pour retoucher. Vérifié dans Chrome headless (bureau et 390 px), tests (64) et
+  build au vert.
 
 ## Prochaine étape
 
-En tête de liste : **la carte de Rose Bloc 2**. Copier l'image du PDF (`Plan RB2.pdf`, une
-seule image JPEG 1080 × 1080) dans le dépôt, la tracer avec `outils/tracer.html` (aucune
-perspective à corriger), puis écrire le script qui transforme le JSON exporté en SVG dans le style
-de Rose Bloc 1 (`public/cartes/rose-bloc-1.svg` sert de modèle). Retours éventuels de Raphaël
-sur la carte de Rose Bloc 1 (noms de secteurs, sens) à traiter en priorité s'il y en a.
+Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
+des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 
 Autres pistes, au choix de Raphael si celle-ci n'avance pas :
 
