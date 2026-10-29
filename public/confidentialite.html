@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <title>Confidentialité — Cote Elo Escalade</title>
+    <meta name="description" content="Politique de confidentialité du site Cote Elo Escalade : ce qui est recueilli, pourquoi, où c'est conservé et comment le faire supprimer." />
+    <style>
+      /* Page statique hors de l'application React (servie telle quelle depuis
+         public/) : memes couleurs que src/styles.css, sans en dependre. */
+      :root {
+        --fond: #fafaf7;
+        --encre: #0b0b0b;
+        --encre-2: #52514e;
+        --bord: rgba(11, 11, 11, 0.1);
+        --lien: #2a78d6;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fond: #121211;
+          --encre: #f2f2ee;
+          --encre-2: #b5b3ac;
+          --bord: rgba(242, 242, 238, 0.14);
+          --lien: #6ea8ff;
+        }
+      }
+      body {
+        margin: 0;
+        background: var(--fond);
+        color: var(--encre);
+        font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+      h1 { font-size: 26px; margin: 0 0 4px; }
+      h2 { font-size: 18px; margin: 28px 0 6px; }
+      p, li { color: var(--encre-2); }
+      strong { color: var(--encre); }
+      a { color: var(--lien); }
+      .date { font-size: 14px; margin: 0 0 20px; }
+      .langue { border-top: 1px solid var(--bord); margin-top: 48px; padding-top: 24px; }
+      nav { font-size: 14px; margin-bottom: 24px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav><a href="./">← Cote Elo Escalade</a> · <a href="#en">English</a></nav>
+
+      <h1>Politique de confidentialité</h1>
+      <p class="date">En vigueur le 29 octobre 2026</p>
+
+      <p>
+        Cote Elo Escalade est un projet personnel et non commercial qui calcule la difficulté des
+        blocs d'escalade à partir des réussites et des échecs des grimpeurs. Cette page dit quels
+        renseignements le site recueille, pourquoi, où ils sont conservés et comment les faire
+        supprimer.
+      </p>
+
+      <h2>Responsable</h2>
+      <p>
+        Raphaël, responsable du site et de la protection des renseignements personnels :
+        <a href="mailto:raph.rebelo@gmail.com">raph.rebelo@gmail.com</a>.
+      </p>
+
+      <h2>Ce qui est recueilli</h2>
+      <p>On peut consulter le site sans compte. Un compte n'est nécessaire que pour enregistrer ses envois.</p>
+      <ul>
+        <li>
+          <strong>Votre adresse courriel</strong>, pour vous connecter et, si vous utilisez un mot de
+          passe, pour confirmer l'adresse et réinitialiser un mot de passe oublié. Elle n'est
+          jamais affichée sur le site.
+        </li>
+        <li>
+          <strong>Votre mot de passe</strong>, si vous en choisissez un. Il est conservé sous forme
+          chiffrée (hachée) par notre hébergeur ; personne, y compris le responsable du site, ne
+          peut le lire.
+        </li>
+        <li>
+          <strong>Si vous vous connectez avec Google</strong> : Google nous transmet votre adresse
+          courriel, votre nom et l'adresse de votre photo de profil. Ils sont conservés avec votre
+          compte, mais seul le courriel sert (à vous connecter) ; le nom et la photo ne sont ni
+          affichés ni utilisés.
+        </li>
+        <li>
+          <strong>Votre pseudonyme</strong>, choisi à la première connexion. <strong>Il est
+          public</strong> : c'est le nom qui apparaît dans les classements.
+        </li>
+        <li>
+          <strong>Vos envois</strong> : pour chaque bloc, la date et le résultat (flash, réussi,
+          échec). <strong>Ils sont publics</strong>, associés à votre pseudonyme : le calcul des
+          cotes se fait dans le navigateur de chaque visiteur à partir de toutes les ascensions.
+        </li>
+      </ul>
+      <p>
+        Le site ne recueille rien d'autre : pas de publicité, pas de mesure d'audience, pas de
+        témoin (cookie) de suivi. Vos renseignements ne sont jamais vendus ni partagés à des fins
+        commerciales.
+      </p>
+
+      <h2>Sur votre appareil</h2>
+      <p>
+        Le navigateur garde localement votre session (pour rester connecté), la langue choisie et,
+        sans compte, le nom de grimpeur saisi sur la carte et les envois faits dans la démo. Ces
+        données restent sur votre appareil ; effacer les données du site dans le navigateur les
+        supprime.
+      </p>
+
+      <h2>Où c'est conservé</h2>
+      <ul>
+        <li>
+          Les comptes, pseudonymes et envois sont conservés par <strong>Supabase</strong>, dans un
+          centre de données situé <strong>au Canada</strong> (région ca-central-1).
+        </li>
+        <li>
+          Les pages du site sont servies par <strong>GitHub Pages</strong>, qui peut consigner
+          l'adresse IP des visiteurs pour des raisons de sécurité, comme tout hébergeur web.
+        </li>
+        <li>La connexion avec Google passe par <strong>Google</strong>, selon ses propres règles.</li>
+      </ul>
+
+      <h2>Combien de temps</h2>
+      <p>
+        Vos renseignements sont conservés tant que votre compte existe. Les envois sur un bloc
+        démonté restent dans l'historique, parce qu'ils continuent de compter dans les cotes.
+      </p>
+
+      <h2>Vos droits</h2>
+      <p>
+        Vous pouvez demander à consulter ou à corriger vos renseignements, ou à faire
+        <strong>supprimer votre compte</strong>, en écrivant à
+        <a href="mailto:raph.rebelo@gmail.com">raph.rebelo@gmail.com</a> depuis l'adresse du
+        compte. La suppression efface votre courriel, votre pseudonyme et tous vos envois. Une
+        réponse vous sera donnée dans les 30 jours.
+      </p>
+
+      <h2>Changements</h2>
+      <p>
+        Si cette politique change, la nouvelle version sera publiée sur cette page avec sa date
+        d'entrée en vigueur.
+      </p>
+
+      <div class="langue" id="en" lang="en">
+        <h1>Privacy policy</h1>
+        <p class="date">Effective October 29, 2026</p>
+
+        <p>
+          Cote Elo Escalade is a personal, non-commercial project that rates the difficulty of
+          climbing boulders from climbers' sends and failed attempts. This page explains what
+          information the site collects, why, where it is stored and how to have it deleted.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          Raphaël, who runs the site and is responsible for personal information:
+          <a href="mailto:raph.rebelo@gmail.com">raph.rebelo@gmail.com</a>.
+        </p>
+
+        <h2>What is collected</h2>
+        <p>You can browse the site without an account. An account is only needed to log your sends.</p>
+        <ul>
+          <li>
+            <strong>Your email address</strong>, to sign in and, if you use a password, to confirm
+            the address and reset a forgotten password. It is never shown on the site.
+          </li>
+          <li>
+            <strong>Your password</strong>, if you choose one. It is stored in hashed form by our
+            host; nobody, including the site owner, can read it.
+          </li>
+          <li>
+            <strong>If you sign in with Google</strong>: Google sends us your email address, your
+            name and the address of your profile picture. They are stored with your account, but
+            only the email is used (to sign you in); the name and picture are neither shown nor
+            used.
+          </li>
+          <li>
+            <strong>Your username</strong>, chosen when you first sign in. <strong>It is
+            public</strong>: it is the name shown in the rankings.
+          </li>
+          <li>
+            <strong>Your sends</strong>: for each boulder, the date and the result (flash, send,
+            fail). <strong>They are public</strong>, tied to your username: ratings are computed in
+            each visitor's browser from all ascents.
+          </li>
+        </ul>
+        <p>
+          Nothing else is collected: no ads, no analytics, no tracking cookies. Your information is
+          never sold or shared for commercial purposes.
+        </p>
+
+        <h2>On your device</h2>
+        <p>
+          Your browser stores your session (to keep you signed in), your language and, without an
+          account, the climber name typed on the map and the sends logged in the demo. This stays
+          on your device; clearing the site's data in your browser removes it.
+        </p>
+
+        <h2>Where it is stored</h2>
+        <ul>
+          <li>
+            Accounts, usernames and sends are stored by <strong>Supabase</strong>, in a data
+            centre located <strong>in Canada</strong> (ca-central-1 region).
+          </li>
+          <li>
+            The site's pages are served by <strong>GitHub Pages</strong>, which may log visitors'
+            IP addresses for security purposes, like any web host.
+          </li>
+          <li>Signing in with Google goes through <strong>Google</strong>, under its own terms.</li>
+        </ul>
+
+        <h2>How long</h2>
+        <p>
+          Your information is kept as long as your account exists. Sends on a boulder that has been
+          taken down stay in the history, because they still count in the ratings.
+        </p>
+
+        <h2>Your rights</h2>
+        <p>
+          You can ask to access or correct your information, or to have <strong>your account
+          deleted</strong>, by writing to
+          <a href="mailto:raph.rebelo@gmail.com">raph.rebelo@gmail.com</a> from the account's
+          address. Deletion erases your email, your username and all your sends. You will get an
+          answer within 30 days.
+        </p>
+
+        <h2>Changes</h2>
+        <p>If this policy changes, the new version will be posted on this page with its effective date.</p>
+      </div>
+    </main>
+  </body>
+</html>
