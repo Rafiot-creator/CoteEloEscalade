@@ -20,9 +20,12 @@ export function VueGrimpeurs({
   resultat,
   resultats,
   simplifie = false,
+  moi,
 }: {
   resultat: Resultat
   resultats: Map<string, Resultat>
+  /** Id du grimpeur du compte connecte : sa ligne est mise en evidence. */
+  moi?: string | null
   /** Vue visiteur : une seule colonne de cote (le melange), appelee simplement "Cote". */
   simplifie?: boolean
 }) {
@@ -318,12 +321,21 @@ export function VueGrimpeurs({
     },
   ]
 
+  const monRang = moi ? classement.findIndex((g) => g.id === moi) + 1 : 0
   const meilleur = classement[0]
   const median = classement[Math.floor(classement.length / 2)]
 
   return (
     <div className="large">
       <div className="grille tuiles">
+        {monRang > 0 && (
+          <Tuile
+            heros
+            etiquette={t('Votre position', 'Your rank')}
+            valeur={t(`${monRang}${monRang === 1 ? 'er' : 'e'}`, `#${monRang}`)}
+            note={t(`sur ${nombre(classement.length)} grimpeurs, surlignée en vert ci-dessous`, `of ${nombre(classement.length)} climbers, highlighted in green below`)}
+          />
+        )}
         <Tuile
           etiquette={t('Grimpeurs classés', 'Ranked climbers')}
           valeur={nombre(classement.length)}
@@ -361,6 +373,7 @@ export function VueGrimpeurs({
           tri={triClassement}
           onTri={setTriClassement}
           pageTaille={25}
+          enEvidence={moi ?? undefined}
         />
       </Carte>
 

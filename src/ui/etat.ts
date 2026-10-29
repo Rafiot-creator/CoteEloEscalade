@@ -5,6 +5,7 @@ import { paramsParDefaut, type Formule, type Params } from '../core/formulas/typ
 import { construireDataset } from '../core/loaders/dataset'
 import { executerMemo, type Resultat } from '../core/pipeline'
 import { chargerToutesLesSources } from '../core/sources'
+import { supabase } from '../core/supabase'
 import type { Ascension, Dataset } from '../core/types'
 import { ascensionsLocales } from './ascensionsLocales'
 
@@ -30,6 +31,13 @@ export interface Atelier {
   dataset: Dataset | null
   chargement: boolean
   erreur: string | null
+  /** Relit toute la base (apres la creation d'un pseudonyme, par exemple). */
+  recharger: () => void
+  /**
+   * Dernier envoi refuse par la base pour le compte connecte (connexion
+   * perdue, frein anti-rafale...). L'envoi a deja ete retire de l'ecran.
+   */
+  erreurEnvoi: string | null
 
   /**
    * Enregistre un envoi (flash / reussi / echec) depuis la Carte comme une
@@ -38,6 +46,12 @@ export interface Atelier {
    * (nom qui ne correspond a aucun grimpeur connu, bloc qui ne correspond a
    * aucun bloc du dataset — la Carte d'un centre sans jeu de donnees connecte,
    * par exemple).
+   *
+   * Pour le grimpeur du compte connecte, l'envoi est enregistre dans la base
+   * (`enregistrer_envoi`) et remplace a l'ecran ses ascensions precedentes
+   * sur ce bloc, comme la base vient de le faire. Pour tout autre nom, il
+   * reste propre a ce navigateur (`ascensionsLocales`), comme avant les
+   * comptes : le jeu de demonstration reste explorable sans compte.
    */
   enregistrerAscension: (blocId: string, grimpeurNom: string, type: TypeEnvoi) => 'ok' | EchecEnregistrement
   /**
@@ -77,8 +91,10 @@ export interface Atelier {
   oublier: () => void
 }
 
-export function useAtelier(): Atelier {
+export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null = null): Atelier {
   const [datasetBase, setDatasetBase] = useState<Dataset | null>(null)
+  const [generation, setGeneration] = useState(0)
+  const [erreurEnvoi, setErreurEnvoi] = useState<string | null>(null)
   const [ascensionsAjoutees, setAscensionsAjoutees] = useState<Ascension[]>(() => ascensionsLocales.lire())
   const [erreur, setErreur] = useState<string | null>(null)
 
@@ -101,7 +117,9 @@ export function useAtelier(): Atelier {
     return () => {
       vivant = false
     }
-  }, [])
+  }, [generation])
+
+  const recharger = useCallback(() => setGeneration((g) => g + 1), [])
 
   // Les ascensions ajoutees depuis la Carte s'ajoutent a celles du fichier :
   // le pipeline ne voit qu'un seul dataset, coherent, trie chronologiquement.
@@ -131,6 +149,27 @@ export function useAtelier(): Atelier {
         // ces valeurs ne font que refleter honnetement flash / plusieurs essais.
         essais: type === 'flash' ? 1 : type === 'reussi' ? 2 : 1,
       }
+      if (grimpeurConnecte && grimpeur.id === grimpeurConnecte.id) {
+        // Affiche tout de suite (meme remplacement que la base va faire),
+        // puis relit la base si elle refuse, pour ne pas montrer un envoi
+        // qui n'existe pas.
+        setErreurEnvoi(null)
+        const remplacer = (d: Dataset): Dataset => ({
+          ...d,
+          ascensions: [
+            ...d.ascensions.filter((a) => !(a.grimpeurId === grimpeur.id && a.blocId === blocId)),
+            ascension,
+          ].sort((a, b) => a.t - b.t),
+        })
+        setDatasetBase((d) => (d ? remplacer(d) : d))
+        void supabase.rpc('enregistrer_envoi', { bloc: blocId, type }).then(({ error }) => {
+          if (error) {
+            setErreurEnvoi(error.message)
+            recharger()
+          }
+        })
+        return 'ok'
+      }
       setAscensionsAjoutees((actuel) => {
         // Un nouveau clic sur ce bloc pour ce grimpeur remplace le precedent
         // (pas les ascensions du fichier, immuables) : se corriger ou changer
@@ -144,7 +183,7 @@ export function useAtelier(): Atelier {
       })
       return 'ok'
     },
-    [datasetBase]
+    [datasetBase, grimpeurConnecte, recharger]
   )
 
   const envoisConnus = useCallback(
@@ -211,6 +250,8 @@ export function useAtelier(): Atelier {
     dataset,
     chargement: !dataset && !erreur,
     erreur,
+    recharger,
+    erreurEnvoi,
     enregistrerAscension,
     envoisConnus,
     formules: FORMULES,

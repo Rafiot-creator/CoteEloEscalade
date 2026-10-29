@@ -44,6 +44,12 @@ interface Props<T> {
   /** Nombre de lignes affichees d'un coup. */
   pageTaille?: number
   videMessage?: string
+  /**
+   * Cle de la ligne a mettre en evidence (ex. le grimpeur du compte
+   * connecte). Elle reste affichee meme au-dela des lignes visibles, apres
+   * une ligne de points de suspension : on se trouve sans tout derouler.
+   */
+  enEvidence?: string
 }
 
 /**
@@ -62,6 +68,7 @@ export function Tableau<T>({
   onTri,
   pageTaille = 50,
   videMessage,
+  enEvidence,
 }: Props<T>) {
   const [triInterne, setTriInterne] = useState(triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 })
   const tri = triPilote ?? triInterne
@@ -85,6 +92,24 @@ export function Tableau<T>({
   if (!lignes.length) return <p className="vide">{videMessage ?? t('Aucune ligne.', 'No rows.')}</p>
 
   const visibles = triees.slice(0, limite)
+  const indexEvidence = enEvidence ? triees.findIndex((l) => cleLigne(l) === enEvidence) : -1
+  const horsPage = indexEvidence >= limite ? triees[indexEvidence] : null
+
+  const ligne = (l: T) => (
+    <tr key={cleLigne(l)} className={cleLigne(l) === enEvidence ? 'en-evidence' : undefined}>
+      {colonnes.map((c) => {
+        const v = c.valeur(l)
+        return (
+          <td
+            key={c.cle}
+            className={[c.num ? 'num' : '', c.principal ? 'principal' : ''].filter(Boolean).join(' ') || undefined}
+          >
+            {c.rendu ? c.rendu(l) : typeof v === 'number' ? nombre(v) : (v ?? '—')}
+          </td>
+        )
+      })}
+    </tr>
+  )
 
   return (
     <>
@@ -111,21 +136,13 @@ export function Tableau<T>({
             </tr>
           </thead>
           <tbody>
-            {visibles.map((l) => (
-              <tr key={cleLigne(l)}>
-                {colonnes.map((c) => {
-                  const v = c.valeur(l)
-                  return (
-                    <td
-                      key={c.cle}
-                      className={[c.num ? 'num' : '', c.principal ? 'principal' : ''].filter(Boolean).join(' ') || undefined}
-                    >
-                      {c.rendu ? c.rendu(l) : typeof v === 'number' ? nombre(v) : (v ?? '—')}
-                    </td>
-                  )
-                })}
+            {visibles.map(ligne)}
+            {horsPage && (
+              <tr className="saut">
+                <td colSpan={colonnes.length}>⋯</td>
               </tr>
-            ))}
+            )}
+            {horsPage && ligne(horsPage)}
           </tbody>
         </table>
       </div>

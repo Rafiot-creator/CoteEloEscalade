@@ -141,6 +141,9 @@ p { margin: 0; }
 }
 .nav button:hover { background: var(--plan-creux); color: var(--encre); }
 .nav button[aria-current='page'] { background: var(--encre); color: var(--surface); }
+/* Bouton de connexion tant qu'on n'est pas connecte (ou sans pseudonyme) : il doit se voir. */
+.nav button.appel-compte { background: var(--bon); color: #fff; font-weight: 600; }
+.nav button.appel-compte:hover { background: #098a09; color: #fff; }
 
 .contenu { overflow-x: hidden; overflow-y: auto; padding: 20px; }
 .large { max-width: 1180px; margin: 0 auto; }
@@ -294,6 +297,12 @@ table.donnees th.num, table.donnees td.num { text-align: right; font-variant-num
 table.donnees th.avec-aide { text-decoration: underline dotted; text-underline-offset: 4px; text-decoration-color: var(--axe); }
 table.donnees tbody tr:hover { background: var(--plan-creux); }
 table.donnees td.principal { font-weight: 500; }
+/* Ligne du compte connecte (cf. `enEvidence` dans Tableau.tsx). */
+table.donnees tbody tr.en-evidence,
+table.donnees tbody tr.en-evidence:hover { background: color-mix(in srgb, var(--bon) 16%, transparent); }
+table.donnees tbody tr.en-evidence td { font-weight: 600; }
+table.donnees tbody tr.saut td { text-align: center; color: var(--encre-3); padding: 2px; }
+table.donnees tbody tr.saut:hover { background: none; }
 .tri { color: var(--encre-3); margin-left: 3px; }
 
 /* Nom de bloc cliquable dans un tableau : renvoie vers sa pastille sur la

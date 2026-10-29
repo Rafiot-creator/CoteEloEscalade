@@ -62,6 +62,8 @@ export function VueCarte({
   enregistrerAscension,
   envoisConnus,
   blocCible,
+  grimpeurConnecte,
+  erreurEnvoi,
 }: {
   centreId: string
   accesComplet: boolean
@@ -92,6 +94,13 @@ export function VueCarte({
    * passe au-dela du changement d'onglet, deja fait par l'appelant.
    */
   blocCible?: string | null
+  /**
+   * Pseudonyme du compte connecte : remplace le choix libre du nom, et ses
+   * envois vont dans la base (cf. `Atelier.enregistrerAscension`).
+   */
+  grimpeurConnecte?: string | null
+  /** Dernier envoi refuse par la base pour le compte connecte. */
+  erreurEnvoi?: string | null
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
@@ -99,7 +108,10 @@ export function VueCarte({
   const [selection, setSelection] = useState<string | null>(null)
   const [survole, setSurvole] = useState<string | null>(null)
   const [grimpeurChoisi, setGrimpeurChoisi] = useState('')
+  const grimpeurActif = grimpeurConnecte ?? grimpeurChoisi
   const [suivi, setSuivi] = useState<Record<string, boolean>>({})
+  // Le suivi manuel suit le nom en vigueur, y compris le pseudonyme du compte.
+  useEffect(() => setSuivi(suiviLocal.lire(centreId, grimpeurActif)), [centreId, grimpeurActif])
   const zoneRef = useRef<HTMLDivElement>(null)
   const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
@@ -187,14 +199,14 @@ export function VueCarte({
   // grimpeur (fichier + Carte confondus) se montre envoye sans qu'il ait
   // besoin de re-cliquer quoi que ce soit.
   const envoisReels = useMemo(
-    () => envoisConnus?.(grimpeurChoisi) ?? new Map<string, StatutEnvoi>(),
-    [envoisConnus, grimpeurChoisi]
+    () => envoisConnus?.(grimpeurActif) ?? new Map<string, StatutEnvoi>(),
+    [envoisConnus, grimpeurActif]
   )
 
   const grimpeurValide = useMemo(() => {
-    const nom = grimpeurChoisi.trim().toLowerCase()
+    const nom = grimpeurActif.trim().toLowerCase()
     return !!nom && !!grimpeurs?.some((g) => g.trim().toLowerCase() === nom)
-  }, [grimpeurChoisi, grimpeurs])
+  }, [grimpeurActif, grimpeurs])
 
   const actionsActives = !!enregistrerAscension && grimpeurValide
   const raisonInactif = !enregistrerAscension
@@ -295,7 +307,7 @@ export function VueCarte({
 
   const basculerEnvoye = (id: string) => {
     const valeur = !suivi[id]
-    suiviLocal.definir(centreId, grimpeurChoisi, id, valeur)
+    suiviLocal.definir(centreId, grimpeurActif, id, valeur)
     setSuivi({ ...suivi, [id]: valeur })
   }
 
@@ -325,7 +337,7 @@ export function VueCarte({
   const enregistrer = (id: string, type: TypeEnvoi) => (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!enregistrerAscension || !grimpeurValide) return
-    enregistrerAscension(id, grimpeurChoisi, type)
+    enregistrerAscension(id, grimpeurActif, type)
   }
 
   const debuterGlisse = (id: string) => (e: React.MouseEvent) => {
@@ -364,6 +376,11 @@ export function VueCarte({
         <label htmlFor="carte-grimpeur" className="discret" style={{ fontSize: 13 }}>
           {t('Carte de :', "Map for:")}
         </label>
+        {grimpeurConnecte ? (
+          <strong id="carte-grimpeur" style={{ fontSize: 14 }}>
+            {grimpeurConnecte}
+          </strong>
+        ) : (
         <input
           id="carte-grimpeur"
           type="text"
@@ -373,7 +390,8 @@ export function VueCarte({
           placeholder={t('votre nom', 'your name')}
           style={{ width: 220 }}
         />
-        {grimpeurChoisi && (
+        )}
+        {!grimpeurConnecte && grimpeurChoisi && (
           <button className="bouton discret" onClick={() => choisirGrimpeur('')}>
             {t('Effacer', 'Clear')}
           </button>
@@ -387,17 +405,23 @@ export function VueCarte({
         )}
       </div>
 
+      {erreurEnvoi && (
+        <p className="sous-titre" style={{ color: 'var(--critique)', marginBottom: 12 }}>
+          {t(`Envoi refusé par la base : ${erreurEnvoi}`, `Send rejected by the database: ${erreurEnvoi}`)}
+        </p>
+      )}
+
       <div className="grille tuiles">
         <Tuile etiquette={t('Blocs sur la carte', 'Boulders on the map')} valeur={String(carte.blocs.length)} />
         {carte.blocs.length > 0 && (
           <Tuile
             etiquette={
-              grimpeurChoisi
-                ? t(`Envoyés par ${grimpeurChoisi}`, `Sent by ${grimpeurChoisi}`)
+              grimpeurActif
+                ? t(`Envoyés par ${grimpeurActif}`, `Sent by ${grimpeurActif}`)
                 : t('Envoyés', 'Sent')
             }
             valeur={String(envoyes)}
-            note={t('sur cet appareil', 'on this device')}
+            note={grimpeurConnecte ? t('enregistrés dans la base', 'saved in the database') : t('sur cet appareil', 'on this device')}
           />
         )}
       </div>

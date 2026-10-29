@@ -605,13 +605,19 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   `login` ne marche que dans une vraie fenêtre PowerShell, avec `npx.cmd` (`npx.ps1` bloqué).
   `db push --linked` fonctionne sans le mot de passe de la base. **Ne jamais afficher ni
   demander la clé secrète / service_role** (pas de `supabase projects api-keys`).
-- **Étape 1 faite** (lecture seule, données de démo, site branché, vérifié identique).
-  Prochaine : étape 2, comptes et envois. Tranché par Raphaël : **inscription ouverte à tous, avec
+- **Étapes 1 et 2 faites** (lecture ; comptes par lien courriel, pseudonymes, envois dans la
+  base, position dans le classement). Compte de Raphaël : pseudonyme « Rafiot ». Tester une
+  fonction de la base sans vraie session : un bloc `do $ ... $` lancé par
+  `npx supabase db query --linked -f`, avec `set local role authenticated` et
+  `request.jwt.claims`, terminé par `raise exception` pour tout annuler.
+  Prochaine : étape 3 (outils de l'ouvreur) ou, avant d'ouvrir à d'autres personnes, Google et
+  un service d'envoi de courriels (le service inclus n'écrit qu'à Raphaël, 2 par heure). Tranché par Raphaël : **inscription ouverte à tous, avec
   pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
 
 ## Prochaine étape
 
-**Étape 2 de la base de données** (voir ci-dessus). Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+**Suite de la base de données** (voir ci-dessus) : étape 3, ou Google et courriels avant
+d'ouvrir à d'autres personnes, au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
 secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
 des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 

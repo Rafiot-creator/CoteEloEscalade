@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAccesComplet } from './ui/acces'
+import { useCompte } from './ui/compte'
+import { PanneauCompte, libelleCompte } from './ui/components/compte'
 import { useAtelier } from './ui/etat'
 import { LangueProvider, useLangue } from './ui/langue'
 import { VueCarte } from './ui/views/VueCarte'
@@ -42,7 +44,14 @@ export function App() {
 }
 
 function Contenu() {
-  const atelier = useAtelier()
+  const compte = useCompte()
+  const atelier = useAtelier(compte.grimpeur)
+  const [panneauCompte, setPanneauCompte] = useState(false)
+  // Retour du lien du courriel, premiere connexion : il manque le pseudonyme.
+  const sansPseudo = compte.pret && !!compte.courriel && !compte.grimpeur
+  useEffect(() => {
+    if (sansPseudo) setPanneauCompte(true)
+  }, [sansPseudo])
   const accesComplet = useAccesComplet()
   const { langue, definir, t } = useLangue()
   const [apercuVisiteur, setApercuVisiteur] = useState(false)
@@ -102,6 +111,15 @@ function Contenu() {
               {t(o.fr, o.en)}
             </button>
           ))}
+          {compte.pret && (
+            <button
+              title={t('Compte et connexion', 'Account and sign-in')}
+              className={compte.grimpeur ? undefined : 'appel-compte'}
+              onClick={() => setPanneauCompte((v) => !v)}
+            >
+              {libelleCompte(compte, t)}
+            </button>
+          )}
           <button
             title={t('Thème clair, sombre ou celui du système', 'Light theme, dark, or match system')}
             onClick={() => setTheme((th) => (th === 'auto' ? 'clair' : th === 'clair' ? 'sombre' : 'auto'))}
@@ -129,6 +147,16 @@ function Contenu() {
       </header>
 
       <main className="contenu">
+        {panneauCompte && (
+          <PanneauCompte
+            compte={compte}
+            apresProfil={() => {
+              atelier.recharger()
+              setPanneauCompte(false)
+            }}
+          />
+        )}
+
         {onglet === 'carte' && (
           <VueCarte
             centreId={centreId}
@@ -138,6 +166,8 @@ function Contenu() {
             enregistrerAscension={centreId === 'demo' ? atelier.enregistrerAscension : undefined}
             envoisConnus={centreId === 'demo' ? atelier.envoisConnus : undefined}
             blocCible={blocCible}
+            grimpeurConnecte={centreId === 'demo' ? compte.grimpeur?.nom : undefined}
+            erreurEnvoi={atelier.erreurEnvoi}
           />
         )}
 
@@ -179,7 +209,12 @@ function Contenu() {
               />
             )}
             {onglet === 'grimpeurs' && (
-              <VueGrimpeurs resultat={atelier.resultat} resultats={atelier.resultats} simplifie={!vueComplete} />
+              <VueGrimpeurs
+                resultat={atelier.resultat}
+                resultats={atelier.resultats}
+                simplifie={!vueComplete}
+                moi={compte.grimpeur?.id}
+              />
             )}
             {onglet === 'formules' && <VueFormules atelier={atelier} onVoirBlocSurCarte={voirBlocSurCarte} />}
             {onglet === 'donnees' && <VueDonnees dataset={atelier.dataset} onVoirBlocSurCarte={voirBlocSurCarte} />}

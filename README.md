@@ -1118,8 +1118,34 @@ refusées.
    Lecture publique, aucune écriture. Jeu de démonstration et cartes chargés. Le site lit la
    base (`src/core/sources/supabase.ts`, `src/core/cartes/sources.ts`) ; vérifié identique à
    l'ancienne version (mêmes lignes dans les trois tables, mêmes tableaux Blocs et Grimpeurs).
-2. **Comptes et envois** : connexion par lien envoyé par courriel ou par Google ; un grimpeur
-   n'écrit que ses propres ascensions, dans la base plutôt que dans `localStorage`.
+2. **Comptes et envois** — *faite le 28 octobre 2026.* Connexion par lien envoyé par courriel,
+   sans mot de passe (bouton vert « Se connecter » dans l'en-tête, `src/ui/compte.ts`,
+   `src/ui/components/compte.tsx`). La session reste sur l'appareil : un nouveau courriel
+   seulement sur un nouvel appareil, après une déconnexion ou un effacement des données. À la
+   première connexion, le compte choisit un **pseudonyme** (2 à 30 caractères, unique sans
+   égard à la casse, différent des noms existants) : c'est le `nom` de son grimpeur dans la
+   table `grimpeurs`, seul visible ; le courriel reste dans `auth.users`. Table `profils`
+   (compte → grimpeur), lisible par son seul propriétaire. Aucune écriture directe sur les
+   tables : deux fonctions de la base, `creer_profil` et `enregistrer_envoi`
+   (`supabase/migrations/20261029000200_comptes.sql`), vérifient elles-mêmes qui appelle. Un
+   envoi remplace les précédents du même grimpeur sur le même bloc ; frein de 100 envois par
+   heure (colonne `enregistre_le`). Testé dans la base avec deux comptes fictifs (transaction
+   annulée) : écriture directe refusée, second profil refusé, pseudonymes en double ou trop
+   courts refusés, profil des autres invisible. Sur la Carte, le pseudonyme du compte remplace
+   le champ « Carte de : » et ses envois vont dans la base
+   (`Atelier.enregistrerAscension`, affichés tout de suite puis relus si la base refuse).
+   **Sans compte, le mode local d'avant reste** (choisir un nom de la démo, envois propres au
+   navigateur), pour que la démo reste explorable. Écran Grimpeurs : tuile « Votre position »
+   et ligne du compte surlignée en vert ; si elle est au-delà des 25 lignes affichées, elle
+   s'ajoute en bas après « ⋯ » (`enEvidence`, `Tableau.tsx`). Testé par Raphaël avec son
+   adresse : connexion, pseudonyme « Rafiot », envois, changement d'avis, rechargement.
+   **Limite** : le service de courriel inclus dans Supabase n'écrit qu'aux membres de l'équipe
+   du projet (Raphaël) et au plus 2 courriels par heure. Avant d'ouvrir à d'autres personnes :
+   brancher Google (aucun courriel) et un service d'envoi (Resend, Brevo...) avec un nom de
+   domaine. Adresses de retour du lien autorisées (`supabase/config.toml`, poussées par
+   `npx supabase config push`) : le site en ligne, `localhost:5173` et `localhost:5191`.
+   Le fichier reprend les autres réglages du projet tels qu'ils étaient en ligne, pour que
+   `config push` ne change rien d'autre (vérifier avec `npx supabase config diff` avant).
 3. **Outils de l'ouvreur** : placer, modifier, démonter des blocs sur la carte, enregistrés dans
    la base.
 4. **Temps réel** : les cotes se mettent à jour sur tous les écrans ouverts.
@@ -1844,3 +1870,8 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   bundle, qui pèse 581 ko (172 ko compressé) avec la bibliothèque de Supabase. Le chargement
   fait une vingtaine de requêtes : l'API renvoie au plus 1000 lignes à la fois, et les
   ascensions sont lues par paquets en parallèle (environ 2 s en local).
+- **Étape 2 de la base de données : comptes et envois**, testée par Raphaël avec sa propre
+  adresse (pseudonyme « Rafiot »). Inscription ouverte à tous avec des pseudonymes, décidé par
+  Raphaël. Bouton « Se connecter » passé sur fond vert à sa demande (trop discret sinon), et
+  repère de sa position dans le classement ajouté à sa demande (il apparaissait 32e, hors des
+  25 lignes affichées). Détail dans « Base de données et multi-utilisateur (en cours) ».
