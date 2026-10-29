@@ -161,6 +161,9 @@ function Contenu() {
           <VueCarte
             centreId={centreId}
             accesComplet={vueComplete}
+            // L'apercu visiteur montre aussi la carte sans les outils d'ouvreur.
+            ouvreur={compte.peutOuvrir(centreId) && !apercuVisiteur}
+            apresModification={centreId === 'demo' ? atelier.recharger : undefined}
             resultatMelange={atelier.resultats.get('melange')}
             grimpeurs={centreId === 'demo' ? atelier.dataset?.grimpeurs.map((g) => g.nom) : undefined}
             enregistrerAscension={centreId === 'demo' ? atelier.enregistrerAscension : undefined}

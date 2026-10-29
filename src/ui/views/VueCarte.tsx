@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { COTATIONS } from '../../core/cotations'
-import { chargerCarte } from '../../core/cartes/sources'
+import { chargerCarte, demonterBloc, modifierBloc, placerBloc } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
+import { STYLES_BLOC } from '../../core/stylesBloc'
 import type { Resultat } from '../../core/pipeline'
 import type { EchecEnregistrement, StatutEnvoi, TypeEnvoi } from '../etat'
 import { Carte, LegendeCote, Tuile } from '../components/base'
@@ -64,9 +65,25 @@ export function VueCarte({
   blocCible,
   grimpeurConnecte,
   erreurEnvoi,
+  ouvreur = false,
+  apresModification,
 }: {
   centreId: string
+  /**
+   * Edition locale de la carte (masquage d'interface seulement) : les
+   * changements ne vont nulle part, sauf dans le JSON exporte.
+   */
   accesComplet: boolean
+  /**
+   * Le compte connecte est ouvreur de ce centre : memes outils d'edition,
+   * mais chaque changement est enregistre dans la base, visible par tous.
+   */
+  ouvreur?: boolean
+  /**
+   * Appele apres un changement enregistre qui touche au calcul (bloc place,
+   * demonte, cotation ou style modifies), pour relire le jeu de donnees.
+   */
+  apresModification?: () => void
   /**
    * Resultat de la formule "melange", pour afficher la cote calculee a cote
    * de la cote affichee. Seul le centre demo a un jeu de donnees connecte :
@@ -103,8 +120,13 @@ export function VueCarte({
   erreurEnvoi?: string | null
 }) {
   const { t } = useLangue()
+  const edition = accesComplet || ouvreur
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
   const [erreurCarte, setErreurCarte] = useState<string | null>(null)
+  // Dernier changement d'ouvreur refuse par la base ; la carte est alors
+  // relue (`generationCarte`) pour ne pas montrer un etat qui n'existe pas.
+  const [erreurEdition, setErreurEdition] = useState<string | null>(null)
+  const [generationCarte, setGenerationCarte] = useState(0)
   const [selection, setSelection] = useState<string | null>(null)
   const [survole, setSurvole] = useState<string | null>(null)
   const [grimpeurChoisi, setGrimpeurChoisi] = useState('')
@@ -115,6 +137,7 @@ export function VueCarte({
   const zoneRef = useRef<HTMLDivElement>(null)
   const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
+  const nomAuFocus = useRef('')
   const [largeurCarte, setLargeurCarte] = useState(640)
 
   // Echelle du pinch-zoom tactile courant (1 = pas de zoom). Le popup est en
@@ -234,7 +257,7 @@ export function VueCarte({
     return () => {
       vivant = false
     }
-  }, [centreId])
+  }, [centreId, generationCarte])
 
   const choisirGrimpeur = (nom: string) => {
     setGrimpeurChoisi(nom)
@@ -283,7 +306,7 @@ export function VueCarte({
   }
 
   const ajouter = (e: React.MouseEvent) => {
-    if (!accesComplet) {
+    if (!edition) {
       // Clic sur le fond de carte (pas un bloc) : referme le popup ouvert au clic.
       setSurvole(null)
       return
@@ -291,18 +314,61 @@ export function VueCarte({
     if (glisse.current) return
     setSurvole(null)
     const { x, y } = relatif(e.clientX, e.clientY)
-    const bloc: BlocCarte = { id: nouvelId(), x, y, cotation: 'V4', couleur: 'bleu', style: '' }
-    setCarte({ ...carte, blocs: [...carte.blocs, bloc] })
-    setSelection(bloc.id)
+    const nouveau: Omit<BlocCarte, 'id'> = { x, y, cotation: 'V4', couleur: 'bleu', style: '' }
+    if (!ouvreur) {
+      const bloc: BlocCarte = { id: nouvelId(), ...nouveau }
+      setCarte({ ...carte, blocs: [...carte.blocs, bloc] })
+      setSelection(bloc.id)
+      return
+    }
+    // Pas d'affichage avant la reponse de la base : c'est elle qui donne
+    // l'id du bloc, sans lequel le modifier tout de suite echouerait.
+    setErreurEdition(null)
+    void placerBloc(centreId, nouveau).then((r) => {
+      if ('erreur' in r) {
+        setErreurEdition(r.erreur)
+        return
+      }
+      setCarte((c) => (c ? { ...c, blocs: [...c.blocs, { id: r.id, ...nouveau, nom: r.id }] } : c))
+      setSelection(r.id)
+      apresModification?.()
+    })
   }
 
   const modifier = (id: string, patch: Partial<BlocCarte>) => {
-    setCarte({ ...carte, blocs: carte.blocs.map((b) => (b.id === id ? { ...b, ...patch } : b)) })
+    setCarte((c) => (c ? { ...c, blocs: c.blocs.map((b) => (b.id === id ? { ...b, ...patch } : b)) } : c))
+  }
+
+  // Envoie l'etat d'un bloc a la base (ouvreur seulement ; en edition locale,
+  // `modifier` suffit). Une position seule ne change aucun calcul : inutile
+  // alors de relire tout le jeu de donnees.
+  const sauver = (bloc: BlocCarte, touchesCalcul = true) => {
+    if (!ouvreur) return
+    setErreurEdition(null)
+    void modifierBloc(bloc).then((erreur) => {
+      if (erreur) {
+        setErreurEdition(erreur)
+        setGenerationCarte((g) => g + 1)
+      } else if (touchesCalcul) apresModification?.()
+    })
+  }
+
+  const modifierEtSauver = (bloc: BlocCarte, patch: Partial<BlocCarte>) => {
+    modifier(bloc.id, patch)
+    sauver({ ...bloc, ...patch })
   }
 
   const supprimer = (id: string) => {
     setCarte({ ...carte, blocs: carte.blocs.filter((b) => b.id !== id) })
     setSelection(null)
+    if (!ouvreur) return
+    setErreurEdition(null)
+    void demonterBloc(id).then((erreur) => {
+      if (erreur) {
+        setErreurEdition(erreur)
+        setGenerationCarte((g) => g + 1)
+      } else apresModification?.()
+    })
   }
 
   const basculerEnvoye = (id: string) => {
@@ -343,12 +409,14 @@ export function VueCarte({
   const debuterGlisse = (id: string) => (e: React.MouseEvent) => {
     // Shift+clic sert a ouvrir le popup flash/reussi/echec en vue complete
     // (le clic seul deplace/selectionne le bloc) : pas de glisse dans ce cas.
-    if (!accesComplet || e.shiftKey) return
+    if (!edition || e.shiftKey) return
     e.stopPropagation()
     glisse.current = { id, deplace: false }
+    let position: { x: number; y: number } | null = null
     const bouger = (ev: MouseEvent) => {
       glisse.current!.deplace = true
-      modifier(id, relatif(ev.clientX, ev.clientY))
+      position = relatif(ev.clientX, ev.clientY)
+      modifier(id, position)
     }
     const relacher = () => {
       window.removeEventListener('mousemove', bouger)
@@ -356,6 +424,9 @@ export function VueCarte({
       const fut = glisse.current
       glisse.current = null
       if (fut && !fut.deplace) setSelection(id)
+      // Enregistre la position finale seulement, pas chaque etape du glisser.
+      const depart = carte.blocs.find((b) => b.id === id)
+      if (fut?.deplace && position && depart) sauver({ ...depart, ...position }, false)
     }
     window.addEventListener('mousemove', bouger)
     window.addEventListener('mouseup', relacher)
@@ -410,6 +481,11 @@ export function VueCarte({
           {t(`Envoi refusé par la base : ${erreurEnvoi}`, `Send rejected by the database: ${erreurEnvoi}`)}
         </p>
       )}
+      {erreurEdition && (
+        <p className="sous-titre" style={{ color: 'var(--critique)', marginBottom: 12 }}>
+          {t(`Changement refusé par la base : ${erreurEdition}`, `Change rejected by the database: ${erreurEdition}`)}
+        </p>
+      )}
 
       <div className="grille tuiles">
         <Tuile etiquette={t('Blocs sur la carte', 'Boulders on the map')} valeur={String(carte.blocs.length)} />
@@ -430,7 +506,7 @@ export function VueCarte({
       <Carte
         titre={t('Carte des blocs', 'Boulder map')}
         sousTitre={
-          accesComplet
+          edition
             ? t(
                 "Cliquer sur la carte pour ajouter un bloc. Cliquer un bloc existant pour le modifier, ou le glisser pour le repositionner. Majuscule (shift) + clic sur un bloc pour l'enregistrer en flash, réussi ou échec.",
                 "Click the map to add a boulder. Click an existing boulder to edit it, or drag it to reposition. Shift + click a boulder to log it as a flash, a send or a fail."
@@ -457,7 +533,7 @@ export function VueCarte({
             aspectRatio: carte.fond ? undefined : '4 / 3',
             borderRadius: 'var(--r)',
             overflow: 'hidden',
-            cursor: accesComplet ? 'copy' : 'default',
+            cursor: edition ? 'copy' : 'default',
             background: carte.fond
               ? 'var(--plan-creux)'
               : 'repeating-linear-gradient(45deg, var(--plan-creux), var(--plan-creux) 10px, var(--plan) 10px, var(--plan) 20px)',
@@ -490,7 +566,7 @@ export function VueCarte({
                     onMouseDown={debuterGlisse(b.id)}
                     onClick={(e) => {
                       e.stopPropagation()
-                      if (accesComplet) {
+                      if (edition) {
                         if (e.shiftKey) ouvrirPopup(b.id)
                         else setSelection(b.id)
                       } else if (enregistrerAscension) {
@@ -533,7 +609,7 @@ export function VueCarte({
                       fontSize: Math.max(Math.round(7 * FACTEUR), Math.round(RAYON * 0.6)),
                       fontWeight: 700,
                       textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
-                      cursor: accesComplet ? 'grab' : 'pointer',
+                      cursor: edition ? 'grab' : 'pointer',
                       touchAction: 'manipulation',
                       opacity: fait ? 0.85 : 1,
                       filter: fait ? 'grayscale(0.4) saturate(0.7)' : undefined,
@@ -663,14 +739,14 @@ export function VueCarte({
 
         {!carte.blocs.length && (
           <p className="vide">
-            {accesComplet
+            {edition
               ? t('Aucun bloc pour ce centre. Cliquez sur la carte pour en ajouter un.', 'No boulders for this gym yet. Click the map to add one.')
               : t('Aucun bloc enregistré pour ce centre pour le moment.', 'No boulders registered for this gym yet.')}
           </p>
         )}
       </Carte>
 
-      {accesComplet && blocSelectionne && (
+      {edition && blocSelectionne && (
         <div ref={editionRef}>
         <Carte titre={t('Modifier le bloc', 'Edit boulder')}>
           <div className="param">
@@ -681,7 +757,14 @@ export function VueCarte({
               type="text"
               value={blocSelectionne.nom ?? ''}
               placeholder={t('ex. DA-0002', 'e.g. DA-0002')}
+              maxLength={40}
               onChange={(e) => modifier(blocSelectionne.id, { nom: e.currentTarget.value })}
+              // Enregistre a la sortie du champ, pas a chaque lettre, et
+              // seulement si le nom a change.
+              onFocus={() => (nomAuFocus.current = blocSelectionne.nom ?? '')}
+              onBlur={() => {
+                if ((blocSelectionne.nom ?? '') !== nomAuFocus.current) sauver(blocSelectionne)
+              }}
               style={{ width: '100%' }}
             />
           </div>
@@ -695,7 +778,7 @@ export function VueCarte({
                   key={c.id}
                   title={t(c.fr, c.en)}
                   aria-pressed={blocSelectionne.couleur === c.id}
-                  onClick={() => modifier(blocSelectionne.id, { couleur: c.id })}
+                  onClick={() => modifierEtSauver(blocSelectionne, { couleur: c.id })}
                   style={{
                     width: 28,
                     height: 28,
@@ -720,7 +803,7 @@ export function VueCarte({
             </div>
             <select
               value={blocSelectionne.cotation}
-              onChange={(e) => modifier(blocSelectionne.id, { cotation: e.currentTarget.value })}
+              onChange={(e) => modifierEtSauver(blocSelectionne, { cotation: e.currentTarget.value })}
             >
               {COTATIONS.map((c) => (
                 <option key={c} value={c}>
@@ -733,27 +816,52 @@ export function VueCarte({
             <div className="param-tete">
               <label>{t('Style', 'Style')}</label>
             </div>
-            <input
-              type="text"
+            {/* Liste fermee plutot que texte libre : le style entre dans la
+                cote par style (STYLES_BLOC), et la base refuse tout autre mot. */}
+            <select
               value={blocSelectionne.style}
-              placeholder={t('ex. Dalle, Dévers, Bat Cave…', 'e.g. Slab, Overhang, Bat Cave…')}
-              onChange={(e) => modifier(blocSelectionne.id, { style: e.currentTarget.value })}
-              style={{ width: '100%' }}
-            />
+              onChange={(e) => modifierEtSauver(blocSelectionne, { style: e.currentTarget.value })}
+            >
+              <option value="">—</option>
+              {STYLES_BLOC.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+              {blocSelectionne.style && !(STYLES_BLOC as readonly string[]).includes(blocSelectionne.style) && (
+                <option value={blocSelectionne.style}>{blocSelectionne.style}</option>
+              )}
+            </select>
           </div>
           <div className="barre-outils" style={{ margin: '10px 0 0' }}>
             <button className="bouton" onClick={() => setSelection(null)}>
               {t('Fermer', 'Close')}
             </button>
             <button className="bouton discret" onClick={() => supprimer(blocSelectionne.id)}>
-              {t('Supprimer', 'Delete')}
+              {ouvreur ? t('Démonter', 'Take down') : t('Supprimer', 'Delete')}
             </button>
           </div>
+          {ouvreur && (
+            <p className="param-aide" style={{ marginTop: 8 }}>
+              {t(
+                "Démonter retire le bloc de la carte. S'il a déjà été grimpé, ses ascensions restent dans le calcul des cotes.",
+                'Taking a boulder down removes it from the map. If it has been climbed, its ascents still count in the ratings.'
+              )}
+            </p>
+          )}
         </Carte>
         </div>
       )}
 
-      {accesComplet && (
+      {ouvreur && (
+        <p className="param-aide" style={{ marginTop: 12 }}>
+          {t(
+            'Vous êtes ouvreur de ce centre : chaque changement est enregistré dans la base et visible par tous.',
+            "You're a setter at this gym: every change is saved to the database and visible to everyone."
+          )}
+        </p>
+      )}
+      {accesComplet && !ouvreur && (
         <p className="param-aide" style={{ marginTop: 12 }}>
           {t(
             "Les changements restent locaux à cette session : exportez le fichier JSON et ajoutez-le à data/cartes/ pour qu'ils deviennent visibles pour tout le monde au prochain déploiement.",

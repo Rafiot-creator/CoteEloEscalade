@@ -25,6 +25,12 @@ export interface Compte {
   courriel: string | null
   /** Grimpeur du compte, une fois le pseudonyme choisi. */
   grimpeur: { id: string; nom: string } | null
+  /**
+   * Le compte peut-il placer, modifier et demonter les blocs de ce centre ?
+   * Table `ouvreurs` (cf. supabase/migrations/) ; la base le reverifie de
+   * toute facon a chaque ecriture.
+   */
+  peutOuvrir: (centreId: string) => boolean
   envoyerLien: (courriel: string) => Promise<string | null>
   creerProfil: (pseudo: string) => Promise<string | null>
   deconnecter: () => Promise<void>
@@ -44,6 +50,8 @@ export function useCompte(): Compte {
   const [userId, setUserId] = useState<string | null>(null)
   const [courriel, setCourriel] = useState<string | null>(null)
   const [grimpeur, setGrimpeur] = useState<{ id: string; nom: string } | null>(null)
+  // Centres ou le compte est ouvreur ; `null` dans la liste : tous les centres.
+  const [centresOuvreur, setCentresOuvreur] = useState<(string | null)[]>([])
 
   useEffect(() => {
     // Lit aussi le retour du lien du courriel (jetons dans l'adresse), que la
@@ -59,15 +67,20 @@ export function useCompte(): Compte {
   const lireProfil = useCallback(async () => {
     if (!userId) {
       setGrimpeur(null)
+      setCentresOuvreur([])
       setProfilLuPour(null)
       return
     }
-    const { data } = await supabase
-      .from('profils')
-      .select('grimpeur_id, grimpeurs(nom)')
-      .eq('user_id', userId)
-      .maybeSingle<{ grimpeur_id: string; grimpeurs: { nom: string } | null }>()
+    const [{ data }, { data: droits }] = await Promise.all([
+      supabase
+        .from('profils')
+        .select('grimpeur_id, grimpeurs(nom)')
+        .eq('user_id', userId)
+        .maybeSingle<{ grimpeur_id: string; grimpeurs: { nom: string } | null }>(),
+      supabase.from('ouvreurs').select('centre_id').eq('user_id', userId).returns<{ centre_id: string | null }[]>(),
+    ])
     setGrimpeur(data ? { id: data.grimpeur_id, nom: data.grimpeurs?.nom ?? '' } : null)
+    setCentresOuvreur((droits ?? []).map((d) => d.centre_id))
     setProfilLuPour(userId)
   }, [userId])
 
@@ -97,5 +110,10 @@ export function useCompte(): Compte {
     await supabase.auth.signOut()
   }, [])
 
-  return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, envoyerLien, creerProfil, deconnecter }
+  const peutOuvrir = useCallback(
+    (centreId: string) => centresOuvreur.some((c) => c === null || c === centreId),
+    [centresOuvreur]
+  )
+
+  return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, envoyerLien, creerProfil, deconnecter }
 }

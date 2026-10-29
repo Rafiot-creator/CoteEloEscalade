@@ -20,14 +20,24 @@ const PAQUET = 1000
 /**
  * Lit une table entiere, par paquets de 1000 lignes demandes en parallele.
  * `ordre` doit etre une colonne unique, sinon deux paquets pourraient se
- * chevaucher ou laisser un trou.
+ * chevaucher ou laisser un trou. `filtre` : ne garder que les lignes ou
+ * cette colonne vaut cette valeur.
  */
-export async function lireTable<T>(table: string, colonnes: string, ordre: string): Promise<T[]> {
-  const { count, error } = await supabase.from(table).select(ordre, { count: 'exact', head: true })
+export async function lireTable<T>(
+  table: string,
+  colonnes: string,
+  ordre: string,
+  filtre?: { colonne: string; valeur: string }
+): Promise<T[]> {
+  const requete = (select: string, options?: { count: 'exact'; head: true }) => {
+    const q = supabase.from(table).select(select, options)
+    return filtre ? q.eq(filtre.colonne, filtre.valeur) : q
+  }
+  const { count, error } = await requete(ordre, { count: 'exact', head: true })
   if (error) throw new Error(`Lecture de ${table} impossible : ${error.message}`)
   const paquets = await Promise.all(
     Array.from({ length: Math.ceil((count ?? 0) / PAQUET) }, (_, i) =>
-      supabase.from(table).select(colonnes).order(ordre).range(i * PAQUET, (i + 1) * PAQUET - 1)
+      requete(colonnes).order(ordre).range(i * PAQUET, (i + 1) * PAQUET - 1)
     )
   )
   return paquets.flatMap(({ data, error: e }) => {

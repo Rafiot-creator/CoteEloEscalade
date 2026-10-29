@@ -610,8 +610,12 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   fonction de la base sans vraie session : un bloc `do $ ... $` lancé par
   `npx supabase db query --linked -f`, avec `set local role authenticated` et
   `request.jwt.claims`, terminé par `raise exception` pour tout annuler.
-  Prochaine : étape 3 (outils de l'ouvreur) ou, avant d'ouvrir à d'autres personnes, Google et
-  un service d'envoi de courriels (le service inclus n'écrit qu'à Raphaël, 2 par heure). Tranché par Raphaël : **inscription ouverte à tous, avec
+- **Étape 3 faite le 2026-10-29** (outils de l'ouvreur : table `ouvreurs`, fonctions
+  `placer_bloc`/`modifier_bloc`/`demonter_bloc`, édition de la Carte enregistrée dans la base).
+  « Rafiot » est admin général. Testé par Raphaël sur Rose Bloc 1. Glisser un bloc : souris
+  seulement. Nommer un ouvreur : SQL donné dans le README.
+  Prochaine : Google et un service d'envoi de courriels avant d'ouvrir à d'autres personnes
+  (le service inclus n'écrit qu'à Raphaël, 2 par heure), ou étape 4 (temps réel). Tranché par Raphaël : **inscription ouverte à tous, avec
   pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
@@ -622,8 +626,8 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**Suite de la base de données** (voir ci-dessus) : étape 3, ou Google et courriels avant
-d'ouvrir à d'autres personnes, au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+**Suite de la base de données** (voir ci-dessus) : Google et courriels avant d'ouvrir à
+d'autres personnes, ou étape 4 (temps réel), au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
 secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
 des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 

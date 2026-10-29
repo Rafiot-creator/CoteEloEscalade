@@ -746,9 +746,9 @@ couleur, style, nom optionnel de l'étiquette) et une interface `CarteProvider` 
 la base Supabase : le fond et la taille des pastilles dans la table `centres`, les positions
 dans les colonnes `x`/`y` de la table `blocs`. `VueCarte.tsx` n'a pas changé, il ne connaît
 que `chargerCarte(centreId)`. Les fichiers `data/cartes/*.json` ne servent plus qu'à remplir
-la base. **Tant que l'étape 3 (outils de l'ouvreur) n'est pas faite**, l'édition de la carte en
-accès complet ne fait que télécharger un JSON : un bloc déplacé ne s'enregistre nulle part tant
-qu'on n'écrit pas une migration qui met à jour `x`/`y`.
+la base. Depuis l'étape 3 (outils de l'ouvreur), un compte ouvreur du centre édite la carte
+directement dans la base ; l'accès complet sans ce rôle garde l'édition locale, qui ne fait que
+télécharger un JSON.
 
 Le suivi « j'ai envoyé ce bloc » (`src/ui/suivi.ts`) suit le même principe : une interface
 `SuiviProvider`, aujourd'hui posée sur `localStorage`, indexée par couple **(centre,
@@ -1146,8 +1146,22 @@ refusées.
    `npx supabase config push`) : le site en ligne, `localhost:5173` et `localhost:5191`.
    Le fichier reprend les autres réglages du projet tels qu'ils étaient en ligne, pour que
    `config push` ne change rien d'autre (vérifier avec `npx supabase config diff` avant).
-3. **Outils de l'ouvreur** : placer, modifier, démonter des blocs sur la carte, enregistrés dans
-   la base.
+3. **Outils de l'ouvreur** — *faite le 29 octobre 2026.* Table `ouvreurs` (compte → centre,
+   `centre_id` nul = tous les centres ; le compte « Rafiot » est admin général), lisible par
+   son seul propriétaire. Trois fonctions de la base, `placer_bloc`, `modifier_bloc`,
+   `demonter_bloc` (`supabase/migrations/20261029000300_ouvreurs.sql`), vérifient que le compte
+   est ouvreur du centre et valident cotation (V0–V12), couleur (les dix de
+   `PALETTE_COULEURS`) et style (`STYLES_BLOC` ou aucun). Démonter retire le bloc de la carte ;
+   s'il a des ascensions, il reste dans la base avec sa date de retrait (son historique compte
+   toujours), sinon il est supprimé. Sur la Carte, un compte ouvreur retrouve les outils
+   d'édition, enregistrés au fil de l'eau (`src/core/cartes/sources.ts`) : ajout au clic,
+   couleur/cotation/style tout de suite, nom à la sortie du champ, position au relâcher ; refus
+   de la base affiché, puis carte relue. Sur la Démo, Blocs et Grimpeurs se rechargent après un
+   changement qui touche au calcul. Ces deux écrans ne lisent que les blocs du centre `demo`.
+   Testé dans la base (deux comptes fictifs, transaction annulée) et par Raphaël sur Rose Bloc 1.
+   **Limites** : glisser un bloc à la souris seulement (pas au doigt) ; pas d'écran pour nommer
+   un ouvreur, à faire en SQL :
+   `insert into public.ouvreurs (user_id, centre_id) select p.user_id, '<centre>' from public.profils p join public.grimpeurs g on g.id = p.grimpeur_id where g.nom = '<pseudo>';`
 4. **Temps réel** : les cotes se mettent à jour sur tous les écrans ouverts.
 5. **Essai dans un vrai centre** (Rose Bloc 1 ou 2).
 
@@ -1878,3 +1892,10 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
 - Fin de session : Raphaël connecté aussi sur le site en ligne. Prochaine étape au choix de
   Raphaël : outils de l'ouvreur (étape 3), ou Google et un service de courriel pour ouvrir les
   comptes à d'autres personnes.
+
+### 2026-10-29
+
+- **Étape 3 de la base de données : outils de l'ouvreur**, choisie par Raphaël et testée par
+  lui sur Rose Bloc 1 (placer, modifier, déplacer, recharger, démonter). Le style d'un bloc se
+  choisit désormais dans une liste fermée sur la Carte. Détail dans « Base de données et
+  multi-utilisateur (en cours) ».
