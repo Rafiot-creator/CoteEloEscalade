@@ -1139,10 +1139,31 @@ refusées.
    et ligne du compte surlignée en vert ; si elle est au-delà des 25 lignes affichées, elle
    s'ajoute en bas après « ⋯ » (`enEvidence`, `Tableau.tsx`). Testé par Raphaël avec son
    adresse : connexion, pseudonyme « Rafiot », envois, changement d'avis, rechargement.
+   **Depuis le 29 octobre 2026, connexion par Google ou par courriel + mot de passe** (le lien
+   par courriel est retiré) : création de compte, mot de passe oublié, nouveau mot de passe au
+   retour du lien (`compte.recuperation`). Google passe par son bouton officiel
+   (`src/ui/components/BoutonGoogle.tsx`, Google Identity Services, puis
+   `signInWithIdToken` avec un nonce) plutôt que par une redirection : la redirection faisait
+   afficher « continuer vers gmopjbpjiwdbnmxbgsxt.supabase.co » par Google, ce bouton affiche
+   « Cote Elo Escalade ». Seul un domaine personnalisé Supabase (payant) aurait corrigé la
+   redirection, gardée en secours si le script de Google ne charge pas. Une même adresse
+   retrouve le même compte par Google ou par mot de passe (vérifié avec le compte « Rafiot »).
+   Projet Google Cloud « Cote Elo Escalade » de Raphaël, écran de consentement publié (accès de
+   base, sans logo pour éviter la vérification de marque), client OAuth Web : origines
+   `https://rafiot-creator.github.io`, `http://localhost:5173` et `http://localhost` (exigée par
+   le bouton de Google en local), redirection `…supabase.co/auth/v1/callback`. L'ID client est
+   dans `supabase/config.toml` et `BoutonGoogle.tsx` ; le secret seulement dans le tableau de
+   bord Supabase. **Avant un `config push`**, vérifier que le secret Google masqué n'est pas
+   écrasé par une valeur vide (variable `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` absente).
+   Politique de confidentialité : `public/confidentialite.html` (bilingue, exigée par Google
+   et par la Loi 25).
    **Limite** : le service de courriel inclus dans Supabase n'écrit qu'aux membres de l'équipe
-   du projet (Raphaël) et au plus 2 courriels par heure. Avant d'ouvrir à d'autres personnes :
-   brancher Google (aucun courriel) et un service d'envoi (Resend, Brevo...) avec un nom de
-   domaine. Adresses de retour du lien autorisées (`supabase/config.toml`, poussées par
+   du projet (Raphaël) et au plus 2 courriels par heure. Google fonctionne pour tout le monde,
+   mais créer un compte par mot de passe (confirmation de l'adresse) ou réinitialiser un mot de
+   passe demande un service d'envoi (Resend, Brevo...), pas encore branché.
+   **Supprimer un compte** (promis par la politique de confidentialité) : supprimer la ligne du
+   grimpeur (`delete from public.grimpeurs where id = '<id>'`, qui efface ses envois et son
+   profil), puis l'utilisateur dans Authentication → Users du tableau de bord. Adresses de retour du lien autorisées (`supabase/config.toml`, poussées par
    `npx supabase config push`) : le site en ligne, `localhost:5173` et `localhost:5191`.
    Le fichier reprend les autres réglages du projet tels qu'ils étaient en ligne, pour que
    `config push` ne change rien d'autre (vérifier avec `npx supabase config diff` avant).
@@ -1899,3 +1920,10 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   lui sur Rose Bloc 1 (placer, modifier, déplacer, recharger, démonter). Le style d'un bloc se
   choisit désormais dans une liste fermée sur la Carte. Détail dans « Base de données et
   multi-utilisateur (en cours) ».
+- **Connexion par Google ou par mot de passe**, au lieu du lien par courriel : choix de
+  Raphaël, après discussion (un mot de passe demande quand même des courriels pour la
+  confirmation et l'oubli). Configuration Google Cloud faite par Raphaël, guidée pas à pas.
+  Politique de confidentialité ajoutée (exigée par Google pour publier). Le nom
+  « gmopjbpjiwdbnmxbgsxt.supabase.co » affiché par Google inquiétait Raphaël : bouton officiel
+  de Google à la place de la redirection, qui affiche « Cote Elo Escalade ». Testé par Raphaël
+  (Google et mot de passe, retrouve bien son compte « Rafiot »).

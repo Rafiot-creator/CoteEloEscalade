@@ -614,8 +614,13 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   `placer_bloc`/`modifier_bloc`/`demonter_bloc`, édition de la Carte enregistrée dans la base).
   « Rafiot » est admin général. Testé par Raphaël sur Rose Bloc 1. Glisser un bloc : souris
   seulement. Nommer un ouvreur : SQL donné dans le README.
-  Prochaine : Google et un service d'envoi de courriels avant d'ouvrir à d'autres personnes
-  (le service inclus n'écrit qu'à Raphaël, 2 par heure), ou étape 4 (temps réel). Tranché par Raphaël : **inscription ouverte à tous, avec
+- **Connexion Google + mot de passe faite le 2026-10-29** (lien par courriel retiré). Bouton
+  officiel de Google (`BoutonGoogle.tsx`) pour que Google affiche « Cote Elo Escalade » et non
+  le domaine Supabase. Détail, réglages Google Cloud et procédure de suppression de compte dans
+  le README. Secret Google : seulement dans le tableau de bord Supabase, jamais le demander.
+  Prochaine : un service d'envoi de courriels (sans lui, seuls les comptes Google marchent pour
+  les autres personnes : la confirmation d'adresse et le mot de passe oublié passent par
+  courriel), ou étape 4 (temps réel). Tranché par Raphaël : **inscription ouverte à tous, avec
   pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
@@ -626,8 +631,8 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**Suite de la base de données** (voir ci-dessus) : Google et courriels avant d'ouvrir à
-d'autres personnes, ou étape 4 (temps réel), au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+**Suite de la base de données** (voir ci-dessus) : service d'envoi de courriels, ou étape 4
+(temps réel), au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
 secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
 des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 

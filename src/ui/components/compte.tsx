@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Compte } from '../compte'
 import { useLangue } from '../langue'
+import { BoutonGoogle } from './BoutonGoogle'
 
 /** Libelle du bouton de l'en-tete, selon l'etat du compte. */
 export function libelleCompte(compte: Compte, t: (fr: string, en: string) => string): string {
@@ -24,6 +25,8 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
   const [info, setInfo] = useState<string | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
   const [occupe, setOccupe] = useState(false)
+  // Le bouton de Google n'a pas pu charger : bouton de secours par redirection.
+  const [secoursGoogle, setSecoursGoogle] = useState(false)
 
   const changerMode = (m: typeof mode) => {
     setMode(m)
@@ -168,9 +171,16 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
             {mode !== 'oubli' && (
               <>
                 <div className="barre-outils">
-                  <button className="bouton" type="button" disabled={occupe} onClick={() => void agir(compte.connecterGoogle, () => {})}>
-                    {t('Continuer avec Google', 'Continue with Google')}
-                  </button>
+                  {secoursGoogle ? (
+                    <button className="bouton" type="button" disabled={occupe} onClick={() => void agir(compte.connecterGoogle, () => {})}>
+                      {t('Continuer avec Google', 'Continue with Google')}
+                    </button>
+                  ) : (
+                    <BoutonGoogle
+                      surJeton={(jeton, nonce) => void agir(() => compte.connecterJetonGoogle(jeton, nonce), () => {})}
+                      surEchec={() => setSecoursGoogle(true)}
+                    />
+                  )}
                 </div>
                 <p className="discret" style={{ margin: '10px 0 6px', fontSize: 13 }}>
                   {t('ou avec votre courriel :', 'or with your email:')}

@@ -39,7 +39,10 @@ export interface Compte {
    */
   recuperation: boolean
   // Chacune renvoie un message d'erreur, ou null.
+  /** Secours si le bouton de Google ne charge pas : passe par une redirection. */
   connecterGoogle: () => Promise<string | null>
+  /** Jeton remis par le bouton de Google (cf. BoutonGoogle), et le nonce brut dont il porte l'empreinte. */
+  connecterJetonGoogle: (jeton: string, nonce: string) => Promise<string | null>
   connecter: (courriel: string, motDePasse: string) => Promise<string | null>
   /** `confirmer` : un courriel de confirmation a ete envoye, pas encore de session. */
   inscrire: (courriel: string, motDePasse: string) => Promise<{ erreur: string | null; confirmer: boolean }>
@@ -124,6 +127,14 @@ export function useCompte(): Compte {
     return error ? message(error) : null
   }, [message])
 
+  const connecterJetonGoogle = useCallback(
+    async (jeton: string, nonce: string) => {
+      const { error } = await supabase.auth.signInWithIdToken({ provider: 'google', token: jeton, nonce })
+      return error ? message(error) : null
+    },
+    [message]
+  )
+
   const connecter = useCallback(async (adresse: string, motDePasse: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email: adresse.trim(), password: motDePasse })
     return error ? message(error) : null
@@ -170,5 +181,5 @@ export function useCompte(): Compte {
   )
 
   return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, recuperation,
-    connecterGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, deconnecter }
+    connecterGoogle, connecterJetonGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, deconnecter }
 }
