@@ -236,10 +236,11 @@ est un changement dans `src/core/sources/` et nulle part ailleurs.
   cotation. C'est un autre modèle, pas un raffinement de celui-ci.
 - **L'import utilisateur** par glisser-déposer : un second `SourceProvider`, sans toucher aux
   parseurs, aux formules ni à l'interface.
-- **Le multi-utilisateur en temps réel**, discuté le 17 septembre 2026 (voir README, § « Piste
-  envisagée, pas commencée »). Il faut une base *et* un serveur (ou un service qui fournit les
-  deux, ex. Supabase) — une base seule, exposée au navigateur, ne peut appliquer aucune règle
-  d'accès. Raphaël a choisi d'attendre plutôt que de commencer.
+- **Le multi-utilisateur en temps réel**, discuté le 17 septembre 2026, **commencé le 28 octobre
+  2026** avec Supabase (voir README, § « Base de données et multi-utilisateur (en cours) »). Il
+  faut une base *et* un serveur (ou un service qui fournit les deux) — une base seule, exposée
+  au navigateur, ne peut appliquer aucune règle d'accès. Étape 1 (lecture) faite ; comptes,
+  outils de l'ouvreur et temps réel à suivre.
 - **Uniformiser les cotes entre centres** une fois qu'il y en aura plusieurs avec de vraies
   données, discuté le 18 septembre 2026. Deux pistes complémentaires, aucune codée :
   - *Grimpeurs-ponts avec cote figée à l'exterieur* : un grimpeur qui visite un centre autre que

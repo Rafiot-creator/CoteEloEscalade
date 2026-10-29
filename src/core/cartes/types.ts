@@ -38,10 +38,9 @@ export interface Carte {
 
 /**
  * Une source fournit la carte d'un centre. Aujourd'hui il n'y en a qu'une,
- * les fichiers versionnes dans data/cartes/ — exactement le meme principe
- * que SourceProvider pour les CSV (src/core/sources/). Le jour d'un serveur,
- * une deuxieme source vient s'ajouter ici, sans que l'interface ne change :
- * VueCarte ne connait que `chargerCarte`, jamais l'origine des donnees.
+ * la base Supabase (src/core/cartes/sources.ts) — exactement le meme principe
+ * que SourceProvider pour les CSV (src/core/sources/). VueCarte ne connait
+ * que `chargerCarte`, jamais l'origine des donnees.
  */
 export interface CarteProvider {
   id: string

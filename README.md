@@ -182,6 +182,14 @@ npm run data:generate  # régénère le jeu de données de démonstration
 
 ## Les données
 
+**Depuis le 28 octobre 2026, le site lit ses données dans une base Supabase**, plus dans ces
+fichiers (voir « Base de données et multi-utilisateur » plus bas). Les tables reprennent
+exactement les colonnes ci-dessous, et le site les remet en CSV avant de les passer au même
+pipeline (`src/core/sources/supabase.ts`). Les fichiers de `data/` restent la source du jeu de
+démonstration : les tests les lisent (`src/core/sources/repo.ts`), et
+`scripts/generer-seed-supabase.mjs` les verse dans la base. Le texte qui suit les décrit tels
+qu'ils étaient lus avant ce changement.
+
 Les fichiers de `data/` sont **importés à la compilation** : leur contenu fait partie du
 bundle JavaScript. Ils sont versionnés avec le code, ce qui fait de Git l'historique des
 données — diff, revert et revue de modification gratuits.
@@ -256,12 +264,14 @@ pas, et rien de tout cela ne s'affiche.
 ## Architecture
 
 ```
-data/                     fichiers sources versionnés
-scripts/                  générateur de données + vérité terrain (tests)
+data/                     jeu de démonstration (tests, remplissage de la base)
+scripts/                  générateur de données + vérité terrain (tests) + remplissage de la base
+supabase/migrations/      schéma, droits et données de la base (npx supabase db push)
 src/core/                 tout le calcul — ne connaît pas React
   cotations.ts            échelle V ↔ index numérique continu
   types.ts                le vocabulaire du domaine
-  sources/                d'où viennent les octets
+  supabase.ts             client de la base (adresse et clé publiques)
+  sources/                d'où viennent les octets (base Supabase pour le site, data/ pour les tests)
   loaders/                CSV → validation (zod) → Dataset typé
   formulas/
     types.ts              le contrat d'une formule
@@ -731,11 +741,14 @@ en vue visiteur on ne fait que consulter et cocher ses propres envois.
 
 `src/core/cartes/types.ts` déclare `BlocCarte` (position relative `x`/`y` de 0 à 1, cotation,
 couleur, style, nom optionnel de l'étiquette) et une interface `CarteProvider` — calquée sur
-`SourceProvider` (les CSV). La seule implémentation aujourd'hui (`src/core/cartes/sources.ts`)
-lit `data/cartes/<centreId>.json`, **versionné avec le code** comme le reste de `data/` : Git
-sert d'historique des positions. Ce choix anticipe explicitement un futur serveur — le jour où
-des ouvreurs modifieront la carte en direct, seule cette source change, `VueCarte.tsx` ne
-connaît que `chargerCarte(centreId)`.
+`SourceProvider` (les CSV). Jusqu'au 28 octobre 2026, la seule implémentation lisait
+`data/cartes/<centreId>.json`, versionné avec le code. Depuis, `src/core/cartes/sources.ts` lit
+la base Supabase : le fond et la taille des pastilles dans la table `centres`, les positions
+dans les colonnes `x`/`y` de la table `blocs`. `VueCarte.tsx` n'a pas changé, il ne connaît
+que `chargerCarte(centreId)`. Les fichiers `data/cartes/*.json` ne servent plus qu'à remplir
+la base. **Tant que l'étape 3 (outils de l'ouvreur) n'est pas faite**, l'édition de la carte en
+accès complet ne fait que télécharger un JSON : un bloc déplacé ne s'enregistre nulle part tant
+qu'on n'écrit pas une migration qui met à jour `x`/`y`.
 
 Le suivi « j'ai envoyé ce bloc » (`src/ui/suivi.ts`) suit le même principe : une interface
 `SuiviProvider`, aujourd'hui posée sur `localStorage`, indexée par couple **(centre,
@@ -1073,20 +1086,62 @@ aujourd'hui il n'y en a qu'un, les fichiers du dépôt. Brancher le glisser-dép
 ajouter un second provider (lecture d'un `File`, persistance IndexedDB) et à le concaténer
 dans `chargerToutesLesSources()`. Ni les parseurs, ni les formules, ni l'interface ne bougent.
 
-## Piste envisagée, pas commencée : le multi-utilisateur en temps réel
+## Base de données et multi-utilisateur (en cours)
 
-Aujourd'hui, le site est statique (GitHub Pages, aucun compte — voir « Accès à deux niveaux »
-plus haut) et rien n'est partagé entre utilisateurs : les envois tapés sur la Carte sont
-persistés en `localStorage`, par appareil (`AscensionLocaleProvider`, § « La carte des blocs »).
-Discuté avec Raphaël le 17 septembre 2026 : pour que plusieurs personnes voient les mêmes
-données en temps réel, il faut à la fois une base *et* un serveur (ou un équivalent) — une base
-exposée directement au navigateur ne peut appliquer aucune règle d'accès. Piste recommandée mais
-non explorée : un service backend-as-a-service (Supabase, Firebase, PocketBase...), qui fournit
-déjà la base et la couche API/auth, plutôt qu'un serveur écrit à la main. Ça s'accrocherait aux
-mêmes seams que l'import utilisateur ci-dessus : une seconde implémentation de `SourceProvider`,
-`CarteProvider` et `AscensionLocaleProvider` qui parle au service au lieu des CSV/`localStorage`,
-sans toucher au calcul ni à l'interface. Raphaël a choisi d'attendre plutôt que de commencer
-maintenant — ne pas relancer ce chantier sans qu'il le redemande.
+Discuté le 17 septembre 2026, lancé à la demande de Raphaël le 28 octobre 2026. Pour que
+plusieurs personnes voient les mêmes données en temps réel, il faut une base *et* un serveur
+qui applique des règles d'accès (une base exposée directement au navigateur n'en applique
+aucune). Choix retenu : **Supabase**, qui fournit les deux (base Postgres, API générée, comptes,
+règles d'accès par ligne, diffusion en temps réel). Le site reste statique sur GitHub Pages ;
+aucun serveur à écrire ni à héberger. Écartés : Firebase (base sans relations, moins adaptée
+aux duels grimpeur × bloc), PocketBase (à héberger soi-même), serveur écrit à la main (travail
+et maintenance sans gain à ce stade).
+
+**Le projet.** `cote-elo-escalade`, région `ca-central-1` (Canada). Un premier projet créé en
+`us-east-1` (l'interface ne proposait qu'« Americas ») a été remplacé par celui-ci : la Loi 25
+demande une évaluation avant de transférer des renseignements personnels hors du Québec. Plan
+gratuit : un projet sans activité pendant 7 jours est mis en pause (à relancer à la main) ;
+passer au plan Pro (25 $ US/mois) quand des grimpeurs en dépendront au quotidien. L'adresse et
+la clé *publishable* sont dans `src/core/supabase.ts` : publiques par conception. La clé
+secrète et le mot de passe de la base ne doivent jamais entrer dans le dépôt.
+
+**Sécurité.** Les droits sont posés explicitement dans les migrations, sans dépendre des
+réglages du tableau de bord : aucun droit par défaut sur les tables (y compris celles créées
+plus tard), règles d'accès (RLS) activées sur chaque table, puis seulement ce qui est permis.
+Vérifié avec la clé publique : lecture des quatre tables permise, écriture et suppression
+refusées.
+
+**Les étapes**, chacune utilisable seule :
+
+1. **Base et lecture** — *faite le 28 octobre 2026.* Tables `centres`, `grimpeurs`, `blocs`
+   (avec la position `x`/`y` sur la carte), `ascensions`, mêmes colonnes que les CSV.
+   Lecture publique, aucune écriture. Jeu de démonstration et cartes chargés. Le site lit la
+   base (`src/core/sources/supabase.ts`, `src/core/cartes/sources.ts`) ; vérifié identique à
+   l'ancienne version (mêmes lignes dans les trois tables, mêmes tableaux Blocs et Grimpeurs).
+2. **Comptes et envois** : connexion par lien envoyé par courriel ou par Google ; un grimpeur
+   n'écrit que ses propres ascensions, dans la base plutôt que dans `localStorage`.
+3. **Outils de l'ouvreur** : placer, modifier, démonter des blocs sur la carte, enregistrés dans
+   la base.
+4. **Temps réel** : les cotes se mettent à jour sur tous les écrans ouverts.
+5. **Essai dans un vrai centre** (Rose Bloc 1 ou 2).
+
+**Rôles prévus.** Visiteur (lecture), grimpeur (ses propres envois), admin d'un centre (les blocs
+et les résultats de ce centre), admin général (Raphaël). Le calcul des cotes reste dans le
+navigateur : il lit toutes les ascensions, qui doivent donc rester lisibles par tous. Ce qui
+peut rester privé : le courriel, l'identité réelle (pseudonymes), éventuellement un mode
+anonyme. Protections contre les faux envois envisagées : un seul statut par grimpeur et par
+bloc, une limite d'envois par heure, aucun envoi sur un bloc démonté, effacement par un admin.
+
+**Décidé par Raphaël** : inscription ouverte à tous, avec des pseudonymes. **Encore ouvert** :
+l'accord de Rose Bloc pour un essai.
+
+**Appliquer un changement de schéma.** Écrire une nouvelle migration dans
+`supabase/migrations/` (ne jamais modifier une migration déjà appliquée), puis
+`npx supabase db push --linked`. L'outil de Supabase est connecté au compte de Raphaël sur son
+ordinateur (`npx.cmd supabase login`, à faire dans une vraie fenêtre PowerShell : la connexion
+automatique ne marche pas depuis Claude Code, et `npx.ps1` est bloqué par la politique
+d'exécution de Windows), et le dépôt est relié au projet (`supabase link`, dans
+`supabase/.temp/`, ignoré par Git).
 
 ## Piste envisagée, pas commencée : uniformiser les cotes entre centres
 
@@ -1106,8 +1161,7 @@ pour les relier via les grimpeurs qui visitent plusieurs centres, détaillées d
   différente, mais sert de validation croisée si elle converge avec l'estimation par grimpeurs-
   ponts.
 
-Rien codé ; ne pas relancer ce chantier sans que Raphaël le redemande, comme pour le
-multi-utilisateur ci-dessus.
+Rien codé ; ne pas relancer ce chantier sans que Raphaël le redemande.
 
 ## Changer d'échelle de cotation
 
@@ -1779,3 +1833,14 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   plancher), et au plancher de la police du chiffre. Rose Bloc 2 à 0,7 : 28 px de diamètre sur
   bureau au lieu de 40, 8 px sur téléphone au lieu de 12 (chiffre lisible en zoomant). Validé par
   Raphaël sur aperçu avec 150 faux blocs placés au hasard sur les murs, retirés ensuite.
+- **Début de la base de données (Supabase)**, à la demande de Raphaël. Discussion d'abord :
+  Supabase plutôt que Firebase, PocketBase ou un serveur écrit à la main ; ce qu'est un serveur
+  et quand un projet en a besoin ; comptes et règles d'accès (personne ne modifie les résultats
+  d'un autre, sauf un admin) ; limites du plan gratuit. Puis étape 1 : schéma et droits
+  (`supabase/migrations/20261029000000_schema_initial.sql`), données de démonstration générées
+  depuis `data/` (`scripts/generer-seed-supabase.mjs` → `20261029000100_donnees_demo.sql`), et
+  le site branché en lecture sur la base. Détail dans « Base de données et multi-utilisateur
+  (en cours) ». Les tests lisent toujours `data/`, sans réseau. Les CSV ne sont plus dans le
+  bundle, qui pèse 581 ko (172 ko compressé) avec la bibliothèque de Supabase. Le chargement
+  fait une vingtaine de requêtes : l'API renvoie au plus 1000 lignes à la fois, et les
+  ascensions sont lues par paquets en parallèle (environ 2 s en local).

@@ -17,12 +17,12 @@ import { normaliserParams, paramsParDefaut } from './formulas/types'
 import { STYLES_BLOC } from './stylesBloc'
 import { construireDataset } from './loaders/dataset'
 import { executer } from './pipeline'
-import { chargerToutesLesSources } from './sources'
+import { sourceRepo } from './sources/repo'
 import type { Ascension, Bloc, Dataset, Grimpeur } from './types'
 
 let cache: Dataset | null = null
 async function dataset(): Promise<Dataset> {
-  if (!cache) cache = construireDataset(await chargerToutesLesSources())
+  if (!cache) cache = construireDataset(await sourceRepo.charger())
   return cache
 }
 

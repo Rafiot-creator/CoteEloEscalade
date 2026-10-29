@@ -4,7 +4,7 @@ import { FORMULES } from './formulas/registry'
 import { paramsParDefaut, type Params } from './formulas/types'
 import { construireDataset } from './loaders/dataset'
 import { executer } from './pipeline'
-import { chargerToutesLesSources } from './sources'
+import { sourceRepo } from './sources/repo'
 import type { Dataset } from './types'
 
 /**
@@ -18,7 +18,7 @@ import type { Dataset } from './types'
 
 let cache: Dataset | null = null
 async function dataset(): Promise<Dataset> {
-  if (!cache) cache = construireDataset(await chargerToutesLesSources())
+  if (!cache) cache = construireDataset(await sourceRepo.charger())
   return cache
 }
 

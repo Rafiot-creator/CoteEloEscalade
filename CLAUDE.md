@@ -593,9 +593,25 @@ Rose Bloc a fourni les plans des deux salles (`Plan RB1.pdf`, `Plan RB2.pdf`, da
   plafond compris). Ses murs n'accueillent qu'environ la moitié des pastilles de Rose Bloc 1 à
   taille égale ; Raphaël veut voir tous les blocs en même temps. Validé sur aperçu.
 
+## Base de données Supabase (commencée le 2026-10-28)
+
+Raphaël a demandé de passer à une base de données pour avoir des utilisateurs et des résultats
+en temps réel. Plan, choix et sécurité dans le README, § « Base de données et multi-utilisateur
+(en cours) » : ne pas les redemander.
+
+- Projet `cote-elo-escalade`, ref `gmopjbpjiwdbnmxbgsxt`, région `ca-central-1`. Le premier
+  projet en `us-east-1` a été supprimé (vérifié).
+- CLI : `npx supabase ...` depuis Claude Code (connecté au compte de Raphaël, dépôt lié). Le
+  `login` ne marche que dans une vraie fenêtre PowerShell, avec `npx.cmd` (`npx.ps1` bloqué).
+  `db push --linked` fonctionne sans le mot de passe de la base. **Ne jamais afficher ni
+  demander la clé secrète / service_role** (pas de `supabase projects api-keys`).
+- **Étape 1 faite** (lecture seule, données de démo, site branché, vérifié identique).
+  Prochaine : étape 2, comptes et envois. Tranché par Raphaël : **inscription ouverte à tous, avec
+  pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
+
 ## Prochaine étape
 
-Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+**Étape 2 de la base de données** (voir ci-dessus). Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
 secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
 des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 
@@ -613,5 +629,6 @@ Autres pistes, au choix de Raphael si celle-ci n'avance pas :
 Autres pistes en attente si rien de ce qui précède ne ressort : brancher de vraies données sur un
 des centres du menu (autre que Rose Bloc 1), ou une des pistes ouvertes listées dans
 `DECISIONS.md` (§ 7) : seuil Glicko à 0,60, test d'équivalence, Glicko-2, modèle morphologique,
-import utilisateur par glisser-déposer, multi-utilisateur en temps réel, uniformisation des cotes
-entre centres (ces deux dernières en attente explicite — ne pas les proposer spontanément).
+import utilisateur par glisser-déposer, uniformisation des cotes entre centres (cette dernière
+en attente explicite — ne pas la proposer spontanément). Le multi-utilisateur est en cours, voir
+ci-dessus.

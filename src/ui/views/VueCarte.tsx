@@ -95,6 +95,7 @@ export function VueCarte({
 }) {
   const { t } = useLangue()
   const [carte, setCarte] = useState<DonneesCarte | null>(null)
+  const [erreurCarte, setErreurCarte] = useState<string | null>(null)
   const [selection, setSelection] = useState<string | null>(null)
   const [survole, setSurvole] = useState<string | null>(null)
   const [grimpeurChoisi, setGrimpeurChoisi] = useState('')
@@ -207,9 +208,14 @@ export function VueCarte({
     let vivant = true
     setCarte(null)
     setSelection(null)
-    chargerCarte(centreId).then((c) => {
-      if (vivant) setCarte(c)
-    })
+    setErreurCarte(null)
+    chargerCarte(centreId)
+      .then((c) => {
+        if (vivant) setCarte(c)
+      })
+      .catch((e: unknown) => {
+        if (vivant) setErreurCarte(e instanceof Error ? e.message : String(e))
+      })
     const nom = lireGrimpeurChoisi(centreId)
     setGrimpeurChoisi(nom)
     setSuivi(suiviLocal.lire(centreId, nom))
@@ -247,6 +253,13 @@ export function VueCarte({
     zoneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [blocCible, carte])
 
+  if (erreurCarte)
+    return (
+      <div className="carte" style={{ borderColor: 'var(--critique)' }}>
+        <h2>{t('Le chargement de la carte a échoué', 'Loading the map failed')}</h2>
+        <p className="sous-titre">{erreurCarte}</p>
+      </div>
+    )
   if (!carte) return <p className="vide">{t('Chargement de la carte…', 'Loading the map…')}</p>
 
   const relatif = (clientX: number, clientY: number): { x: number; y: number } => {

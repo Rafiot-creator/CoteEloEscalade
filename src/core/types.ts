@@ -59,7 +59,7 @@ export interface FichierBrut {
   nom: string
   contenu: string
   octets: number
-  origine: 'repo' | 'utilisateur'
+  origine: 'repo' | 'supabase' | 'utilisateur'
 }
 
 export interface Anomalie {
