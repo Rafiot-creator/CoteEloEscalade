@@ -943,8 +943,10 @@ visiteur.
   automatiquement sur cette image, au pixel près (voir le journal du 2026-10-28). Même sens que
   le plan (accueil en bas), même style que Rose Bloc 1. Noms de zones repris du plan (Comp Wall,
   Training Center, Main Room, Accueil, Vestiaires, Sauna) ou donnés par Raphaël (mur de vitesse,
-  spraywall, board, musculation, rangement de prises, magasin). Sans bloc positionné pour
-  l'instant.
+  spraywall, board, musculation, rangement de prises, magasin). Pastilles réduites à 70 %
+  (`"taillePastilles": 0.7` dans `data/cartes/rose-bloc-2.json`) : ses murs, en bandes fines sur
+  une carte presque carrée, n'occupent que 14 % de la carte (25 % pour Rose Bloc 1), et à taille
+  normale les pastilles se chevauchaient. Sans bloc positionné pour l'instant.
 - Les autres centres du menu n'ont pas encore de carte : l'écran affiche un canevas vierge,
   cliquable en accès complet pour commencer à y placer des blocs.
 
@@ -1768,3 +1770,12 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   carte à sa demande). Le script d'assemblage n'est pas commité (il dépend du PDF hors dépôt) :
   pour retoucher la carte, éditer directement le SVG. `data/cartes/rose-bloc-2.json` créé, sans
   bloc.
+- **Taille des pastilles par carte** : Raphaël craignait que tous les blocs de Rose Bloc 2 ne
+  tiennent pas. Mesuré : à taille de pastille égale, ses murs en accueillent environ deux fois
+  moins que ceux de Rose Bloc 1. Agrandir la carte n'est pas possible (elle occupe déjà toute la
+  largeur, et tous les blocs doivent rester visibles en même temps). Nouveau champ optionnel
+  `taillePastilles` (`Carte`, `src/core/cartes/types.ts`), facteur appliqué à `RAYON`
+  (`VueCarte.tsx`), à son plancher et à son plafond (sinon aucun effet sur téléphone, déjà au
+  plancher), et au plancher de la police du chiffre. Rose Bloc 2 à 0,7 : 28 px de diamètre sur
+  bureau au lieu de 40, 8 px sur téléphone au lieu de 12 (chiffre lisible en zoomant). Validé par
+  Raphaël sur aperçu avec 150 faux blocs placés au hasard sur les murs, retirés ensuite.

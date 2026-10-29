@@ -161,7 +161,10 @@ export function VueCarte({
   // proportionnelle justement sur les cartes les plus etroites, la ou elle
   // compte le plus) — la legende (V-grade) reste lisible via son propre
   // minimum de police, decouple de RAYON.
-  const RAYON = Math.round(Math.max(5, Math.min(20, largeurCarte * 0.018)))
+  // Le facteur par carte (`taillePastilles`) s'applique aussi au plancher et au
+  // plafond : sinon il n'aurait aucun effet sur telephone (deja au plancher).
+  const FACTEUR = carte?.taillePastilles ?? 1
+  const RAYON = Math.round(Math.max(5 * FACTEUR, Math.min(20 * FACTEUR, largeurCarte * 0.018 * FACTEUR)))
   // Le contour de la pastille (boxShadow plus bas) etait fixe a 2px depuis
   // toujours, jamais retouche pendant les correctifs precedents de l'anneau
   // "envoye" — la cause reelle du "debordement" signale par Raphael sur
@@ -490,7 +493,7 @@ export function VueCarte({
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: couleur.texte,
-                      fontSize: Math.max(7, Math.round(RAYON * 0.6)),
+                      fontSize: Math.max(Math.round(7 * FACTEUR), Math.round(RAYON * 0.6)),
                       fontWeight: 700,
                       textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
                       cursor: accesComplet ? 'grab' : 'pointer',

@@ -588,6 +588,10 @@ Rose Bloc a fourni les plans des deux salles (`Plan RB1.pdf`, `Plan RB2.pdf`, da
   donnés par Raphaël, aperçu validé (« C'est bon ! »). Script non commité : éditer le SVG
   directement pour retoucher. Vérifié dans Chrome headless (bureau et 390 px), tests (64) et
   build au vert.
+- **Pastilles de Rose Bloc 2 réduites à 70 %** : nouveau champ optionnel `taillePastilles` par
+  carte (`src/core/cartes/types.ts`, appliqué à `RAYON` dans `VueCarte.tsx`, plancher et
+  plafond compris). Ses murs n'accueillent qu'environ la moitié des pastilles de Rose Bloc 1 à
+  taille égale ; Raphaël veut voir tous les blocs en même temps. Validé sur aperçu.
 
 ## Prochaine étape
 

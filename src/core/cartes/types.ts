@@ -27,6 +27,12 @@ export interface BlocCarte {
 export interface Carte {
   /** Image de fond (chemin public), absente = carte abstraite (canevas vierge). */
   fond?: string
+  /**
+   * Facteur sur la taille des pastilles (1 par defaut). Pour une salle dont
+   * les murs occupent peu de place sur la carte (Rose Bloc 2 : murs en bandes
+   * fines, carte carree), ou des pastilles standard ne tiendraient pas toutes.
+   */
+  taillePastilles?: number
   blocs: BlocCarte[]
 }
 
