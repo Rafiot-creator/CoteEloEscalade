@@ -48,10 +48,11 @@ function Contenu() {
   const atelier = useAtelier(compte.grimpeur)
   const [panneauCompte, setPanneauCompte] = useState(false)
   // Retour du lien du courriel, premiere connexion : il manque le pseudonyme.
+  // Ou retour du lien « mot de passe oublie » : il manque le nouveau mot de passe.
   const sansPseudo = compte.pret && !!compte.courriel && !compte.grimpeur
   useEffect(() => {
-    if (sansPseudo) setPanneauCompte(true)
-  }, [sansPseudo])
+    if (sansPseudo || compte.recuperation) setPanneauCompte(true)
+  }, [sansPseudo, compte.recuperation])
   const accesComplet = useAccesComplet()
   const { langue, definir, t } = useLangue()
   const [apercuVisiteur, setApercuVisiteur] = useState(false)

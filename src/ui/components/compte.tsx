@@ -10,16 +10,56 @@ export function libelleCompte(compte: Compte, t: (fr: string, en: string) => str
 }
 
 /**
- * Panneau de connexion, sous l'en-tete : courriel -> lien recu par courriel
- * -> pseudonyme (premiere connexion seulement) -> connecte.
+ * Panneau de connexion, sous l'en-tete : Google, ou courriel et mot de passe
+ * -> pseudonyme (premiere connexion seulement) -> connecte. Sert aussi a
+ * choisir un nouveau mot de passe au retour du lien « mot de passe oublie ».
  */
 export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresProfil: () => void }) {
   const { t } = useLangue()
   const [courriel, setCourriel] = useState('')
+  const [motDePasse, setMotDePasse] = useState('')
+  const [mode, setMode] = useState<'connexion' | 'inscription' | 'oubli'>('connexion')
   const [pseudo, setPseudo] = useState('')
-  const [envoye, setEnvoye] = useState<string | null>(null)
+  // Message de reussite (courriel envoye, mot de passe change...).
+  const [info, setInfo] = useState<string | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
   const [occupe, setOccupe] = useState(false)
+
+  const changerMode = (m: typeof mode) => {
+    setMode(m)
+    setErreur(null)
+    setInfo(null)
+  }
+
+  const soumettre = () => {
+    if (mode === 'connexion') void agir(() => compte.connecter(courriel, motDePasse), () => {})
+    else if (mode === 'oubli')
+      void agir(
+        () => compte.oublie(courriel),
+        () =>
+          setInfo(
+            t(
+              `Si un compte existe pour ${courriel.trim()}, un lien pour choisir un nouveau mot de passe vient d'y être envoyé.`,
+              `If an account exists for ${courriel.trim()}, a link to choose a new password has just been sent to it.`
+            )
+          )
+      )
+    else
+      void agir(
+        async () => {
+          const r = await compte.inscrire(courriel, motDePasse)
+          if (r.confirmer)
+            setInfo(
+              t(
+                `Compte créé. Ouvrez le lien envoyé à ${courriel.trim()} pour confirmer l'adresse, puis connectez-vous.`,
+                `Account created. Open the link sent to ${courriel.trim()} to confirm the address, then sign in.`
+              )
+            )
+          return r.erreur
+        },
+        () => {}
+      )
+  }
 
   const agir = async (action: () => Promise<string | null>, succes: () => void) => {
     setOccupe(true)
@@ -33,7 +73,36 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
   return (
     <div className="large">
       <div className="carte">
-        {compte.grimpeur ? (
+        {compte.recuperation ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void agir(
+                () => compte.changerMotDePasse(motDePasse),
+                () => setInfo(t('Mot de passe changé.', 'Password changed.'))
+              )
+            }}
+          >
+            <h2>{t('Nouveau mot de passe', 'New password')}</h2>
+            <p className="sous-titre">{t('Au moins 6 caractères.', 'At least 6 characters.')}</p>
+            <div className="barre-outils">
+              <input
+                type="password"
+                autoComplete="new-password"
+                value={motDePasse}
+                onChange={(e) => setMotDePasse(e.currentTarget.value)}
+                placeholder={t('nouveau mot de passe', 'new password')}
+                style={{ width: 220 }}
+                minLength={6}
+                required
+                autoFocus
+              />
+              <button className="bouton" type="submit" disabled={occupe}>
+                {t('Enregistrer', 'Save')}
+              </button>
+            </div>
+          </form>
+        ) : compte.grimpeur ? (
           <>
             <h2>{t(`Connecté : ${compte.grimpeur.nom}`, `Signed in: ${compte.grimpeur.nom}`)}</h2>
             <p className="sous-titre">
@@ -79,38 +148,95 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
             </div>
           </form>
         ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              void agir(() => compte.envoyerLien(courriel), () => setEnvoye(courriel.trim()))
-            }}
-          >
-            <h2>{t('Se connecter', 'Sign in')}</h2>
+          <>
+            <h2>
+              {mode === 'inscription'
+                ? t('Créer un compte', 'Create an account')
+                : mode === 'oubli'
+                  ? t('Mot de passe oublié', 'Forgot password')
+                  : t('Se connecter', 'Sign in')}
+            </h2>
             <p className="sous-titre">
-              {envoye
-                ? t(
-                    `Lien envoyé à ${envoye}. Ouvrez-le sur cet appareil-ci : vous y resterez connecté.`,
-                    `Link sent to ${envoye}. Open it on this device: you'll stay signed in here.`
-                  )
-                : t(
-                    'Recevez un lien de connexion par courriel, sans mot de passe. Une seule fois par appareil : vous restez connecté ensuite.',
-                    'Get a sign-in link by email, no password. Once per device: you stay signed in afterwards.'
-                  )}
+              {t(
+                'Vous restez connecté sur cet appareil. Votre courriel n\'est jamais affiché : seul votre pseudonyme l\'est.',
+                'You stay signed in on this device. Your email is never shown: only your username is.'
+              )}{' '}
+              <a href={t('confidentialite.html', 'confidentialite.html#en')} target="_blank" rel="noreferrer">
+                {t('Confidentialité', 'Privacy')}
+              </a>
             </p>
-            <div className="barre-outils">
-              <input
-                type="email"
-                value={courriel}
-                onChange={(e) => setCourriel(e.currentTarget.value)}
-                placeholder={t('votre courriel', 'your email')}
-                style={{ width: 260 }}
-                required
-              />
-              <button className="bouton" type="submit" disabled={occupe}>
-                {envoye ? t('Renvoyer le lien', 'Send again') : t('Recevoir le lien', 'Send me the link')}
-              </button>
+            {mode !== 'oubli' && (
+              <>
+                <div className="barre-outils">
+                  <button className="bouton" type="button" disabled={occupe} onClick={() => void agir(compte.connecterGoogle, () => {})}>
+                    {t('Continuer avec Google', 'Continue with Google')}
+                  </button>
+                </div>
+                <p className="discret" style={{ margin: '10px 0 6px', fontSize: 13 }}>
+                  {t('ou avec votre courriel :', 'or with your email:')}
+                </p>
+              </>
+            )}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                soumettre()
+              }}
+            >
+              <div className="barre-outils">
+                <input
+                  type="email"
+                  autoComplete="email"
+                  value={courriel}
+                  onChange={(e) => setCourriel(e.currentTarget.value)}
+                  placeholder={t('courriel', 'email')}
+                  style={{ width: 240 }}
+                  required
+                />
+                {mode !== 'oubli' && (
+                  <input
+                    type="password"
+                    autoComplete={mode === 'inscription' ? 'new-password' : 'current-password'}
+                    value={motDePasse}
+                    onChange={(e) => setMotDePasse(e.currentTarget.value)}
+                    placeholder={mode === 'inscription' ? t('mot de passe (6 caractères ou plus)', 'password (6+ characters)') : t('mot de passe', 'password')}
+                    style={{ width: 240 }}
+                    minLength={mode === 'inscription' ? 6 : undefined}
+                    required
+                  />
+                )}
+                <button className="bouton" type="submit" disabled={occupe}>
+                  {mode === 'inscription'
+                    ? t('Créer le compte', 'Create account')
+                    : mode === 'oubli'
+                      ? t('Recevoir un lien', 'Send me a link')
+                      : t('Se connecter', 'Sign in')}
+                </button>
+              </div>
+            </form>
+            <div className="barre-outils" style={{ marginTop: 8, fontSize: 13 }}>
+              {mode !== 'connexion' && (
+                <button className="lien-bloc" type="button" onClick={() => changerMode('connexion')}>
+                  {t('J\'ai déjà un compte', 'I already have an account')}
+                </button>
+              )}
+              {mode !== 'inscription' && (
+                <button className="lien-bloc" type="button" onClick={() => changerMode('inscription')}>
+                  {t('Créer un compte', 'Create an account')}
+                </button>
+              )}
+              {mode === 'connexion' && (
+                <button className="lien-bloc" type="button" onClick={() => changerMode('oubli')}>
+                  {t('Mot de passe oublié ?', 'Forgot password?')}
+                </button>
+              )}
             </div>
-          </form>
+          </>
+        )}
+        {info && (
+          <p className="sous-titre" style={{ color: 'var(--bon)', marginTop: 8 }}>
+            {info}
+          </p>
         )}
         {erreur && (
           <p className="sous-titre" style={{ color: 'var(--critique)', marginTop: 8 }}>

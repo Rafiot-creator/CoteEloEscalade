@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../core/supabase'
+import { useLangue } from './langue'
 
 /**
  * Le compte connecte, s'il y en a un.
  *
- * Connexion par lien envoye par courriel (Supabase Auth, sans mot de passe).
- * La session est gardee par le navigateur (localStorage, gere par la
- * bibliotheque Supabase) : un nouveau courriel n'est necessaire que sur un
- * nouvel appareil, apres une deconnexion ou un effacement des donnees du
- * navigateur.
+ * Connexion par Google, ou par courriel et mot de passe (Supabase Auth). Le
+ * courriel ne sert alors qu'a confirmer l'adresse a l'inscription et a
+ * reinitialiser un mot de passe oublie. Une adresse deja connue par l'un des
+ * deux moyens retrouve le meme compte par l'autre (Supabase relie les
+ * identites qui partagent une adresse verifiee). La session est gardee par le
+ * navigateur (localStorage, geree par la bibliotheque Supabase).
  *
  * A la premiere connexion, le compte choisit un pseudonyme : c'est le nom de
  * son grimpeur dans la base, seul visible publiquement (jamais le courriel).
@@ -31,14 +33,37 @@ export interface Compte {
    * toute facon a chaque ecriture.
    */
   peutOuvrir: (centreId: string) => boolean
-  envoyerLien: (courriel: string) => Promise<string | null>
+  /**
+   * Retour du lien « mot de passe oublie » : la session est ouverte, il reste
+   * a choisir un nouveau mot de passe.
+   */
+  recuperation: boolean
+  // Chacune renvoie un message d'erreur, ou null.
+  connecterGoogle: () => Promise<string | null>
+  connecter: (courriel: string, motDePasse: string) => Promise<string | null>
+  /** `confirmer` : un courriel de confirmation a ete envoye, pas encore de session. */
+  inscrire: (courriel: string, motDePasse: string) => Promise<{ erreur: string | null; confirmer: boolean }>
+  oublie: (courriel: string) => Promise<string | null>
+  changerMotDePasse: (motDePasse: string) => Promise<string | null>
   creerProfil: (pseudo: string) => Promise<string | null>
   deconnecter: () => Promise<void>
 }
 
-/** Ou revient le lien du courriel : la page en cours, sans parametres. */
+/** Ou reviennent Google et les liens des courriels : la page en cours, sans parametres. */
 function adresseRetour(): string {
   return window.location.origin + window.location.pathname
+}
+
+/** Messages de Supabase Auth les plus courants, traduits pour le site en francais (ils sont deja en anglais). */
+const MESSAGES: Record<string, string> = {
+  'Invalid login credentials': 'Courriel ou mot de passe incorrect.',
+  'Email not confirmed': "Adresse pas encore confirmée : ouvrez le lien reçu par courriel à l'inscription.",
+  'User already registered': 'Un compte existe déjà avec ce courriel : connectez-vous.',
+  'Password should be at least 6 characters.': 'Le mot de passe doit faire au moins 6 caractères.',
+  'New password should be different from the old password.': "Le nouveau mot de passe doit être différent de l'ancien.",
+}
+function traduire(e: { message: string }, langue: string): string {
+  return langue === 'fr' ? (MESSAGES[e.message] ?? e.message) : e.message
 }
 
 export function useCompte(): Compte {
@@ -52,11 +77,16 @@ export function useCompte(): Compte {
   const [grimpeur, setGrimpeur] = useState<{ id: string; nom: string } | null>(null)
   // Centres ou le compte est ouvreur ; `null` dans la liste : tous les centres.
   const [centresOuvreur, setCentresOuvreur] = useState<(string | null)[]>([])
+  const { langue } = useLangue()
+  const message = useCallback((e: { message: string }) => traduire(e, langue), [langue])
+  const [recuperation, setRecuperation] = useState(false)
 
   useEffect(() => {
-    // Lit aussi le retour du lien du courriel (jetons dans l'adresse), que la
-    // bibliotheque transforme elle-meme en session.
-    const { data } = supabase.auth.onAuthStateChange((_evenement, session) => {
+    // Lit aussi le retour de Google ou d'un lien de courriel (jetons dans
+    // l'adresse), que la bibliotheque transforme elle-meme en session.
+    const { data } = supabase.auth.onAuthStateChange((evenement, session) => {
+      if (evenement === 'PASSWORD_RECOVERY') setRecuperation(true)
+      if (evenement === 'SIGNED_OUT') setRecuperation(false)
       setUserId(session?.user.id ?? null)
       setCourriel(session?.user.email ?? null)
       setSessionLue(true)
@@ -88,13 +118,37 @@ export function useCompte(): Compte {
     void lireProfil()
   }, [lireProfil])
 
-  const envoyerLien = useCallback(async (adresse: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
+  const connecterGoogle = useCallback(async () => {
+    // Quitte la page pour Google, qui revient sur `adresseRetour`.
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: adresseRetour() } })
+    return error ? message(error) : null
+  }, [message])
+
+  const connecter = useCallback(async (adresse: string, motDePasse: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email: adresse.trim(), password: motDePasse })
+    return error ? message(error) : null
+  }, [message])
+
+  const inscrire = useCallback(async (adresse: string, motDePasse: string) => {
+    const { data, error } = await supabase.auth.signUp({
       email: adresse.trim(),
+      password: motDePasse,
       options: { emailRedirectTo: adresseRetour() },
     })
-    return error ? error.message : null
-  }, [])
+    return { erreur: error ? message(error) : null, confirmer: !error && !data.session }
+  }, [message])
+
+  const oublie = useCallback(async (adresse: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(adresse.trim(), { redirectTo: adresseRetour() })
+    return error ? message(error) : null
+  }, [message])
+
+  const changerMotDePasse = useCallback(async (motDePasse: string) => {
+    const { error } = await supabase.auth.updateUser({ password: motDePasse })
+    if (error) return message(error)
+    setRecuperation(false)
+    return null
+  }, [message])
 
   const creerProfil = useCallback(
     async (pseudo: string) => {
@@ -115,5 +169,6 @@ export function useCompte(): Compte {
     [centresOuvreur]
   )
 
-  return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, envoyerLien, creerProfil, deconnecter }
+  return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, recuperation,
+    connecterGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, deconnecter }
 }
