@@ -1875,3 +1875,6 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   Raphaël. Bouton « Se connecter » passé sur fond vert à sa demande (trop discret sinon), et
   repère de sa position dans le classement ajouté à sa demande (il apparaissait 32e, hors des
   25 lignes affichées). Détail dans « Base de données et multi-utilisateur (en cours) ».
+- Fin de session : Raphaël connecté aussi sur le site en ligne. Prochaine étape au choix de
+  Raphaël : outils de l'ouvreur (étape 3), ou Google et un service de courriel pour ouvrir les
+  comptes à d'autres personnes.

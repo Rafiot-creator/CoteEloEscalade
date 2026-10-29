@@ -614,6 +614,12 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   un service d'envoi de courriels (le service inclus n'écrit qu'à Raphaël, 2 par heure). Tranché par Raphaël : **inscription ouverte à tous, avec
   pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
 
+**Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
+vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
+local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
+ordinateur, n'existe que quand le serveur de dev tourne) et le site publié : à garder en tête
+pour présenter les prochains aperçus.
+
 ## Prochaine étape
 
 **Suite de la base de données** (voir ci-dessus) : étape 3, ou Google et courriels avant
