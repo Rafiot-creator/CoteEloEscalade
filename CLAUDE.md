@@ -605,7 +605,7 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   `login` ne marche que dans une vraie fenêtre PowerShell, avec `npx.cmd` (`npx.ps1` bloqué).
   `db push --linked` fonctionne sans le mot de passe de la base. **Ne jamais afficher ni
   demander la clé secrète / service_role** (pas de `supabase projects api-keys`).
-- **Étapes 1 et 2 faites** (lecture ; comptes par lien courriel, pseudonymes, envois dans la
+- **Étapes 1 et 2 faites** (lecture ; comptes, par lien courriel puis Google ou mot de passe depuis le 29 ; pseudonymes, envois dans la
   base, position dans le classement). Compte de Raphaël : pseudonyme « Rafiot ». Tester une
   fonction de la base sans vraie session : un bloc `do $ ... $` lancé par
   `npx supabase db query --linked -f`, avec `set local role authenticated` et
@@ -628,10 +628,42 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   cote V), période d'essai de 10 blocs (pseudonyme caché, K ×2 en Elo, blocs non déplacés).
   Mesures et coût dans `DECISIONS.md` (« Les nouveaux grimpeurs »). Rafiot : flash V6,
   niveau déclaré V7, classé depuis son 10e bloc.
-  Prochaine : étape 5 (essai dans un vrai centre, accord de Rose Bloc à obtenir), ou
-  vérification de la marque Google (la fenêtre de connexion affiche
-  « rafiot-creator.github.io » en ligne, pas « Cote Elo Escalade »). Tranché par Raphaël : **inscription ouverte à tous, avec
-  pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
+- Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
+  l'accord de Rose Bloc pour un essai (étape 5).
+
+**Fin de session du 2026-10-30** (session commencée le 29). Tout est poussé (dernier commit
+de code `0b25b5f`), déploiement vérifié vert. Fait : étape 3 (ouvreurs), connexion Google +
+mot de passe, politique de confidentialité, courriels par Gmail, étape 4 (temps réel),
+période d'essai des nouveaux. Méthodes utiles découvertes en route :
+
+- **Le serveur de dev peut devenir périmé** après de longues heures (des modifications de
+  `base.tsx` n'arrivaient plus au navigateur, Raphaël voyait une ancienne version). En cas
+  d'écart inexpliqué entre le code et ce que voit Raphaël : trouver le processus sur le port
+  5173 (`Get-NetTCPConnection -LocalPort 5173`), l'arrêter et relancer `npm run dev`. Un
+  `TaskStop` sur `npm run dev` peut laisser vite tourner (processus orphelin).
+- **Vérifier un écran « connecté » sans session** : la connexion passe par Google ou un
+  courriel, impossible à faire soi-même. Fait ici en remplaçant temporairement dans
+  `App.tsx` la prop `moi` par un paramètre d'adresse (`?moitmp=<id du grimpeur>`), puis
+  Chrome sans interface via `puppeteer-core` (installé dans le scratchpad, pas dans le
+  projet), puis retour exact au fichier d'origine. Pour le calcul seul : un test vitest
+  temporaire qui charge `sourceSupabase` et lance `executer` sur les vraies données.
+- **Tester le temps réel** : écritures temporaires dans la vraie base
+  (`npx supabase db query --linked`) pendant qu'une page est ouverte dans Chrome sans
+  interface, puis annulation, en vérifiant ensuite que la base est revenue à l'identique
+  (nombre d'ascensions, position du bloc).
+- **Mesurer un changement du modèle** : test vitest temporaire qui écrit ses chiffres dans un
+  fichier (la sortie console des tests n'apparaît pas), sur `mesurer()` de
+  `recuperation.test.ts` ; comparer les erreurs sur le **même** ensemble de blocs, le nombre
+  de blocs fiables pouvant changer.
+
+**Avant l'étape 5** (essai dans un vrai centre), à savoir : les écrans Blocs et Grimpeurs ne
+lisent que les blocs du centre `demo` (filtre dans `src/core/sources/supabase.ts`), `App.tsx`
+affiche « pas encore de données » pour tout autre centre, et les envois depuis la Carte ne
+sont branchés que sur la Démo (`centreId === 'demo'` à plusieurs endroits de `App.tsx`). Il
+faudra brancher ces trois points sur le centre choisi. Limites connues restantes : glisser un
+bloc à la souris seulement (pas au doigt), pas d'écran pour nommer un ouvreur ni pour
+supprimer un compte (SQL dans le README), et au lancement tout le monde sera en période
+d'essai en même temps (coût mesuré dans `DECISIONS.md`).
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
@@ -641,8 +673,9 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**Suite de la base de données** (voir ci-dessus) : étape 5 (essai dans un vrai centre) ou
-vérification de la marque Google, au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+**Suite de la base de données** (voir ci-dessus) : étape 5 (essai dans un vrai centre, une fois
+l'accord de Rose Bloc obtenu ; voir « Avant l'étape 5 » plus haut) ou vérification de la
+marque Google, au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
 secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
 des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 

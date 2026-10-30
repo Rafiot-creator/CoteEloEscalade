@@ -712,7 +712,11 @@ technique : « Écart », « Duels utiles » ou « Verdict » ne veulent rien di
 
 ## Deux niveaux d'accès : visiteur et complet
 
-Le site n'a ni serveur ni compte, donc pas de vraie authentification. Par défaut, un visiteur
+*Depuis le 28 octobre 2026, le site a de vrais comptes (base Supabase, voir « Base de données
+et multi-utilisateur ») : les envois d'un compte et les droits d'ouvreur sont vérifiés par la
+base. L'« accès complet » décrit ici reste, lui, un simple masquage d'interface.*
+
+Le site n'avait au départ ni serveur ni compte, donc pas de vraie authentification. Par défaut, un visiteur
 ne voit que les écrans **Blocs**, **Grimpeurs** et **Carte** — les trois autres, plus
 techniques, sont masqués. Visiter une fois une URL contenant un paramètre secret débloque
 l'« accès complet » sur ce navigateur (mémorisé en `localStorage`, `src/ui/acces.ts`) ; les six
@@ -722,7 +726,8 @@ complète » et « Vue visiteur » sans perdre le déverrouillage.
 **Exception** : l'écran **Carte** est visible dans les deux vues, mais son édition (ajouter,
 déplacer, modifier, supprimer un bloc, exporter la carte) est réservée à l'accès complet ; la
 vue visiteur n'y a que de la lecture et le suivi personnel des envois. Voir « La carte des
-blocs » ci-dessous.
+blocs » ci-dessous. Depuis l'étape 3 de la base, un compte **ouvreur** du centre a les mêmes
+outils dans les deux vues, et ses changements sont enregistrés dans la base.
 
 **Ce n'est qu'un masquage d'interface, pas une protection réelle** : le site étant statique,
 le paramètre secret est visible dans le code source par quiconque le cherche. Suffisant tant
@@ -1118,7 +1123,8 @@ refusées.
    Lecture publique, aucune écriture. Jeu de démonstration et cartes chargés. Le site lit la
    base (`src/core/sources/supabase.ts`, `src/core/cartes/sources.ts`) ; vérifié identique à
    l'ancienne version (mêmes lignes dans les trois tables, mêmes tableaux Blocs et Grimpeurs).
-2. **Comptes et envois** — *faite le 28 octobre 2026.* Connexion par lien envoyé par courriel,
+2. **Comptes et envois** — *faite le 28 octobre 2026* (connexion remplacée le 29 par Google
+   ou mot de passe, voir plus bas). Connexion par lien envoyé par courriel,
    sans mot de passe (bouton vert « Se connecter » dans l'en-tête, `src/ui/compte.ts`,
    `src/ui/components/compte.tsx`). La session reste sur l'appareil : un nouveau courriel
    seulement sur un nouvel appareil, après une déconnexion ou un effacement des données. À la
