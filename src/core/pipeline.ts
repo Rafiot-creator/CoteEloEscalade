@@ -1,6 +1,7 @@
 import { PARAMS_CALIBRAGE, calibrer, ratingVersIndex, type Calibrage, type PointCalibrage } from './calibrage'
 import { cotationDIndex } from './cotations'
 import { normaliserParams, type Diagnostic, type EtatRating, type Formule, type Params, type PointHistorique } from './formulas/types'
+import { DUELS_PROVISOIRES } from './formulas/lib'
 import { estStyleConnu } from './stylesBloc'
 import type { Dataset } from './types'
 
@@ -49,6 +50,16 @@ export interface LigneBloc {
 
 export interface LigneGrimpeur {
   id: string
+  /** Blocs differents tentes (reussis ou non) : un duel par bloc. */
+  blocsTentes: number
+  /**
+   * Encore en periode d'essai (moins de `DUELS_PROVISOIRES` blocs tentes) :
+   * cote pas encore stable, a ne pas montrer dans les classements publics
+   * (cf. formulas/lib.ts). Le grimpeur lui-meme voit sa position, marquee
+   * provisoire. Ne suit pas un reglage modifie dans l'ecran Formules : c'est
+   * la duree par defaut qui decide de l'affichage.
+   */
+  provisoire: boolean
   nom: string
   gymPrincipal: string
   sexe: string
@@ -191,11 +202,14 @@ export function executer(
   // quelle que soit la formule active.
   const meilleureParStyle = new Map<string, Map<string, number>>()
   const gymsParGrimpeur = new Map<string, Set<string>>()
+  const blocsTentes = new Map<string, Set<string>>()
   for (const a of dataset.ascensions) {
     const b = dataset.blocParId.get(a.blocId)
     if (!b) continue
     if (!gymsParGrimpeur.has(a.grimpeurId)) gymsParGrimpeur.set(a.grimpeurId, new Set())
     gymsParGrimpeur.get(a.grimpeurId)!.add(b.gym)
+    if (!blocsTentes.has(a.grimpeurId)) blocsTentes.set(a.grimpeurId, new Set())
+    blocsTentes.get(a.grimpeurId)!.add(a.blocId)
     if (a.resultat !== 'reussite') continue
     const courant = meilleure.get(a.grimpeurId)
     if (courant === undefined || b.indexOfficiel > courant) meilleure.set(a.grimpeurId, b.indexOfficiel)
@@ -212,8 +226,11 @@ export function executer(
     const rating = e?.rating ?? Number.NaN
     const indexNiveau = ratingVersIndex(rating, calibrage)
     const best = meilleure.get(g.id)
+    const nTentes = blocsTentes.get(g.id)?.size ?? 0
     return {
       id: g.id,
+      blocsTentes: nTentes,
+      provisoire: nTentes < DUELS_PROVISOIRES,
       nom: g.nom,
       gymPrincipal: g.gymPrincipal,
       sexe: g.sexe,

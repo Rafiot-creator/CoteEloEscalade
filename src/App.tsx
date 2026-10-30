@@ -166,7 +166,13 @@ function Contenu() {
             ouvreur={compte.peutOuvrir(centreId) && !apercuVisiteur}
             apresModification={centreId === 'demo' ? atelier.recharger : undefined}
             resultatMelange={atelier.resultats.get('melange')}
-            grimpeurs={centreId === 'demo' ? atelier.dataset?.grimpeurs.map((g) => g.nom) : undefined}
+            // Sans les grimpeurs en periode d'essai : leur pseudonyme reste cache
+            // tant que leur cote n'est pas stable (cf. `LigneGrimpeur.provisoire`).
+            grimpeurs={
+              centreId === 'demo'
+                ? atelier.resultats.get('melange')?.grimpeurs.filter((g) => !g.provisoire).map((g) => g.nom)
+                : undefined
+            }
             enregistrerAscension={centreId === 'demo' ? atelier.enregistrerAscension : undefined}
             envoisConnus={centreId === 'demo' ? atelier.envoisConnus : undefined}
             blocCible={blocCible}

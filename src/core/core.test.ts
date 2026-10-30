@@ -5,6 +5,7 @@ import {
   ECHELLE_REFERENCE,
   amorceBloc,
   amorcesGrimpeurs,
+  fenetreAmorce,
   construireDuels,
   construireEvenements,
   cote,
@@ -609,7 +610,8 @@ describe('cote par style', () => {
       affrontements.duels,
       params.ptsParCran as number,
       params.ratingInitial as number,
-      params.amorceGrimpeurs as string
+      params.amorceGrimpeurs as string,
+      fenetreAmorce(params.periodeProvisoire as number)
     )
 
     expect(sortie.parStyle).toBeDefined()
@@ -694,4 +696,57 @@ describe('cote par style', () => {
     expect(parStyle.get(STYLES_BLOC[1])!.matchs).toBe(0)
     expect(parStyle.get(STYLES_BLOC[1])!.rating).toBe(depart)
   })
+})
+
+describe("periode d'essai des nouveaux grimpeurs", () => {
+  /** Le jeu livre, plus un nouveau grimpeur qui flashe les blocs les plus durs a la fin de l'historique. */
+  async function avecNouveau(nBlocs: number) {
+    const ds = await dataset()
+    const durs = [...ds.blocs].sort((a, b) => b.indexOfficiel - a.indexOfficiel).slice(0, nBlocs)
+    const nouveau: Grimpeur = { ...ds.grimpeurs[0], id: 'nouveau', nom: 'Nouveau', niveauDeclare: null }
+    const tFin = ds.ascensions[ds.ascensions.length - 1].t
+    const siennes: Ascension[] = durs.map((b, i) => ({
+      date: '2099-01-01',
+      t: tFin + 1000 * (i + 1),
+      grimpeurId: 'nouveau',
+      blocId: b.id,
+      resultat: 'reussite',
+      essais: 1,
+    }))
+    const avec: Dataset = {
+      ...ds,
+      grimpeurs: [...ds.grimpeurs, nouveau],
+      grimpeurParId: new Map([...ds.grimpeurParId, ['nouveau', nouveau]]),
+      ascensions: [...ds.ascensions, ...siennes],
+    }
+    return { ds, avec, durs }
+  }
+
+  it.each(['elo-bloc', 'glicko', 'melange'])(
+    '%s : les dix premiers duels d un nouveau ne deplacent aucun bloc',
+    async (id) => {
+      // C'est aussi la protection contre un compte jetable ou de faux envois :
+      // sans elle, dix faux flashs baissaient les blocs les plus durs de
+      // 0,08 cote V (Elo) a 0,45 (Glicko).
+      const { ds, avec, durs } = await avecNouveau(10)
+      const f = FORMULES.find((x) => x.id === id)!
+      const sans = executer(ds, f, paramsParDefaut(f.params), {})
+      const apres = executer(avec, f, paramsParDefaut(f.params), {})
+      for (const b of durs) {
+        expect(apres.blocs.find((x) => x.id === b.id)!.rating).toBeCloseTo(sans.blocs.find((x) => x.id === b.id)!.rating, 6)
+      }
+    },
+    60_000
+  )
+
+  it('le onzieme duel compte de nouveau pour le bloc', async () => {
+    const { ds, avec, durs } = await avecNouveau(11)
+    const elo = FORMULES.find((x) => x.id === 'elo-bloc')!
+    const sans = executer(ds, elo, paramsParDefaut(elo.params), {})
+    const apres = executer(avec, elo, paramsParDefaut(elo.params), {})
+    const onzieme = durs[10]
+    expect(apres.blocs.find((x) => x.id === onzieme.id)!.rating).toBeLessThan(
+      sans.blocs.find((x) => x.id === onzieme.id)!.rating
+    )
+  }, 60_000)
 })

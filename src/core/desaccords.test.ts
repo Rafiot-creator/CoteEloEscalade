@@ -69,9 +69,14 @@ describe('les desaccords ne sont pas du bruit', () => {
     "n'en signale aucun quand l'ouvreur ne se trompe jamais",
     async () => {
       const juges = await juger(true)
-      expect(juges.length).toBeGreaterThan(200)
-      // C'est le resultat central. Il vaut 2,7 % avec les reglages livres —
-      // six blocs sur 226 — contre 0 % avec un seuil d'un cran et sans ecart
+      // 200 depuis la periode d'essai des nouveaux (211 avant) : les dix
+      // premiers duels de chaque grimpeur ne comptent plus pour les blocs, et
+      // tous les grimpeurs du jeu livre debutent en meme temps, sur les memes
+      // premiers blocs (cf. DECISIONS.md, « Les nouveaux grimpeurs »).
+      expect(juges.length).toBeGreaterThan(190)
+      // C'est le resultat central. Il vaut 2,0 % avec les reglages livres —
+      // quatre blocs sur 200 (2,8 % avant la periode d'essai des nouveaux) —
+      // contre 0 % avec un seuil d'un cran et sans ecart
       // neglige. C'est le prix assume de deux choix qui, en echange, font
       // passer la detection des blocs sous-cotes de 13 % a 57 %. Si ce taux
       // derivait nettement au-dessus, c'est que le calcul se serait mis a

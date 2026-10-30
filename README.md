@@ -1958,3 +1958,24 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
 - **Étape 4 de la base de données : temps réel**, choisie par Raphaël et testée par lui sur
   deux fenêtres (envois et blocs). Détail dans « Base de données et multi-utilisateur (en
   cours) ».
+- **Les nouveaux grimpeurs.** Rafiot (7 blocs, sans niveau déclaré) est passé du 22e au 9e
+  rang sur un V7 *échoué* : sa cote de départ, médiane des blocs de ses premiers duels, a
+  sauté d'une cote V. Sur proposition de Raphaël, quatre changements, mesurés sur la Démo et
+  détaillés dans `DECISIONS.md` (« Les nouveaux grimpeurs ») :
+  - **niveau de flash demandé au choix du pseudonyme** (facultatif ; flash V4 → départ à
+    5000), fonctions `creer_profil(pseudo, flash)` et `declarer_flash` (une seule fois, pour
+    un compte créé avant la question) dans
+    `supabase/migrations/20261030000100_niveau_flash.sql` ;
+  - **période d'essai de 10 blocs différents** (`DUELS_PROVISOIRES`) : pseudonyme absent des
+    classements, des graphiques et des noms proposés sur la Carte ; tuile verte « Votre
+    position provisoire » pour le compte seul, qui disparaît une fois classé (sa ligne
+    surlignée suffit alors) ; cote de départ figée au même moment ;
+  - **K doublé pendant l'essai** (Elo, réglage `kNouveaux`) ;
+  - **les blocs ne bougent pas pendant l'essai** (Elo et Glicko, réglage
+    `periodeProvisoire`, 0 = ancien comportement).
+  Un nouveau est plus juste après 10 blocs (0,33 → 0,24 cote V, Elo) et dix faux flashs ne
+  déplacent plus aucun bloc (Glicko : 0,45 cote V avant). Coût : treize blocs fiables de
+  moins sur la Démo, plus sensible au lancement d'un vrai centre. Deux tests ajustés, quatre
+  ajoutés (68). Testé par Raphaël avec Rafiot (flash V6, passage du 8e au 10e bloc). Bug
+  trouvé en route et corrigé : les boutons d'envoi de la Carte se désactivaient pour un compte
+  en période d'essai, absent de la liste des noms connus.

@@ -109,6 +109,56 @@ affichée d'un nouveau est juste dès sa première séance au lieu de partir de 
 en distribuant au passage des victoires imméritées aux blocs faciles qu'il affronte. C'est une
 question d'équité d'affichage, pas de précision.
 
+### Les nouveaux grimpeurs (30 octobre 2026)
+
+**Le déclencheur.** Premier vrai compte, « Rafiot », 7 blocs au compteur : un V7 *échoué* l'a
+fait passer du 22e au 9e rang. Sans niveau déclaré, sa cote de départ était la médiane des
+blocs de ses douze premiers duels, réussis ou non ; ce V7 a fait passer la médiane de V5 à V6,
+soit +1000 points au départ, bien plus que ce que l'échec lui coûtait. Le jeu de démonstration
+ne pouvait pas le montrer : ses 55 grimpeurs ont tous des centaines de duels, leur départ est
+figé depuis longtemps. Dans un vrai centre, chaque nouvel inscrit y passe.
+
+**Ce qui a été retenu**, proposé par Raphaël :
+
+1. **Niveau de flash demandé à l'inscription** (facultatif). Une cote du site est celle d'un
+   bloc réussi une fois sur deux ; on flashe en général un cran en dessous. Flash V4 → niveau
+   déclaré V5 → départ à 5000. Un niveau déclaré ne bouge plus jamais.
+2. **Période d'essai de dix blocs** (`DUELS_PROVISOIRES`, `src/core/formulas/lib.ts`) : le
+   pseudonyme n'apparaît dans aucun classement ; le grimpeur voit seul sa position, marquée
+   provisoire. La fenêtre d'estimation du départ passe de douze duels à cette même période,
+   pour que le départ soit figé au moment où le pseudonyme apparaît.
+3. **K doublé pendant la période d'essai** (Elo, réglage `kNouveaux`). Glicko le fait déjà de
+   lui-même : un nouveau y a une grande incertitude.
+4. **Les blocs ne bougent pas pendant la période d'essai** (Elo et Glicko) : ni leur cote, ni
+   leurs effectifs.
+
+**Mesuré sur le jeu de démonstration** (réglage `periodeProvisoire` à 0 = ancien
+comportement) :
+
+| | Sans période d'essai | Avec |
+|---|---|---|
+| Nouveau arrivé en fin d'historique : écart à sa cote finale après 10 blocs, Elo | 0,33 cote V | **0,24** (K ×2 ; ×1 : 0,34, ×3 : 0,24) |
+| Idem, Glicko | 0,29 | 0,29 |
+| Faux compte, 10 flashs sur les 10 blocs les plus durs : baisse de ces blocs, Elo | 0,08 cote V | **0** |
+| Idem, Glicko | **0,45** | **0** |
+| Erreur médiane des blocs, mêmes 213 blocs, Elo | 0,247 | 0,259 |
+| Erreur quadratique, mêmes blocs, Elo | 0,351 | 0,347 |
+| Erreur médiane, mêmes 184 blocs, Glicko | 0,182 | 0,194 |
+| Blocs fiables, Elo / Glicko | 226 / 197 | 213 / 185 |
+| Fausses alertes sur le monde témoin (Elo) | 2,8 % | **2,0 %** |
+| Précision des alertes / sous-cotés trouvés (Elo) | 98 % / 17 sur 37 | 97 % / 14 sur 34 |
+
+**Le coût**, honnêtement : environ 550 duels sur 19 000 ne comptent plus pour les blocs, d'où
+treize blocs fiables de moins et une détection un peu moins sensible. Il est grossi par le jeu
+de démonstration, où les 55 grimpeurs débutent tous en même temps sur les mêmes premiers blocs ;
+dans un centre en régime établi, les nouveaux arrivent au compte-gouttes. **Il sera réel au
+lancement d'un vrai centre**, où tout le monde est nouveau en même temps : les dix premiers
+blocs de chacun n'y compteront pas pour les blocs.
+
+**Le gain** ne se voit pas dans les erreurs moyennes, puisque la démonstration n'a ni nouveaux
+en cours de route ni tricheurs : un nouveau est juste plus vite, et dix faux envois ne
+déplacent plus aucun bloc. Glicko y était bien plus vulnérable que l'Elo.
+
 ---
 
 ## 3. Détecter les blocs mal cotés

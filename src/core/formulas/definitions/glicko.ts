@@ -1,12 +1,15 @@
 import type { Dataset } from '../../types'
 import {
+  DUELS_PROVISOIRES,
   ECHELLE_REFERENCE,
   Evaluateur,
   amorceBloc,
   amorcesGrimpeurs,
   construireDuels,
   diagnosticDuels,
+  duelsProvisoires,
   etatVide,
+  fenetreAmorce,
   type Duel,
 } from '../lib'
 import type { EtatRating, Formule, PointHistorique, SortieFormule } from '../types'
@@ -214,6 +217,21 @@ const formule: Formule = {
       aideEn: '"Climbers then boulders" alternations. Watch the convergence curve.',
     },
     {
+      nom: 'periodeProvisoire',
+      label: "Période d'essai des nouveaux",
+      labelEn: 'Newcomer trial period',
+      type: 'nombre',
+      defaut: DUELS_PROVISOIRES,
+      min: 0,
+      max: 40,
+      pas: 1,
+      unite: 'duels',
+      groupe: 'Nouveaux grimpeurs',
+      groupeEn: 'New climbers',
+      aide: "Nombre de premiers duels (donc de blocs différents) pendant lesquels un grimpeur est en période d'essai : ses duels ne déplacent pas les blocs, et son pseudonyme n'apparaît pas dans les classements. Sa cote de départ est aussi estimée sur ces duels-là. Sa cote bouge déjà plus vite d'elle-même au début, par sa grande incertitude. 0 = aucune période d'essai.",
+      aideEn: "Number of first duels (hence of different boulders) during which a climber is on trial: their duels don't move the boulders, and their username isn't shown in the rankings. Their starting rating is also estimated from those duels. Their rating already moves faster on its own at first, through its high uncertainty. 0 = no trial period.",
+    },
+    {
       nom: 'amorceGrimpeurs',
       label: 'Amorce des grimpeurs',
       labelEn: 'Climber seeding',
@@ -286,12 +304,15 @@ const formule: Formule = {
         etatVide(amorceBloc(b.indexOfficiel, ratingInitial, p.ptsParCran as number, p.amorce as string), rdInitial)
       )
     }
+    const periode = p.periodeProvisoire as number
+    const provisoires = duelsProvisoires(retenus, periode)
     const amorces = amorcesGrimpeurs(
       dataset,
       retenus,
       p.ptsParCran as number,
       ratingInitial,
-      p.amorceGrimpeurs as string
+      p.amorceGrimpeurs as string,
+      fenetreAmorce(periode)
     )
     for (const g0 of dataset.grimpeurs) {
       grimpeurs.set(g0.id, etatVide(amorces.get(g0.id) ?? ratingInitial, rdInitial))
@@ -429,6 +450,8 @@ const formule: Formule = {
           const ng = niveaux?.get(d.grimpeurId)
           const eb = blocs.get(d.blocId)
           if (!ng || !eb) continue
+          // Periode d'essai d'un nouveau grimpeur : le bloc n'apprend rien de lui.
+          if (provisoires.has(d)) continue
           if (jouedAvance(ng.rating - (cotesBlocsAvant.get(d.blocId) ?? eb.rating), d.gagne)) continue
           if (dernierePasse) {
             eb.matchs += 1

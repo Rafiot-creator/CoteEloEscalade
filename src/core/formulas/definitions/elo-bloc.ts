@@ -1,11 +1,14 @@
 import type { Dataset } from '../../types'
 import { STYLES_BLOC } from '../../stylesBloc'
 import {
+  DUELS_PROVISOIRES,
   ECHELLE_REFERENCE,
   amorcesGrimpeurs,
   construireDuels,
   diagnosticDuels,
+  duelsProvisoires,
   etatVide,
+  fenetreAmorce,
   moteurElo,
   type Duel,
   type ObservateurGrimpeur,
@@ -183,6 +186,36 @@ const formule: Formule = {
       aideEn: "Number of replays of the history. The 1st pass does most of the work, later ones refine it. Watch the convergence curve.",
     },
     {
+      nom: 'periodeProvisoire',
+      label: "Période d'essai des nouveaux",
+      labelEn: 'Newcomer trial period',
+      type: 'nombre',
+      defaut: DUELS_PROVISOIRES,
+      min: 0,
+      max: 40,
+      pas: 1,
+      unite: 'duels',
+      groupe: 'Nouveaux grimpeurs',
+      groupeEn: 'New climbers',
+      aide: "Nombre de premiers duels (donc de blocs différents) pendant lesquels un grimpeur est en période d'essai : sa cote bouge plus vite (voir le réglage suivant), ses duels ne déplacent pas les blocs, et son pseudonyme n'apparaît pas dans les classements. Sa cote de départ est aussi estimée sur ces duels-là. 0 = aucune période d'essai.",
+      aideEn: "Number of first duels (hence of different boulders) during which a climber is on trial: their rating moves faster (see next setting), their duels don't move the boulders, and their username isn't shown in the rankings. Their starting rating is also estimated from those duels. 0 = no trial period.",
+    },
+    {
+      nom: 'kNouveaux',
+      label: 'Multiplicateur de K des nouveaux',
+      labelEn: 'Newcomer K multiplier',
+      type: 'nombre',
+      defaut: 2,
+      min: 1,
+      max: 6,
+      pas: 0.5,
+      unite: '×',
+      groupe: 'Nouveaux grimpeurs',
+      groupeEn: 'New climbers',
+      aide: "Pendant la période d'essai, le facteur K du grimpeur est multiplié par ce nombre : sa cote rejoint plus vite son vrai niveau, sans effet sur les blocs, qui ne bougent pas pendant cette période.",
+      aideEn: "During the trial period, the climber's K factor is multiplied by this number: their rating reaches their real level faster, with no effect on the boulders, which don't move during that period.",
+    },
+    {
       nom: 'amorceGrimpeurs',
       label: 'Amorce des grimpeurs',
       labelEn: 'Climber seeding',
@@ -194,8 +227,8 @@ const formule: Formule = {
         { valeur: 'niveau', label: 'Depuis leur niveau (V4 = 4000)', labelEn: 'From their level (V4 = 4000)' },
         { valeur: 'uniforme', label: 'Tous à la cote de repli', labelEn: 'Everyone at the fallback rating' },
       ],
-      aide: "Niveau : on part du niveau annoncé à l'inscription, ou à défaut de la médiane des blocs affrontés lors des douze premiers duels. Un grimpeur V4 démarre donc vers 4000. Uniforme : tout le monde part du milieu de l'échelle, et passe ses premières semaines à rejoindre son niveau réel.",
-      aideEn: "Level: starts from the level declared at sign-up, or failing that the median of the boulders faced in the first twelve duels. A V4 climber thus starts around 4000. Uniform: everyone starts at the middle of the scale and spends their first weeks catching up to their real level.",
+      aide: "Niveau : on part du niveau annoncé à l'inscription, ou à défaut de la médiane des blocs affrontés pendant la période d'essai (douze premiers duels si elle est désactivée). Un grimpeur V4 démarre donc vers 4000. Uniforme : tout le monde part du milieu de l'échelle, et passe ses premières semaines à rejoindre son niveau réel.",
+      aideEn: "Level: starts from the level declared at sign-up, or failing that the median of the boulders faced during the trial period (first twelve duels if it is turned off). A V4 climber thus starts around 4000. Uniform: everyone starts at the middle of the scale and spends their first weeks catching up to their real level.",
     },
     {
       nom: 'amorce',
@@ -246,12 +279,14 @@ const formule: Formule = {
     }
 
     const affrontements = construireDuels(dataset.ascensions)
+    const periode = p.periodeProvisoire as number
     const amorces = amorcesGrimpeurs(
       dataset,
       affrontements.duels,
       p.ptsParCran as number,
       p.ratingInitial as number,
-      p.amorceGrimpeurs as string
+      p.amorceGrimpeurs as string,
+      fenetreAmorce(periode)
     )
 
     // Ventilation par style : chaque style d'un grimpeur demarre au meme
@@ -292,6 +327,8 @@ const formule: Formule = {
       amorce: p.amorce as string,
       ptsParCran: p.ptsParCran as number,
       score,
+      provisoires: duelsProvisoires(affrontements.duels, periode),
+      kNouveaux: p.kNouveaux as number,
       observateurGrimpeur,
     })
 

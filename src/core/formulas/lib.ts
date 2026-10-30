@@ -267,8 +267,9 @@ export function amorceBloc(
  * des victoires imméritées. On part donc de son niveau :
  *
  *  - le niveau annonce a l'inscription s'il existe (V4 -> 4000) ;
- *  - sinon, la mediane des blocs qu'il affronte lors de ses premiers duels,
- *    puisqu'on choisit spontanement des blocs proches de son niveau ;
+ *  - sinon, la mediane des blocs qu'il affronte lors de ses premiers duels
+ *    (`fenetre`), puisqu'on choisit spontanement des blocs proches de son
+ *    niveau ;
  *  - a defaut, la valeur par defaut.
  */
 export function amorcesGrimpeurs(
@@ -276,7 +277,8 @@ export function amorcesGrimpeurs(
   duels: Duel[],
   ptsParCran: number,
   ratingParDefaut: number,
-  mode: string
+  mode: string,
+  fenetre: number = DUELS_POUR_ESTIMER
 ): Map<string, number> {
   const amorces = new Map<string, number>()
   if (mode !== 'niveau') {
@@ -287,7 +289,7 @@ export function amorcesGrimpeurs(
   const premiersBlocs = new Map<string, number[]>()
   for (const d of duels) {
     const liste = premiersBlocs.get(d.grimpeurId) ?? []
-    if (liste.length >= DUELS_POUR_ESTIMER) continue
+    if (liste.length >= fenetre) continue
     const bloc = dataset.blocParId.get(d.blocId)
     if (bloc) liste.push(bloc.indexOfficiel)
     premiersBlocs.set(d.grimpeurId, liste)
@@ -311,8 +313,54 @@ export function amorcesGrimpeurs(
   return amorces
 }
 
-/** Nombre de premiers duels servant a estimer un niveau non declare. */
+/**
+ * Nombre de premiers duels servant a estimer un niveau non declare, quand la
+ * periode d'essai des nouveaux est desactivee (sinon : la meme duree que
+ * cette periode, cf. `fenetreAmorce`).
+ */
 const DUELS_POUR_ESTIMER = 12
+
+// --- Nouveaux grimpeurs -----------------------------------------------------
+
+/**
+ * Duree par defaut de la periode d'essai d'un nouveau grimpeur, en duels
+ * (donc en blocs differents). Pendant cette periode :
+ *  - son pseudonyme n'apparait pas dans les classements (cf. pipeline) ;
+ *  - sa cote bouge plus vite (Elo : K multiplie ; Glicko le fait deja de
+ *    lui-meme, par la grande incertitude d'un nouveau) ;
+ *  - ses duels ne deplacent pas les blocs : un nouveau mal estime, un compte
+ *    jetable ou de faux envois ne pesent sur aucune cote de bloc.
+ * Voir DECISIONS.md, « Les nouveaux grimpeurs ».
+ */
+export const DUELS_PROVISOIRES = 10
+
+/**
+ * Fenetre d'estimation du niveau de depart (`amorcesGrimpeurs`) : la periode
+ * d'essai elle-meme, pour que la cote de depart d'un grimpeur soit figee au
+ * moment ou son pseudonyme apparait. Sans periode d'essai (0), l'ancienne
+ * fenetre de douze duels.
+ */
+export function fenetreAmorce(periodeProvisoire: number): number {
+  return periodeProvisoire > 0 ? periodeProvisoire : DUELS_POUR_ESTIMER
+}
+
+/**
+ * Les `periode` premiers duels de chaque grimpeur, dans l'ordre ou il les a
+ * entames (premiere seance sur le bloc, pas son issue).
+ */
+export function duelsProvisoires(duels: Duel[], periode: number): Set<Duel> {
+  const provisoires = new Set<Duel>()
+  if (periode <= 0) return provisoires
+  const debut = (d: Duel) => d.tPremierEchec ?? d.tEnvoi ?? d.t
+  const vus = new Map<string, number>()
+  for (const d of [...duels].sort((a, b) => debut(a) - debut(b))) {
+    const n = vus.get(d.grimpeurId) ?? 0
+    if (n >= periode) continue
+    vus.set(d.grimpeurId, n + 1)
+    provisoires.add(d)
+  }
+  return provisoires
+}
 
 // --- Moteur Elo -------------------------------------------------------------
 
@@ -348,6 +396,13 @@ export interface OptionsElo {
    * enchainement laborieux).
    */
   score(duel: Duel): number
+  /**
+   * Duels de la periode d'essai des nouveaux grimpeurs (`duelsProvisoires`) :
+   * K du grimpeur multiplie par `kNouveaux`, et le bloc ne bouge pas (ni sa
+   * cote, ni ses effectifs). Absent : aucun duel n'est traite a part.
+   */
+  provisoires?: Set<Duel>
+  kNouveaux?: number
   /**
    * Suivi en parallele du cote grimpeur, sans aucune influence sur le calcul :
    * ni sur `eg.rating`/`eb.rating`, ni sur les autres formules qui n'y passent
@@ -457,11 +512,15 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
       // finale : c'est la seule prediction qui ait un sens a comparer.
       if (dernierePasse && ev.premier) evaluateur.ajouter(attendu, d.gagne)
 
-      const kg = kEffectif(o.k, o.kMin, o.kDemiVie, eg.matchs)
+      // Periode d'essai : le nouveau rejoint son niveau plus vite, et le bloc
+      // n'apprend rien de lui (le remboursement d'une defaite rend donc 0 au
+      // bloc, symetriquement).
+      const provisoire = o.provisoires?.has(d) ?? false
+      const kg = kEffectif(o.k, o.kMin, o.kDemiVie, eg.matchs) * (provisoire ? (o.kNouveaux ?? 1) : 1)
       const kb = kEffectif(o.k, o.kMin, o.kDemiVie, eb.matchs)
       const delta = score - attendu
       const dg = kg * delta
-      const db = -kb * delta
+      const db = provisoire ? 0 : -kb * delta
 
       eg.rating += dg
       eb.rating += db
@@ -474,10 +533,10 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
       if (passe === 1 && !comptes.has(cle)) {
         comptes.add(cle)
         eg.matchs += 1
-        eb.matchs += 1
-        if (d.gagne) {
-          eg.reussites += 1
-          eb.reussites += 1
+        if (d.gagne) eg.reussites += 1
+        if (!provisoire) {
+          eb.matchs += 1
+          if (d.gagne) eb.reussites += 1
         }
         o.observateurGrimpeur?.compte(d)
       }

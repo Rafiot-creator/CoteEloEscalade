@@ -39,7 +39,7 @@ rejetées). Ne pas ré-expliquer ce qui y est déjà écrit.**
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test                # 64 tests sur le cœur de calcul
+npm test                # 68 tests sur le cœur de calcul
 npm run build           # site statique dans dist/
 npm run data:generate   # régénère le jeu de données de démonstration
 ```
@@ -623,8 +623,11 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   **Pas de `config push`** (SMTP non déclaré dans `config.toml`) : modifier les modèles dans
   le tableau de bord. Les comptes sont désormais ouverts à tous (Google ou mot de passe).
 - **Étape 4 (temps réel) faite le 2026-10-30** : envois et blocs diffusés, appliqués sans
-  recharger (détail dans le README). Testée par Raphaël sur deux fenêtres, pas encore sur
-  téléphone.
+  recharger (détail dans le README). Testée par Raphaël sur deux fenêtres et sur téléphone.
+- **Nouveaux grimpeurs, 2026-10-30** : niveau de flash à l'inscription (départ = flash + 1
+  cote V), période d'essai de 10 blocs (pseudonyme caché, K ×2 en Elo, blocs non déplacés).
+  Mesures et coût dans `DECISIONS.md` (« Les nouveaux grimpeurs »). Rafiot : flash V6,
+  niveau déclaré V7, classé depuis son 10e bloc.
   Prochaine : étape 5 (essai dans un vrai centre, accord de Rose Bloc à obtenir), ou
   vérification de la marque Google (la fenêtre de connexion affiche
   « rafiot-creator.github.io » en ligne, pas « Cote Elo Escalade »). Tranché par Raphaël : **inscription ouverte à tous, avec

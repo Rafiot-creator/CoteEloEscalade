@@ -36,15 +36,18 @@ export function Tuile({
   unite,
   note,
   heros,
+  vert,
 }: {
   etiquette: string
   valeur: ReactNode
   unite?: string
   note?: ReactNode
   heros?: boolean
+  /** Fond vert : ce qui concerne le grimpeur connecte. */
+  vert?: boolean
 }) {
   return (
-    <div className={heros ? 'tuile heros' : 'tuile'}>
+    <div className={['tuile', heros && 'heros', vert && 'vert'].filter(Boolean).join(' ')}>
       <div className="etiquette">{etiquette}</div>
       <div className="valeur">
         {valeur}

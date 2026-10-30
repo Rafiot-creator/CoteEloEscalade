@@ -227,10 +227,14 @@ export function VueCarte({
     [envoisConnus, grimpeurActif]
   )
 
+  // Le compte connecte est toujours valide, meme absent de `grimpeurs` : cette
+  // liste ne propose pas les grimpeurs en periode d'essai, dont il peut faire
+  // partie, et la base verifie elle-meme qui enregistre.
   const grimpeurValide = useMemo(() => {
+    if (grimpeurConnecte) return true
     const nom = grimpeurActif.trim().toLowerCase()
     return !!nom && !!grimpeurs?.some((g) => g.trim().toLowerCase() === nom)
-  }, [grimpeurActif, grimpeurs])
+  }, [grimpeurConnecte, grimpeurActif, grimpeurs])
 
   const actionsActives = !!enregistrerAscension && grimpeurValide
   const raisonInactif = !enregistrerAscension

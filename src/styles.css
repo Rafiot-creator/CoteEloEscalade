@@ -210,6 +210,15 @@ p { margin: 0; }
   overflow: hidden;
 }
 .heros .valeur { font-size: 44px; line-height: 1.1; }
+/* Ce qui concerne le grimpeur connecte (sa position) : meme vert que le bouton
+   « Se connecter » et le surlignage de sa ligne. */
+.tuile.vert { background: var(--bon); border-color: var(--bon); }
+.tuile.vert .etiquette,
+.tuile.vert .valeur,
+.tuile.vert .note { color: #fff; }
+/* Son message doit se lire en entier, meme sur telephone : pas de coupure a
+   trois lignes comme pour les autres tuiles. */
+.tuile.vert .note { display: block; -webkit-line-clamp: unset; overflow: visible; }
 
 /* --- Formulaires ---------------------------------------------------------- */
 

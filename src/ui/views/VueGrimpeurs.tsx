@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ratingVersIndex } from '../../core/calibrage'
 import { FORMULES } from '../../core/formulas/registry'
+import { DUELS_PROVISOIRES } from '../../core/formulas/lib'
 import { formaterIndex } from '../../core/cotations'
 import type { LigneGrimpeur, Resultat } from '../../core/pipeline'
 import { STYLES_BLOC } from '../../core/stylesBloc'
@@ -77,10 +78,16 @@ export function VueGrimpeurs({
   // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
   const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
 
+  // Les grimpeurs en periode d'essai (moins de dix blocs tentes, cf.
+  // `LigneGrimpeur.provisoire`) n'apparaissent nulle part dans le classement
+  // ni dans les graphiques : leur cote n'est pas encore stable. Seul le
+  // compte concerne voit sa position, marquee provisoire (tuile plus bas).
   const classement = useMemo(
-    () => [...resultat.grimpeurs].filter((g) => g.matchs > 0).sort((a, b) => b.rating - a.rating),
+    () => [...resultat.grimpeurs].filter((g) => g.matchs > 0 && !g.provisoire).sort((a, b) => b.rating - a.rating),
     [resultat]
   )
+  const enEssai = useMemo(() => resultat.grimpeurs.filter((g) => g.matchs > 0 && g.provisoire).length, [resultat])
+  const moiProvisoire = moi ? resultat.grimpeurs.find((g) => g.id === moi && g.provisoire) : undefined
 
   // Selection par defaut : le meilleur, le median, et le plus assidu.
   const defaut = useMemo(() => {
@@ -321,25 +328,43 @@ export function VueGrimpeurs({
     },
   ]
 
-  const monRang = moi ? classement.findIndex((g) => g.id === moi) + 1 : 0
+  // Rang qu'aurait le compte s'il etait classe, sans le placer dans le tableau.
+  const monRangProvisoire = moiProvisoire
+    ? classement.filter((g) => g.rating > moiProvisoire.rating).length + 1
+    : 0
   const meilleur = classement[0]
   const median = classement[Math.floor(classement.length / 2)]
 
   return (
     <div className="large">
       <div className="grille tuiles">
-        {monRang > 0 && (
+        {/* Une fois classe, le grimpeur connecte se retrouve dans le tableau,
+            surligne en vert (et ajoute apres « ⋯ » s'il est au-dela des lignes
+            affichees, cf. `enEvidence`) : la tuile ne sert que pendant la
+            periode d'essai, ou il n'y figure pas. */}
+        {moiProvisoire && (
           <Tuile
             heros
-            etiquette={t('Votre position', 'Your rank')}
-            valeur={t(`${monRang}${monRang === 1 ? 'er' : 'e'}`, `#${monRang}`)}
-            note={t(`sur ${nombre(classement.length)} grimpeurs, surlignée en vert ci-dessous`, `of ${nombre(classement.length)} climbers, highlighted in green below`)}
+            vert
+            etiquette={t('Votre position provisoire', 'Your provisional rank')}
+            valeur={t(`${monRangProvisoire}${monRangProvisoire === 1 ? 'er' : 'e'}`, `#${monRangProvisoire}`)}
+            note={t(
+              `${moiProvisoire.blocsTentes} blocs sur ${DUELS_PROVISOIRES} : votre pseudonyme apparaîtra au classement après ${DUELS_PROVISOIRES} blocs différents.`,
+              `${moiProvisoire.blocsTentes} boulders of ${DUELS_PROVISOIRES}: your username will appear in the rankings after ${DUELS_PROVISOIRES} different boulders.`
+            )}
           />
         )}
         <Tuile
           etiquette={t('Grimpeurs classés', 'Ranked climbers')}
           valeur={nombre(classement.length)}
-          note={t('au moins un affrontement', 'at least one duel')}
+          note={
+            enEssai
+              ? t(
+                  `au moins ${DUELS_PROVISOIRES} blocs tentés ; ${nombre(enEssai)} en période d'essai`,
+                  `at least ${DUELS_PROVISOIRES} boulders tried; ${nombre(enEssai)} on trial`
+                )
+              : t(`au moins ${DUELS_PROVISOIRES} blocs tentés`, `at least ${DUELS_PROVISOIRES} boulders tried`)
+          }
         />
         <Tuile
           etiquette={t('Meilleur niveau', 'Best level')}
