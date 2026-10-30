@@ -16,12 +16,13 @@ export interface SourceProvider {
   label: string
   /** Variante anglaise de `label`. */
   labelEn?: string
-  charger(): Promise<FichierBrut[]>
+  /** `centreId` : le centre dont lire les blocs et les ascensions (ignore par les CSV du depot). */
+  charger(centreId?: string): Promise<FichierBrut[]>
 }
 
 export const SOURCES: SourceProvider[] = [sourceSupabase]
 
-export async function chargerToutesLesSources(): Promise<FichierBrut[]> {
-  const lots = await Promise.all(SOURCES.map((s) => s.charger()))
+export async function chargerToutesLesSources(centreId: string): Promise<FichierBrut[]> {
+  const lots = await Promise.all(SOURCES.map((s) => s.charger(centreId)))
   return lots.flat()
 }

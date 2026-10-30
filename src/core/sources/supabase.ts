@@ -7,30 +7,39 @@ import { lireTable } from '../supabase'
  * `data/*.csv` : le pipeline (parseurs, validation, formules) les lit comme
  * avant, sans savoir qu'elles viennent d'une base. L'ecran Fichiers continue
  * aussi de montrer ce qui a ete lu, et ce qui a ete refuse.
+ *
+ * Un centre a la fois : ses blocs, et les ascensions sur ces blocs (jointure
+ * sur `blocs`, la table `ascensions` n'a pas de centre). Les grimpeurs sont
+ * communs a tous les centres ; chaque centre a ses propres cotes, calculees
+ * sur ses seules ascensions.
  */
-const TABLES = [
+const tables = (centreId: string) => [
   { nom: 'grimpeurs.csv', table: 'grimpeurs', ordre: 'id', colonnes: ['id', 'nom', 'sexe', 'gym_principal', 'premiere_saison', 'niveau_declare'] },
   {
     nom: 'blocs.csv',
     table: 'blocs',
     ordre: 'id',
     colonnes: ['id', 'nom', 'gym', 'secteur', 'couleur', 'cotation_officielle', 'date_ouverture', 'date_retrait'],
-    // Seul le centre Demo a un jeu de donnees branche sur les ecrans Blocs et
-    // Grimpeurs : les blocs qu'un ouvreur place sur la carte d'un autre centre
-    // n'y apparaissent pas (ils ne seraient qu'une seconde salle sans duels).
-    filtre: { colonne: 'centre_id', valeur: 'demo' },
+    filtre: { colonne: 'centre_id', valeur: centreId },
   },
-  { nom: 'ascensions.csv', table: 'ascensions', ordre: 'id', colonnes: ['date', 'grimpeur_id', 'bloc_id', 'resultat', 'essais'] },
+  {
+    nom: 'ascensions.csv',
+    table: 'ascensions',
+    ordre: 'id',
+    colonnes: ['date', 'grimpeur_id', 'bloc_id', 'resultat', 'essais'],
+    jointure: 'blocs!inner(centre_id)',
+    filtre: { colonne: 'blocs.centre_id', valeur: centreId },
+  },
 ]
 
 export const sourceSupabase: SourceProvider = {
   id: 'supabase',
   label: 'Base Supabase',
   labelEn: 'Supabase database',
-  async charger() {
+  async charger(centreId = 'demo') {
     return Promise.all(
-      TABLES.map(async ({ nom, table, ordre, colonnes, filtre }) => {
-        const lignes = await lireTable<Record<string, unknown>>(table, colonnes.join(','), ordre, filtre)
+      tables(centreId).map(async ({ nom, table, ordre, colonnes, filtre, jointure }) => {
+        const lignes = await lireTable<Record<string, unknown>>(table, colonnes.join(','), ordre, filtre, jointure)
         const contenu = Papa.unparse({ fields: colonnes, data: lignes.map((l) => colonnes.map((c) => l[c] ?? '')) })
         return { chemin: `supabase/${nom}`, nom, contenu, octets: new Blob([contenu]).size, origine: 'supabase' as const }
       })

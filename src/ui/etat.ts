@@ -100,7 +100,11 @@ export interface Atelier {
   oublier: () => void
 }
 
-export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null = null): Atelier {
+/**
+ * `centreId` : le centre dont les blocs et les ascensions sont lus et calcules
+ * (les grimpeurs sont communs a tous). Changer de centre relit tout.
+ */
+export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null = null, centreId = 'demo'): Atelier {
   const [datasetBase, setDatasetBase] = useState<Dataset | null>(null)
   const [generation, setGeneration] = useState(0)
   const [erreurEnvoi, setErreurEnvoi] = useState<string | null>(null)
@@ -114,9 +118,16 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
   const [paramsCalibrage, setParamsCalibrage] = useState<Params>(() => paramsParDefaut(PARAMS_CALIBRAGE))
   const [reference, setReference] = useState<{ resultat: Resultat; etiquette: string } | null>(null)
 
+  // Un autre centre : rien de l'ancien ne doit rester affiche pendant le chargement.
+  useEffect(() => {
+    setDatasetBase(null)
+    setErreur(null)
+    setReference(null)
+  }, [centreId])
+
   useEffect(() => {
     let vivant = true
-    chargerToutesLesSources()
+    chargerToutesLesSources(centreId)
       .then((fichiers) => {
         if (vivant) setDatasetBase(construireDataset(fichiers))
       })
@@ -126,7 +137,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
     return () => {
       vivant = false
     }
-  }, [generation])
+  }, [generation, centreId])
 
   const recharger = useCallback(() => setGeneration((g) => g + 1), [])
 
@@ -150,11 +161,15 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
     }
     let dejaAbonne = false
     const canal = supabase
-      .channel('atelier')
+      .channel(`atelier-${centreId}`)
       .on<LigneAscension>('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ascensions' }, ({ new: l }) => {
         setDatasetBase((d) => {
           if (!d) return d
-          if (!d.grimpeurParId.has(l.grimpeur_id) || !d.blocParId.has(l.bloc_id)) {
+          // Bloc inconnu : envoi dans un autre centre, sans effet ici. Un bloc
+          // tout juste place dans ce centre arrive par l'abonnement `blocs`
+          // ci-dessous, dont la relecture reprend aussi ses ascensions.
+          if (!d.blocParId.has(l.bloc_id)) return d
+          if (!d.grimpeurParId.has(l.grimpeur_id)) {
             relire()
             return d
           }
@@ -177,7 +192,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
           }
         })
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'blocs', filter: 'centre_id=eq.demo' }, relire)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'blocs', filter: `centre_id=eq.${centreId}` }, relire)
       .subscribe((statut) => {
         if (statut !== 'SUBSCRIBED') return
         // Le premier abonnement suit le chargement initial ; un suivant est
@@ -189,16 +204,19 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
       if (relectureDiffere.current) clearTimeout(relectureDiffere.current)
       void supabase.removeChannel(canal)
     }
-  }, [recharger])
+  }, [recharger, centreId])
 
   // Les ascensions ajoutees depuis la Carte s'ajoutent a celles du fichier :
   // le pipeline ne voit qu'un seul dataset, coherent, trie chronologiquement.
+  // Elles sont gardees pour tous les centres a la fois : seules celles sur un
+  // bloc du centre affiche entrent dans son calcul.
   const dataset = useMemo<Dataset | null>(() => {
     if (!datasetBase) return null
-    if (!ascensionsAjoutees.length) return datasetBase
+    const ici = ascensionsAjoutees.filter((a) => datasetBase.blocParId.has(a.blocId))
+    if (!ici.length) return datasetBase
     return {
       ...datasetBase,
-      ascensions: [...datasetBase.ascensions, ...ascensionsAjoutees].sort((a, b) => a.t - b.t),
+      ascensions: [...datasetBase.ascensions, ...ici].sort((a, b) => a.t - b.t),
     }
   }, [datasetBase, ascensionsAjoutees])
 

@@ -34,6 +34,7 @@ const CENTRES = [
 ] as const
 
 type CentreId = (typeof CENTRES)[number]['id']
+const CENTRES_BRANCHES: CentreId[] = ['demo', 'rose-bloc-1', 'rose-bloc-2']
 
 export function App() {
   return (
@@ -45,7 +46,11 @@ export function App() {
 
 function Contenu() {
   const compte = useCompte()
-  const atelier = useAtelier(compte.grimpeur)
+  const [centreId, setCentreId] = useState<CentreId>('demo')
+  // Centres dont les blocs et les envois sont branches sur le calcul (Blocs,
+  // Grimpeurs, envois depuis la Carte) ; les autres n'ont que leur carte.
+  const donneesBranchees = CENTRES_BRANCHES.includes(centreId)
+  const atelier = useAtelier(compte.grimpeur, centreId)
   const [panneauCompte, setPanneauCompte] = useState(false)
   // Retour du lien du courriel, premiere connexion : il manque le pseudonyme.
   // Ou retour du lien « mot de passe oublie » : il manque le nouveau mot de passe.
@@ -60,7 +65,6 @@ function Contenu() {
   const onglets = ONGLETS.filter((o) => vueComplete || !o.reserve)
   const [onglet, setOnglet] = useState<OngletId>('blocs')
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
-  const [centreId, setCentreId] = useState<CentreId>('demo')
   const centre = CENTRES.find((c) => c.id === centreId) ?? CENTRES[0]
   const [blocCible, setBlocCible] = useState<string | null>(null)
   const voirBlocSurCarte = (blocId: string) => {
@@ -164,24 +168,24 @@ function Contenu() {
             accesComplet={vueComplete}
             // L'apercu visiteur montre aussi la carte sans les outils d'ouvreur.
             ouvreur={compte.peutOuvrir(centreId) && !apercuVisiteur}
-            apresModification={centreId === 'demo' ? atelier.recharger : undefined}
+            apresModification={donneesBranchees ? atelier.recharger : undefined}
             resultatMelange={atelier.resultats.get('melange')}
             // Sans les grimpeurs en periode d'essai : leur pseudonyme reste cache
             // tant que leur cote n'est pas stable (cf. `LigneGrimpeur.provisoire`).
             grimpeurs={
-              centreId === 'demo'
+              donneesBranchees
                 ? atelier.resultats.get('melange')?.grimpeurs.filter((g) => !g.provisoire).map((g) => g.nom)
                 : undefined
             }
-            enregistrerAscension={centreId === 'demo' ? atelier.enregistrerAscension : undefined}
-            envoisConnus={centreId === 'demo' ? atelier.envoisConnus : undefined}
+            enregistrerAscension={donneesBranchees ? atelier.enregistrerAscension : undefined}
+            envoisConnus={donneesBranchees ? atelier.envoisConnus : undefined}
             blocCible={blocCible}
-            grimpeurConnecte={centreId === 'demo' ? compte.grimpeur?.nom : undefined}
+            grimpeurConnecte={donneesBranchees ? compte.grimpeur?.nom : undefined}
             erreurEnvoi={atelier.erreurEnvoi}
           />
         )}
 
-        {onglet !== 'carte' && centre.id !== 'demo' && (
+        {onglet !== 'carte' && !donneesBranchees && (
           <div className="large">
             <div className="carte">
               <h2>{t(`Pas encore de données pour ${centre.fr}`, `No data yet for ${centre.en}`)}</h2>
@@ -195,7 +199,7 @@ function Contenu() {
           </div>
         )}
 
-        {onglet !== 'carte' && centre.id === 'demo' && atelier.erreur && (
+        {onglet !== 'carte' && donneesBranchees && atelier.erreur && (
           <div className="large">
             <div className="carte" style={{ borderColor: 'var(--critique)' }}>
               <h2>{t('Le chargement a échoué', 'Loading failed')}</h2>
@@ -204,11 +208,11 @@ function Contenu() {
           </div>
         )}
 
-        {onglet !== 'carte' && centre.id === 'demo' && atelier.chargement && (
+        {onglet !== 'carte' && donneesBranchees && atelier.chargement && (
           <p className="vide">{t('Chargement des fichiers…', 'Loading files…')}</p>
         )}
 
-        {onglet !== 'carte' && centre.id === 'demo' && atelier.dataset && atelier.resultat && (
+        {onglet !== 'carte' && donneesBranchees && atelier.dataset && atelier.resultat && (
           <>
             {onglet === 'blocs' && (
               <VueBlocs

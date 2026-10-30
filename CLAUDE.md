@@ -662,11 +662,13 @@ période d'essai des nouveaux. Méthodes utiles découvertes en route :
   `recuperation.test.ts` ; comparer les erreurs sur le **même** ensemble de blocs, le nombre
   de blocs fiables pouvant changer.
 
-**Avant l'étape 5** (essai dans un vrai centre), à savoir : les écrans Blocs et Grimpeurs ne
-lisent que les blocs du centre `demo` (filtre dans `src/core/sources/supabase.ts`), `App.tsx`
-affiche « pas encore de données » pour tout autre centre, et les envois depuis la Carte ne
-sont branchés que sur la Démo (`centreId === 'demo'` à plusieurs endroits de `App.tsx`). Il
-faudra brancher ces trois points sur le centre choisi. Limites connues restantes : glisser un
+**Avant l'étape 5** (essai dans un vrai centre), à savoir : **fait le 2026-10-30 pour RB1 et
+RB2** — Blocs, Grimpeurs, envois depuis la Carte et temps réel suivent le centre choisi
+(`CENTRES_BRANCHES` dans `App.tsx`, `useAtelier(grimpeur, centreId)`, source Supabase filtrée
+par centre, ascensions par jointure sur `blocs`). Chaque centre a ses propres cotes ; les
+grimpeurs sont communs, mais la période d'essai (10 blocs) se compte par centre. Les autres
+centres du menu n'ont que leur carte. Un bloc sans assez de duels n'apparaît pas dans
+l'écran Blocs (`fiable`), comme sur la Démo. Limites connues restantes : glisser un
 bloc à la souris seulement (pas au doigt), pas d'écran pour nommer un ouvreur ni pour
 supprimer un compte (SQL dans le README), et au lancement tout le monde sera en période
 d'essai en même temps (coût mesuré dans `DECISIONS.md`).

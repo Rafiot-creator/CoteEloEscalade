@@ -27,10 +27,14 @@ export async function lireTable<T>(
   table: string,
   colonnes: string,
   ordre: string,
-  filtre?: { colonne: string; valeur: string }
+  filtre?: { colonne: string; valeur: string },
+  jointure?: string
 ): Promise<T[]> {
+  // `jointure` (ex. 'blocs!inner(centre_id)') permet de filtrer sur une
+  // colonne d'une autre table (`filtre.colonne` = 'blocs.centre_id') ; elle
+  // doit figurer aussi dans le comptage, sinon il compterait toute la table.
   const requete = (select: string, options?: { count: 'exact'; head: true }) => {
-    const q = supabase.from(table).select(select, options)
+    const q = supabase.from(table).select(jointure ? `${select},${jointure}` : select, options)
     return filtre ? q.eq(filtre.colonne, filtre.valeur) : q
   }
   const { count, error } = await requete(ordre, { count: 'exact', head: true })
