@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
+import { depuisCotationV, etiquetteDIndex, type Echelle } from '../../core/echelles'
 import { FORMULES } from '../../core/formulas/registry'
 import { versCsv } from '../../core/loaders/csv'
 import { SEUIL_DESACCORD, type LigneBloc, type Resultat } from '../../core/pipeline'
 import { BasculeVue } from '../charts/base'
 import { Histogramme } from '../charts/Histogramme'
 import { Nuage } from '../charts/Nuage'
-import { Carte, LegendeCote, Tuile } from '../components/base'
+import { Carte, LegendeCote, PastilleCote, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { nombre, pourcent, signe, telecharger } from '../format'
 import { bilingue, useLangue } from '../langue'
@@ -19,6 +20,7 @@ export function VueBlocs({
   resultats,
   simplifie = false,
   onVoirBlocSurCarte,
+  echelle = 'v',
 }: {
   resultat: Resultat
   /** Toutes les formules, pour afficher leurs cotes cote a cote. */
@@ -27,8 +29,11 @@ export function VueBlocs({
   simplifie?: boolean
   /** Rend le nom du bloc cliquable : bascule sur l'onglet Carte et l'y montre. */
   onVoirBlocSurCarte?: (blocId: string) => void
+  /** Echelle affichee par le centre (src/core/echelles.ts) : colonnes Affichée et Calculée. */
+  echelle?: Echelle
 }) {
   const { langue, t } = useLangue()
+  const maison = echelle !== 'v'
   const [gym, setGym] = useState('tous')
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
   const [tableauNuage, setTableauNuage] = useState(false)
@@ -153,7 +158,8 @@ export function VueBlocs({
     {
       cle: 'officielle',
       titre: t('Affichée', 'Displayed'),
-      valeur: (b) => b.cotationOfficielle,
+      valeur: (b) => (maison ? depuisCotationV(b.cotationOfficielle, echelle) : b.cotationOfficielle),
+      rendu: maison ? (b) => <PastilleCote>{depuisCotationV(b.cotationOfficielle, echelle)}</PastilleCote> : undefined,
       tri: (b) => b.indexOfficiel,
       aide: t(
         "La cotation annoncée par l'ouvreur. C'est elle que le site met à l'épreuve, pas elle qui sert de référence.",
@@ -164,6 +170,14 @@ export function VueBlocs({
       cle: 'calculee',
       titre: t('Calculée', 'Calculated'),
       valeur: (b) => b.cotationCalculee,
+      // Echelle maison : la cote du centre encerclee, puis son equivalent V.
+      rendu: maison
+        ? (b) => (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <PastilleCote>{etiquetteDIndex(b.indexCalcule, echelle)}</PastilleCote>/ {b.cotationCalculee}
+            </span>
+          )
+        : undefined,
       tri: (b) => b.indexCalcule,
       aide: t(
         "La cotation déduite des réussites et des échecs par la formule active, sans regarder l'étiquette autrement que comme point de départ.",

@@ -190,3 +190,12 @@ export function PanneauParams({
     </>
   )
 }
+
+/**
+ * Cote d'un centre a echelle maison (Rose Bloc : 1 a 15) dans un tableau :
+ * le chiffre encercle comme une pastille de la Carte, mais sans couleur — la
+ * couleur des prises n'a rien a voir avec la cote.
+ */
+export function PastilleCote({ children }: { children: ReactNode }) {
+  return <span className="pastille-cote">{children}</span>
+}

@@ -427,3 +427,20 @@ svg text { font-family: var(--sans); }
 .etiquette-serie { fill: var(--encre-2); font-size: 11px; }
 
 .barre-ecart { height: 7px; border-radius: 2px; display: block; }
+
+/* Cote 1-15 encerclee dans un tableau (PastilleCote, src/ui/components/base.tsx). */
+.pastille-cote {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--encre-2);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
+}

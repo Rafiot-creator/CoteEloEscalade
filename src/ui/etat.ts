@@ -8,6 +8,7 @@ import { chargerToutesLesSources } from '../core/sources'
 import { supabase } from '../core/supabase'
 import type { Ascension, Dataset } from '../core/types'
 import { ascensionsLocales } from './ascensionsLocales'
+import type { Echelle } from '../core/echelles'
 
 /** Les trois facons d'enregistrer un envoi depuis la Carte. */
 export type TypeEnvoi = 'flash' | 'reussi' | 'echec'
@@ -38,6 +39,8 @@ interface LigneAscension {
  */
 export interface Atelier {
   dataset: Dataset | null
+  /** Echelle affichee par le centre (src/core/echelles.ts) ; le calcul reste en V. */
+  echelle: Echelle
   chargement: boolean
   erreur: string | null
   /** Relit toute la base (apres la creation d'un pseudonyme, par exemple). */
@@ -110,6 +113,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
   const [erreurEnvoi, setErreurEnvoi] = useState<string | null>(null)
   const [ascensionsAjoutees, setAscensionsAjoutees] = useState<Ascension[]>(() => ascensionsLocales.lire())
   const [erreur, setErreur] = useState<string | null>(null)
+  const [echelle, setEchelle] = useState<Echelle>('v')
 
   const [formuleId, setFormuleId] = useState(FORMULE_PAR_DEFAUT.id)
   const [parFormule, setParFormule] = useState<Record<string, Params>>(() =>
@@ -133,6 +137,14 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
       })
       .catch((e: unknown) => {
         if (vivant) setErreur(e instanceof Error ? e.message : String(e))
+      })
+    void supabase
+      .from('centres')
+      .select('echelle')
+      .eq('id', centreId)
+      .maybeSingle<{ echelle: Echelle }>()
+      .then(({ data }) => {
+        if (vivant) setEchelle(data?.echelle ?? 'v')
       })
     return () => {
       vivant = false
@@ -338,6 +350,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
     dataset,
     chargement: !dataset && !erreur,
     erreur,
+    echelle,
     recharger,
     erreurEnvoi,
     enregistrerAscension,

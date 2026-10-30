@@ -220,6 +220,7 @@ function Contenu() {
                 resultats={atelier.resultats}
                 simplifie={!vueComplete}
                 onVoirBlocSurCarte={voirBlocSurCarte}
+                echelle={atelier.echelle}
               />
             )}
             {onglet === 'grimpeurs' && (

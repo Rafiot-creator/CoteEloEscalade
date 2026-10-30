@@ -1,4 +1,4 @@
-import { COTATIONS } from './cotations'
+import { COTATIONS, cotationDIndex } from './cotations'
 
 /**
  * Echelle *affichee* par un centre sur sa carte et dans l'edition des blocs.
@@ -37,7 +37,13 @@ export function depuisCotationV(cotation: string, echelle: Echelle): string {
   if (echelle === 'v') return cotation
   const v = Number(cotation.trim().replace(/^v/i, ''))
   if (!Number.isFinite(v)) return cotation
-  return String(Math.min(COTE_MAX_ROSE_BLOC, Math.max(1, Math.round(v * FACTEUR_ROSE_BLOC + 1))))
+  return etiquetteDIndex(v, echelle)
+}
+
+/** Index V continu (une cote calculee, 5,4) -> etiquette de l'echelle du centre ('7'). */
+export function etiquetteDIndex(index: number, echelle: Echelle): string {
+  if (echelle === 'v') return cotationDIndex(index)
+  return String(Math.min(COTE_MAX_ROSE_BLOC, Math.max(1, Math.round(index * FACTEUR_ROSE_BLOC + 1))))
 }
 
 /** Ce qu'affiche la pastille : le numero seul ('V4' -> '4', '7' -> '7'). */
