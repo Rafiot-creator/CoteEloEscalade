@@ -1157,13 +1157,22 @@ refusées.
    écrasé par une valeur vide (variable `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` absente).
    Politique de confidentialité : `public/confidentialite.html` (bilingue, exigée par Google
    et par la Loi 25).
-   **Limite** : le service de courriel inclus dans Supabase n'écrit qu'aux membres de l'équipe
-   du projet (Raphaël) et au plus 2 courriels par heure. Google fonctionne pour tout le monde,
-   mais créer un compte par mot de passe (confirmation de l'adresse) ou réinitialiser un mot de
-   passe demande un service d'envoi (Resend, Brevo...), pas encore branché.
-   **Supprimer un compte** (promis par la politique de confidentialité) : supprimer la ligne du
-   grimpeur (`delete from public.grimpeurs where id = '<id>'`, qui efface ses envois et son
-   profil), puis l'utilisateur dans Authentication → Users du tableau de bord. Adresses de retour du lien autorisées (`supabase/config.toml`, poussées par
+   **Courriels** (confirmation d'inscription, mot de passe oublié), depuis le 29 octobre 2026 :
+   envoyés par **coteeloescalade@gmail.com**, compte Gmail dédié créé par Raphaël, branché en
+   SMTP dans le tableau de bord Supabase (`smtp.gmail.com`, port 465, mot de passe
+   d'application de ce compte, saisi par Raphaël seulement). Gratuit, environ 500 courriels par
+   jour ; Supabase avertit que Gmail est fait pour du courriel personnel, sans conséquence à ce
+   volume. Si le site grossit beaucoup : nom de domaine + Resend, en ne changeant que les
+   réglages SMTP. Modèles bilingues dans `supabase/templates/` (`confirmation.html`,
+   `recovery.html`), collés dans le tableau de bord (Authentication → Emails → Templates) et
+   reflétés dans `supabase/config.toml`. **Ne pas faire de `config push`** pour les modifier :
+   le SMTP n'est pas déclaré dans `config.toml` (son mot de passe ne doit pas être dans le
+   dépôt) et risquerait d'être désactivé ou vidé. Testé par Raphaël avec l'adresse du site
+   elle-même (hors de l'équipe Supabase) : inscription, confirmation, mot de passe oublié.
+   **Supprimer un compte** (promis par la politique de confidentialité), par
+   `npx supabase db query --linked` : `delete from public.grimpeurs where id = '<id>'` (efface
+   ses envois et son profil), puis `delete from auth.users where id = '<uuid>'`. Fait ainsi
+   pour le compte de test du 29 octobre. Adresses de retour du lien autorisées (`supabase/config.toml`, poussées par
    `npx supabase config push`) : le site en ligne, `localhost:5173` et `localhost:5191`.
    Le fichier reprend les autres réglages du projet tels qu'ils étaient en ligne, pour que
    `config push` ne change rien d'autre (vérifier avec `npx supabase config diff` avant).
@@ -1927,3 +1936,8 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   « gmopjbpjiwdbnmxbgsxt.supabase.co » affiché par Google inquiétait Raphaël : bouton officiel
   de Google à la place de la redirection, qui affiche « Cote Elo Escalade ». Testé par Raphaël
   (Google et mot de passe, retrouve bien son compte « Rafiot »).
+- **Service de courriels** : Gmail dédié (coteeloescalade@gmail.com) plutôt qu'un nom de
+  domaine + Resend ou le Gmail personnel de Raphaël, choix de Raphaël. Création du compte
+  guidée pas à pas (Google a refusé une première vérification par le téléphone de Raphaël,
+  déjà associé à trop de comptes). Courriels bilingues installés, inscription et mot de passe
+  oublié testés de bout en bout, compte de test supprimé.

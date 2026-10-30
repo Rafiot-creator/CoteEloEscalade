@@ -618,9 +618,13 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   officiel de Google (`BoutonGoogle.tsx`) pour que Google affiche « Cote Elo Escalade » et non
   le domaine Supabase. Détail, réglages Google Cloud et procédure de suppression de compte dans
   le README. Secret Google : seulement dans le tableau de bord Supabase, jamais le demander.
-  Prochaine : un service d'envoi de courriels (sans lui, seuls les comptes Google marchent pour
-  les autres personnes : la confirmation d'adresse et le mot de passe oublié passent par
-  courriel), ou étape 4 (temps réel). Tranché par Raphaël : **inscription ouverte à tous, avec
+- **Courriels faits le 2026-10-29** : SMTP Gmail du compte dédié coteeloescalade@gmail.com,
+  modèles bilingues (`supabase/templates/`). Mot de passe d'application : jamais le demander.
+  **Pas de `config push`** (SMTP non déclaré dans `config.toml`) : modifier les modèles dans
+  le tableau de bord. Les comptes sont désormais ouverts à tous (Google ou mot de passe).
+  Prochaine : étape 4 (temps réel), ou vérification de la marque Google (la fenêtre de
+  connexion affiche « rafiot-creator.github.io » en ligne, pas « Cote Elo Escalade »), ou
+  l'essai dans un vrai centre (étape 5, accord de Rose Bloc à obtenir). Tranché par Raphaël : **inscription ouverte à tous, avec
   pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
@@ -631,8 +635,8 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**Suite de la base de données** (voir ci-dessus) : service d'envoi de courriels, ou étape 4
-(temps réel), au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+**Suite de la base de données** (voir ci-dessus) : étape 4 (temps réel), vérification de la
+marque Google, ou étape 5, au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
 secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
 des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 

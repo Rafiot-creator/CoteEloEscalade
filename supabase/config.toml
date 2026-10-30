@@ -244,6 +244,18 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# Courriels en francais et en anglais (29 octobre 2026). Seuls ces deux-la
+# servent : inscription par mot de passe et mot de passe oublie. Colles dans
+# le tableau de bord : ne PAS faire de config push, le SMTP (Gmail du site)
+# n'est pas declare ici et risquerait d'etre desactive ou vide.
+[auth.email.template.confirmation]
+subject = "Confirmez votre adresse électronique / Confirm your email address - Cote Elo Escalade"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Nouveau mot de passe / New password - Cote Elo Escalade"
+content_path = "./supabase/templates/recovery.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
