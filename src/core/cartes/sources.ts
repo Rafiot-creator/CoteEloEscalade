@@ -1,9 +1,11 @@
 import type { BlocCarte, Carte, CarteProvider } from './types'
 import { supabase } from '../supabase'
+import type { Echelle } from '../echelles'
 
 interface LigneCentre {
   fond: string | null
   taille_pastilles: number
+  echelle: Echelle
 }
 interface LigneBloc {
   id: string
@@ -16,8 +18,8 @@ interface LigneBloc {
 }
 
 /**
- * La carte d'un centre vient de la base : son fond et sa taille de pastilles
- * (table `centres`), et les blocs qui y ont une position (table `blocs`, x/y
+ * La carte d'un centre vient de la base : son fond, sa taille de pastilles et
+ * son echelle (table `centres`), et les blocs qui y ont une position (table `blocs`, x/y
  * non nuls). `data/cartes/*.json` ne sert plus qu'a remplir la base
  * (`scripts/generer-seed-supabase.mjs`).
  */
@@ -25,7 +27,7 @@ export const carteSupabase: CarteProvider = {
   id: 'supabase',
   async charger(centreId) {
     const [centre, blocs] = await Promise.all([
-      supabase.from('centres').select('fond, taille_pastilles').eq('id', centreId).maybeSingle<LigneCentre>(),
+      supabase.from('centres').select('fond, taille_pastilles, echelle').eq('id', centreId).maybeSingle<LigneCentre>(),
       supabase
         .from('blocs')
         .select('id, nom, x, y, cotation_officielle, couleur, secteur')
@@ -40,6 +42,7 @@ export const carteSupabase: CarteProvider = {
     return {
       ...(centre.data.fond ? { fond: centre.data.fond } : {}),
       ...(centre.data.taille_pastilles !== 1 ? { taillePastilles: centre.data.taille_pastilles } : {}),
+      ...(centre.data.echelle !== 'v' ? { echelle: centre.data.echelle } : {}),
       blocs: (blocs.data ?? []).map((b) => ({
         id: b.id,
         nom: b.nom,

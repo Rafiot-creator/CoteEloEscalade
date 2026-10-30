@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { COTATIONS } from '../../core/cotations'
+import { depuisCotationV, etiquettesEchelle, numeroPastille, versCotationV } from '../../core/echelles'
 import { chargerCarte, demonterBloc, modifierBloc, placerBloc } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import { STYLES_BLOC } from '../../core/stylesBloc'
@@ -202,6 +202,8 @@ export function VueCarte({
   // plafond : sinon il n'aurait aucun effet sur telephone (deja au plancher).
   const FACTEUR = carte?.taillePastilles ?? 1
   const RAYON = Math.round(Math.max(5 * FACTEUR, Math.min(20 * FACTEUR, largeurCarte * 0.018 * FACTEUR)))
+  // Echelle affichee (src/core/echelles.ts) ; la base et le calcul restent en V.
+  const echelleCotes = carte?.echelle ?? 'v'
   // Le contour de la pastille (boxShadow plus bas) etait fixe a 2px depuis
   // toujours, jamais retouche pendant les correctifs precedents de l'anneau
   // "envoye" — la cause reelle du "debordement" signale par Raphael sur
@@ -356,7 +358,9 @@ export function VueCarte({
     if (glisse.current) return
     setSurvole(null)
     const { x, y } = relatif(e.clientX, e.clientY)
-    const nouveau: Omit<BlocCarte, 'id'> = { x, y, cotation: 'V4', couleur: 'bleu', style: '' }
+    // Cote par defaut : V4, ou son equivalent dans l'echelle du centre.
+    const cotation = versCotationV(depuisCotationV('V4', echelleCotes), echelleCotes)
+    const nouveau: Omit<BlocCarte, 'id'> = { x, y, cotation, couleur: 'bleu', style: '' }
     if (!ouvreur) {
       const bloc: BlocCarte = { id: nouvelId(), ...nouveau }
       setCarte({ ...carte, blocs: [...carte.blocs, bloc] })
@@ -657,7 +661,7 @@ export function VueCarte({
                       filter: fait ? 'grayscale(0.4) saturate(0.7)' : undefined,
                     }}
                   >
-                    {b.cotation.replace(/^V/i, '')}
+                    {numeroPastille(b.cotation, echelleCotes)}
                   </div>
 
                   {survole === b.id && (() => {
@@ -704,7 +708,7 @@ export function VueCarte({
                         transformOrigin: aGauche ? 'top right' : 'top left',
                       }}
                     >
-                      <div className="t">{b.nom || b.cotation}</div>
+                      <div className="t">{b.nom || depuisCotationV(b.cotation, echelleCotes)}</div>
                       <div className="l">
                         <span>{t('Statut', 'Status')}</span>
                         <b
@@ -728,7 +732,7 @@ export function VueCarte({
                       </div>
                       <div className="l">
                         <span>{t('Cotation', 'Grade')}</span>
-                        <b>{cote !== undefined ? `${b.cotation} (${nombre(cote)})` : b.cotation}</b>
+                        <b>{cote !== undefined ? `${depuisCotationV(b.cotation, echelleCotes)} (${nombre(cote)})` : depuisCotationV(b.cotation, echelleCotes)}</b>
                       </div>
                       <div className="l">
                         <span>{t('Couleur', 'Color')}</span>
@@ -844,10 +848,12 @@ export function VueCarte({
               <label>{t('Cotation', 'Grade')}</label>
             </div>
             <select
-              value={blocSelectionne.cotation}
-              onChange={(e) => modifierEtSauver(blocSelectionne, { cotation: e.currentTarget.value })}
+              value={depuisCotationV(blocSelectionne.cotation, echelleCotes)}
+              onChange={(e) =>
+                modifierEtSauver(blocSelectionne, { cotation: versCotationV(e.currentTarget.value, echelleCotes) })
+              }
             >
-              {COTATIONS.map((c) => (
+              {etiquettesEchelle(echelleCotes).map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>

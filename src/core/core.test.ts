@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { calibrer } from './calibrage'
 import { cotationDIndex, ecartEnCrans, formaterIndex, indexDeCotation } from './cotations'
+import { depuisCotationV, etiquettesEchelle, numeroPastille, versCotationV } from './echelles'
 import {
   ECHELLE_REFERENCE,
   amorceBloc,
@@ -71,6 +72,28 @@ describe('cotations', () => {
   it('accepte le numero nu que produisent les exports de salle', () => {
     expect(indexDeCotation('4')).toBe(4)
     expect(indexDeCotation(' 0 ')).toBe(0)
+  })
+
+  it('accepte une cotation V fractionnaire, sans depasser l echelle', () => {
+    expect(indexDeCotation('V5.31')).toBe(5.31)
+    expect(indexDeCotation('V12.39')).toBe(12.39)
+    expect(indexDeCotation('V12.5')).toBeNull()
+    expect(indexDeCotation('V5.312')).toBeNull()
+  })
+
+  it('convertit l echelle Rose Bloc (1 a 15) en cotation V et retour', () => {
+    expect(versCotationV('1', 'rose-bloc')).toBe('V0')
+    expect(versCotationV('10', 'rose-bloc')).toBe('V7.96')
+    expect(versCotationV('15', 'rose-bloc')).toBe('V12.39')
+    for (const e of etiquettesEchelle('rose-bloc')) {
+      const v = versCotationV(e, 'rose-bloc')
+      expect(indexDeCotation(v)).not.toBeNull()
+      expect(depuisCotationV(v, 'rose-bloc')).toBe(e)
+    }
+    // L'echelle V reste telle quelle.
+    expect(versCotationV('V4', 'v')).toBe('V4')
+    expect(numeroPastille('V4', 'v')).toBe('4')
+    expect(numeroPastille('V4.42', 'rose-bloc')).toBe('6')
   })
 
   it('affiche la fraction plutot que de la masquer', () => {

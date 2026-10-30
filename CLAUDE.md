@@ -628,6 +628,12 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   cote V), période d'essai de 10 blocs (pseudonyme caché, K ×2 en Elo, blocs non déplacés).
   Mesures et coût dans `DECISIONS.md` (« Les nouveaux grimpeurs »). Rafiot : flash V6,
   niveau déclaré V7, classé depuis son 10e bloc.
+- **Échelle Rose Bloc, 2026-10-30** : RB1 et RB2 cotent de 1 à 15. Colonne
+  `centres.echelle` ('v' ou 'rose-bloc') ; la base et le calcul restent en V, à deux
+  décimales au plus (`V = (cote − 1) ÷ 1,13`, choisi par Raphaël : 1 = V0, 10 au plus près
+  de V8). Traduction à l'affichage et à la saisie seulement (`src/core/echelles.ts`,
+  `VueCarte.tsx`). Édition de la Carte en 1-15 pas encore testée avec un vrai compte
+  d'ouvreur.
 - Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
   l'accord de Rose Bloc pour un essai (étape 5).
 

@@ -35,6 +35,14 @@ export function indexDeCotation(cotation: string): number | null {
     const n = Number(brut)
     return n >= 0 && n <= V_MAX ? n : null
   }
+  // Cotation V fractionnaire, deux decimales au plus ('V5.31') : celle que
+  // stocke la base pour un centre a echelle maison (src/core/echelles.ts,
+  // Rose Bloc 15 -> V12.39, d'ou la demi-cote de marge au-dessus de V_MAX).
+  const fraction = /^v(\d{1,2}(\.\d{1,2})?)$/.exec(brut)
+  if (fraction) {
+    const n = Number(fraction[1])
+    return n >= 0 && n < V_MAX + 0.5 ? n : null
+  }
   return null
 }
 

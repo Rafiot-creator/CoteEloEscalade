@@ -1,3 +1,5 @@
+import type { Echelle } from '../echelles'
+
 /**
  * Un bloc positionne sur la carte d'un centre.
  *
@@ -13,7 +15,10 @@ export interface BlocCarte {
   /** Position relative sur le fond de carte, de 0 a 1. */
   x: number
   y: number
-  /** Cotation V affichee au centre de la pastille (ex. 'V4'). */
+  /**
+   * Cotation V du bloc (ex. 'V4', ou 'V5.31' pour un centre a echelle maison),
+   * affichee sur la pastille dans l'echelle du centre (`Carte.echelle`).
+   */
   cotation: string
   /**
    * Couleur des prises, choisie par l'ouvreur : identifiant de
@@ -33,6 +38,11 @@ export interface Carte {
    * fines, carte carree), ou des pastilles standard ne tiendraient pas toutes.
    */
   taillePastilles?: number
+  /**
+   * Echelle affichee sur les pastilles et dans l'edition (src/core/echelles.ts),
+   * 'v' par defaut. `BlocCarte.cotation` reste toujours une cotation V.
+   */
+  echelle?: Echelle
   blocs: BlocCarte[]
 }
 
