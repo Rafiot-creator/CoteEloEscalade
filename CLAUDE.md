@@ -622,9 +622,12 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   modèles bilingues (`supabase/templates/`). Mot de passe d'application : jamais le demander.
   **Pas de `config push`** (SMTP non déclaré dans `config.toml`) : modifier les modèles dans
   le tableau de bord. Les comptes sont désormais ouverts à tous (Google ou mot de passe).
-  Prochaine : étape 4 (temps réel), ou vérification de la marque Google (la fenêtre de
-  connexion affiche « rafiot-creator.github.io » en ligne, pas « Cote Elo Escalade »), ou
-  l'essai dans un vrai centre (étape 5, accord de Rose Bloc à obtenir). Tranché par Raphaël : **inscription ouverte à tous, avec
+- **Étape 4 (temps réel) faite le 2026-10-30** : envois et blocs diffusés, appliqués sans
+  recharger (détail dans le README). Testée par Raphaël sur deux fenêtres, pas encore sur
+  téléphone.
+  Prochaine : étape 5 (essai dans un vrai centre, accord de Rose Bloc à obtenir), ou
+  vérification de la marque Google (la fenêtre de connexion affiche
+  « rafiot-creator.github.io » en ligne, pas « Cote Elo Escalade »). Tranché par Raphaël : **inscription ouverte à tous, avec
   pseudonymes**. Reste ouvert : l'accord de Rose Bloc pour un essai (étape 5).
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
@@ -635,8 +638,8 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**Suite de la base de données** (voir ci-dessus) : étape 4 (temps réel), vérification de la
-marque Google, ou étape 5, au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
+**Suite de la base de données** (voir ci-dessus) : étape 5 (essai dans un vrai centre) ou
+vérification de la marque Google, au choix de Raphaël. Les cartes des deux Rose Bloc sont faites. Retours éventuels de Raphaël dessus (noms de
 secteurs, sens, éléments à nommer) à traiter en priorité s'il y en a. Suite logique : y placer
 des blocs (clic sur la carte en accès complet), voire brancher de vraies données sur ces centres.
 

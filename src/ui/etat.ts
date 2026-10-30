@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PARAMS_CALIBRAGE } from '../core/calibrage'
 import { FORMULES, FORMULE_PAR_DEFAUT, formuleParId } from '../core/formulas/registry'
 import { paramsParDefaut, type Formule, type Params } from '../core/formulas/types'
@@ -17,6 +17,15 @@ export type EchecEnregistrement = 'grimpeur-inconnu' | 'bloc-inconnu'
 
 /** L'etat d'un bloc pour un grimpeur donne, d'apres ses ascensions connues. */
 export type StatutEnvoi = 'flash' | 'reussi' | 'echec'
+
+/** Une ligne de la table `ascensions`, telle que la diffuse le temps reel. */
+interface LigneAscension {
+  date: string
+  grimpeur_id: string
+  bloc_id: string
+  resultat: 'reussite' | 'echec'
+  essais: number
+}
 
 /**
  * L'etat de l'atelier : un dataset, une formule, ses reglages, un resultat.
@@ -120,6 +129,67 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
   }, [generation])
 
   const recharger = useCallback(() => setGeneration((g) => g + 1), [])
+
+  // Temps reel : les envois des autres arrivent ici des qu'ils sont
+  // enregistres (publication `supabase_realtime`, cf. supabase/migrations/).
+  // Un envoi dont le grimpeur et le bloc sont connus s'applique tel quel, avec
+  // la meme regle de remplacement que `enregistrer_envoi` ; c'est le cas
+  // courant, et il evite de relire toute la base (une vingtaine de requetes)
+  // pour chaque envoi de chaque grimpeur. Le reste (nouveau grimpeur, bloc
+  // place ou modifie par un ouvreur, reconnexion apres une coupure pendant
+  // laquelle des changements ont pu manquer) relit tout, regroupe en une
+  // seule relecture si plusieurs changements arrivent coup sur coup.
+  // Les suppressions d'ascensions sont ignorees : `enregistrer_envoi` les
+  // fait toujours suivre de l'insertion qui les remplace, et la suppression
+  // d'un compte (rare, a la main) se verra au prochain chargement.
+  const relectureDiffere = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    const relire = () => {
+      if (relectureDiffere.current) clearTimeout(relectureDiffere.current)
+      relectureDiffere.current = setTimeout(recharger, 1500)
+    }
+    let dejaAbonne = false
+    const canal = supabase
+      .channel('atelier')
+      .on<LigneAscension>('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ascensions' }, ({ new: l }) => {
+        setDatasetBase((d) => {
+          if (!d) return d
+          if (!d.grimpeurParId.has(l.grimpeur_id) || !d.blocParId.has(l.bloc_id)) {
+            relire()
+            return d
+          }
+          const ascension: Ascension = {
+            date: l.date,
+            // Comme un envoi fait sur cet ecran (`enregistrerAscension`) :
+            // le plus recent passe apres tout l'historique deja charge.
+            t: Date.now(),
+            grimpeurId: l.grimpeur_id,
+            blocId: l.bloc_id,
+            resultat: l.resultat,
+            essais: l.essais,
+          }
+          return {
+            ...d,
+            ascensions: [
+              ...d.ascensions.filter((a) => !(a.grimpeurId === l.grimpeur_id && a.blocId === l.bloc_id)),
+              ascension,
+            ],
+          }
+        })
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'blocs', filter: 'centre_id=eq.demo' }, relire)
+      .subscribe((statut) => {
+        if (statut !== 'SUBSCRIBED') return
+        // Le premier abonnement suit le chargement initial ; un suivant est
+        // une reconnexion (telephone en veille, reseau coupe...).
+        if (dejaAbonne) relire()
+        dejaAbonne = true
+      })
+    return () => {
+      if (relectureDiffere.current) clearTimeout(relectureDiffere.current)
+      void supabase.removeChannel(canal)
+    }
+  }, [recharger])
 
   // Les ascensions ajoutees depuis la Carte s'ajoutent a celles du fichier :
   // le pipeline ne voit qu'un seul dataset, coherent, trie chronologiquement.

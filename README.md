@@ -1192,7 +1192,18 @@ refusées.
    **Limites** : glisser un bloc à la souris seulement (pas au doigt) ; pas d'écran pour nommer
    un ouvreur, à faire en SQL :
    `insert into public.ouvreurs (user_id, centre_id) select p.user_id, '<centre>' from public.profils p join public.grimpeurs g on g.id = p.grimpeur_id where g.nom = '<pseudo>';`
-4. **Temps réel** : les cotes se mettent à jour sur tous les écrans ouverts.
+4. **Temps réel** — *fait le 30 octobre 2026.* `ascensions` et `blocs` ajoutées à la
+   publication `supabase_realtime` (`supabase/migrations/20261030000000_temps_reel.sql`) ; la
+   diffusion respecte les règles d'accès, `profils` et `ouvreurs` restent hors publication.
+   `useAtelier` (`src/ui/etat.ts`) applique directement un nouvel envoi dont le grimpeur et le
+   bloc sont connus (même remplacement que `enregistrer_envoi`, sans relire la base), et relit
+   tout, regroupé après 1,5 s de calme, pour le reste : grimpeur ou bloc inconnu, bloc de la
+   Démo changé par un ouvreur, reconnexion. Les suppressions d'ascensions sont ignorées
+   (toujours suivies de l'insertion qui les remplace ; une suppression de compte se voit au
+   chargement suivant). `VueCarte` relit la carte du centre à chaque bloc placé, modifié ou
+   démonté (toute suppression, faute de filtre possible), en gardant la version locale du
+   bloc en cours d'édition. Vérifié par un test automatique (Chrome sans interface + écritures
+   temporaires dans la base, annulées ensuite) puis par Raphaël sur deux fenêtres.
 5. **Essai dans un vrai centre** (Rose Bloc 1 ou 2).
 
 **Rôles prévus.** Visiteur (lecture), grimpeur (ses propres envois), admin d'un centre (les blocs
@@ -1941,3 +1952,9 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   guidée pas à pas (Google a refusé une première vérification par le téléphone de Raphaël,
   déjà associé à trop de comptes). Courriels bilingues installés, inscription et mot de passe
   oublié testés de bout en bout, compte de test supprimé.
+
+### 2026-10-30
+
+- **Étape 4 de la base de données : temps réel**, choisie par Raphaël et testée par lui sur
+  deux fenêtres (envois et blocs). Détail dans « Base de données et multi-utilisateur (en
+  cours) ».

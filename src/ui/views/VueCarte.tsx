@@ -3,6 +3,7 @@ import { COTATIONS } from '../../core/cotations'
 import { chargerCarte, demonterBloc, modifierBloc, placerBloc } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import { STYLES_BLOC } from '../../core/stylesBloc'
+import { supabase } from '../../core/supabase'
 import type { Resultat } from '../../core/pipeline'
 import type { EchecEnregistrement, StatutEnvoi, TypeEnvoi } from '../etat'
 import { Carte, LegendeCote, Tuile } from '../components/base'
@@ -258,6 +259,43 @@ export function VueCarte({
       vivant = false
     }
   }, [centreId, generationCarte])
+
+  // Temps reel : un bloc place, modifie, deplace ou demonte par un ouvreur
+  // apparait sur toutes les cartes ouvertes de ce centre. La carte est relue
+  // en entier (une seule requete, legere) plutot que corrigee bloc par bloc ;
+  // le bloc en cours d'edition ici garde sa version locale, pour ne pas
+  // ecraser un nom en train d'etre tape. Les suppressions ne peuvent pas etre
+  // filtrees par centre (la base ne diffuse alors que l'id du bloc) : toute
+  // suppression relit la carte, ce qui reste rare.
+  const selectionRef = useRef(selection)
+  selectionRef.current = selection
+  useEffect(() => {
+    let vivant = true
+    const relire = () => {
+      chargerCarte(centreId)
+        .then((nouvelle) => {
+          if (!vivant) return
+          setCarte((actuelle) => {
+            const enEdition = actuelle?.blocs.find((b) => b.id === selectionRef.current)
+            if (!enEdition || !nouvelle.blocs.some((b) => b.id === enEdition.id)) return nouvelle
+            return { ...nouvelle, blocs: nouvelle.blocs.map((b) => (b.id === enEdition.id ? enEdition : b)) }
+          })
+        })
+        .catch(() => {
+          // Relecture d'appoint : en cas d'echec, la carte affichee reste valable.
+        })
+    }
+    const canal = supabase
+      .channel(`carte-${centreId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'blocs', filter: `centre_id=eq.${centreId}` }, relire)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'blocs', filter: `centre_id=eq.${centreId}` }, relire)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'blocs' }, relire)
+      .subscribe()
+    return () => {
+      vivant = false
+      void supabase.removeChannel(canal)
+    }
+  }, [centreId])
 
   const choisirGrimpeur = (nom: string) => {
     setGrimpeurChoisi(nom)
