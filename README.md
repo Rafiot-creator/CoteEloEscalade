@@ -1250,6 +1250,11 @@ pour les relier via les grimpeurs qui visitent plusieurs centres, détaillées d
 
 Rien codé ; ne pas relancer ce chantier sans que Raphaël le redemande.
 
+En attendant (2026-10-30) : Rose Bloc 1 et 2 sont calculés ensemble, comme une seule salle à
+deux murs — une cote commune par grimpeur (`GROUPES_CALCUL`, `src/App.tsx`). Raphaël a demandé
+que les prochains centres soient reliés par les pistes ci-dessus plutôt qu'en les ajoutant à un
+groupe.
+
 ## Changer d'échelle de cotation
 
 L'échelle V est déclarée dans `src/core/cotations.ts` sous forme d'un simple tableau

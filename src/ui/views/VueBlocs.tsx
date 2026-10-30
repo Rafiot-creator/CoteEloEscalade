@@ -21,6 +21,7 @@ export function VueBlocs({
   simplifie = false,
   onVoirBlocSurCarte,
   echelle = 'v',
+  salleParDefaut,
 }: {
   resultat: Resultat
   /** Toutes les formules, pour afficher leurs cotes cote a cote. */
@@ -31,10 +32,12 @@ export function VueBlocs({
   onVoirBlocSurCarte?: (blocId: string) => void
   /** Echelle affichee par le centre (src/core/echelles.ts) : colonnes Affichée et Calculée. */
   echelle?: Echelle
+  /** Salle preselectionnee dans le filtre quand le calcul en couvre plusieurs (celle choisie dans le menu). */
+  salleParDefaut?: string
 }) {
   const { langue, t } = useLangue()
   const maison = echelle !== 'v'
-  const [gym, setGym] = useState('tous')
+  const [gymChoisi, setGym] = useState(salleParDefaut ?? 'tous')
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
   const [tableauNuage, setTableauNuage] = useState(false)
   const [tableauHisto, setTableauHisto] = useState(false)
@@ -45,6 +48,8 @@ export function VueBlocs({
     [resultat]
   )
 
+  // Une salle absente du calcul (pas encore de bloc fiable, ou la Demo) : toutes.
+  const gym = gyms.includes(gymChoisi) ? gymChoisi : 'tous'
   const audites = useMemo(
     () => resultat.blocs.filter((b) => b.fiable && (gym === 'tous' || b.gym === gym)),
     [resultat, gym]

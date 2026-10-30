@@ -34,7 +34,13 @@ const CENTRES = [
 ] as const
 
 type CentreId = (typeof CENTRES)[number]['id']
-const CENTRES_BRANCHES: CentreId[] = ['demo', 'rose-bloc-1', 'rose-bloc-2']
+// Centres dont les blocs et les envois sont branches sur le calcul (Blocs,
+// Grimpeurs, envois depuis la Carte), par groupe calcule ensemble : un grimpeur
+// a une cote par groupe. Rose Bloc 1 et 2 partagent la leur (choix de Raphael,
+// 2026-10-30) ; pour relier de futurs centres entre eux, voir les pistes du
+// README, « uniformiser les cotes entre centres ». Les autres centres n'ont que
+// leur carte.
+const GROUPES_CALCUL: CentreId[][] = [['demo'], ['rose-bloc-1', 'rose-bloc-2']]
 
 export function App() {
   return (
@@ -47,10 +53,9 @@ export function App() {
 function Contenu() {
   const compte = useCompte()
   const [centreId, setCentreId] = useState<CentreId>('demo')
-  // Centres dont les blocs et les envois sont branches sur le calcul (Blocs,
-  // Grimpeurs, envois depuis la Carte) ; les autres n'ont que leur carte.
-  const donneesBranchees = CENTRES_BRANCHES.includes(centreId)
-  const atelier = useAtelier(compte.grimpeur, centreId)
+  const groupeCalcul = GROUPES_CALCUL.find((g) => g.includes(centreId))
+  const donneesBranchees = !!groupeCalcul
+  const atelier = useAtelier(compte.grimpeur, groupeCalcul ?? [centreId])
   const [panneauCompte, setPanneauCompte] = useState(false)
   // Retour du lien du courriel, premiere connexion : il manque le pseudonyme.
   // Ou retour du lien « mot de passe oublie » : il manque le nouveau mot de passe.
@@ -221,6 +226,8 @@ function Contenu() {
                 simplifie={!vueComplete}
                 onVoirBlocSurCarte={voirBlocSurCarte}
                 echelle={atelier.echelle}
+                salleParDefaut={centre.fr}
+                key={centreId}
               />
             )}
             {onglet === 'grimpeurs' && (

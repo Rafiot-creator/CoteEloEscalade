@@ -104,10 +104,13 @@ export interface Atelier {
 }
 
 /**
- * `centreId` : le centre dont les blocs et les ascensions sont lus et calcules
- * (les grimpeurs sont communs a tous). Changer de centre relit tout.
+ * `centres` : le groupe de centres calcules ensemble (un seul, ou Rose Bloc 1 et 2 :
+ * `GROUPES_CALCUL`, src/App.tsx) ; leurs blocs et leurs ascensions sont lus et calcules
+ * (les grimpeurs sont communs a tous). Changer de groupe relit tout ; passer de Rose Bloc 1 a 2, non.
  */
-export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null = null, centreId = 'demo'): Atelier {
+export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null = null, centres: string[] = ['demo']): Atelier {
+  // Cle stable pour les dependances des effets (un nouveau tableau a chaque rendu sinon).
+  const groupe = centres.join(',')
   const [datasetBase, setDatasetBase] = useState<Dataset | null>(null)
   const [generation, setGeneration] = useState(0)
   const [erreurEnvoi, setErreurEnvoi] = useState<string | null>(null)
@@ -127,11 +130,11 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
     setDatasetBase(null)
     setErreur(null)
     setReference(null)
-  }, [centreId])
+  }, [groupe])
 
   useEffect(() => {
     let vivant = true
-    chargerToutesLesSources(centreId)
+    chargerToutesLesSources(groupe.split(','))
       .then((fichiers) => {
         if (vivant) setDatasetBase(construireDataset(fichiers))
       })
@@ -141,7 +144,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
     void supabase
       .from('centres')
       .select('echelle')
-      .eq('id', centreId)
+      .eq('id', groupe.split(',')[0])
       .maybeSingle<{ echelle: Echelle }>()
       .then(({ data }) => {
         if (vivant) setEchelle(data?.echelle ?? 'v')
@@ -149,7 +152,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
     return () => {
       vivant = false
     }
-  }, [generation, centreId])
+  }, [generation, groupe])
 
   const recharger = useCallback(() => setGeneration((g) => g + 1), [])
 
@@ -173,7 +176,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
     }
     let dejaAbonne = false
     const canal = supabase
-      .channel(`atelier-${centreId}`)
+      .channel(`atelier-${groupe}`)
       .on<LigneAscension>('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ascensions' }, ({ new: l }) => {
         setDatasetBase((d) => {
           if (!d) return d
@@ -204,7 +207,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
           }
         })
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'blocs', filter: `centre_id=eq.${centreId}` }, relire)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'blocs', filter: `centre_id=in.(${groupe})` }, relire)
       .subscribe((statut) => {
         if (statut !== 'SUBSCRIBED') return
         // Le premier abonnement suit le chargement initial ; un suivant est
@@ -216,7 +219,7 @@ export function useAtelier(grimpeurConnecte: { id: string; nom: string } | null 
       if (relectureDiffere.current) clearTimeout(relectureDiffere.current)
       void supabase.removeChannel(canal)
     }
-  }, [recharger, centreId])
+  }, [recharger, groupe])
 
   // Les ascensions ajoutees depuis la Carte s'ajoutent a celles du fichier :
   // le pipeline ne voit qu'un seul dataset, coherent, trie chronologiquement.

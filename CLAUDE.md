@@ -664,10 +664,13 @@ période d'essai des nouveaux. Méthodes utiles découvertes en route :
 
 **Avant l'étape 5** (essai dans un vrai centre), à savoir : **fait le 2026-10-30 pour RB1 et
 RB2** — Blocs, Grimpeurs, envois depuis la Carte et temps réel suivent le centre choisi
-(`CENTRES_BRANCHES` dans `App.tsx`, `useAtelier(grimpeur, centreId)`, source Supabase filtrée
-par centre, ascensions par jointure sur `blocs`). Chaque centre a ses propres cotes ; les
-grimpeurs sont communs, mais la période d'essai (10 blocs) se compte par centre. Les autres
-centres du menu n'ont que leur carte. Un bloc sans assez de duels n'apparaît pas dans
+(`GROUPES_CALCUL` dans `App.tsx`, `useAtelier(grimpeur, centres)`, source Supabase filtrée
+par groupe, ascensions par jointure sur `blocs`). **Une cote par groupe de calcul** : RB1 et
+RB2 forment un seul groupe (cote commune, choix de Raphaël le 2026-10-30), la Démo un autre ;
+la période d'essai (10 blocs) se compte par groupe. L'écran Blocs présélectionne la salle
+choisie dans le menu (filtre de salle existant). **Pour les futurs centres, Raphaël veut
+appliquer les pistes du 18 septembre** (README, « uniformiser les cotes entre centres ») plutôt
+que d'empiler des groupes. Les autres centres du menu n'ont que leur carte. Un bloc sans assez de duels n'apparaît pas dans
 l'écran Blocs (`fiable`), comme sur la Démo. Limites connues restantes : glisser un
 bloc à la souris seulement (pas au doigt), pas d'écran pour nommer un ouvreur ni pour
 supprimer un compte (SQL dans le README), et au lancement tout le monde sera en période

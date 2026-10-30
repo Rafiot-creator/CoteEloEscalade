@@ -21,13 +21,13 @@ const PAQUET = 1000
  * Lit une table entiere, par paquets de 1000 lignes demandes en parallele.
  * `ordre` doit etre une colonne unique, sinon deux paquets pourraient se
  * chevaucher ou laisser un trou. `filtre` : ne garder que les lignes ou
- * cette colonne vaut cette valeur.
+ * cette colonne vaut cette valeur (ou l'une de ces valeurs).
  */
 export async function lireTable<T>(
   table: string,
   colonnes: string,
   ordre: string,
-  filtre?: { colonne: string; valeur: string },
+  filtre?: { colonne: string; valeur: string | string[] },
   jointure?: string
 ): Promise<T[]> {
   // `jointure` (ex. 'blocs!inner(centre_id)') permet de filtrer sur une
@@ -35,7 +35,8 @@ export async function lireTable<T>(
   // doit figurer aussi dans le comptage, sinon il compterait toute la table.
   const requete = (select: string, options?: { count: 'exact'; head: true }) => {
     const q = supabase.from(table).select(jointure ? `${select},${jointure}` : select, options)
-    return filtre ? q.eq(filtre.colonne, filtre.valeur) : q
+    if (!filtre) return q
+    return Array.isArray(filtre.valeur) ? q.in(filtre.colonne, filtre.valeur) : q.eq(filtre.colonne, filtre.valeur)
   }
   const { count, error } = await requete(ordre, { count: 'exact', head: true })
   if (error) throw new Error(`Lecture de ${table} impossible : ${error.message}`)
