@@ -39,7 +39,7 @@ rejetées). Ne pas ré-expliquer ce qui y est déjà écrit.**
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test                # 71 tests sur le cœur de calcul
+npm test                # 74 tests sur le cœur de calcul
 npm run build           # site statique dans dist/
 npm run data:generate   # régénère le jeu de données de démonstration
 ```
@@ -646,6 +646,11 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   si `centres.comp_wall`. Pastille en étoile noire, numéro blanc (`FondEtoile`,
   `VueCarte.tsx`) ; « ★12 » dans Blocs, Administration et le popup ; colonne Calculée en
   1-15 / V comme les autres. Numéro déjà pris : avertissement, pas refus (remontages).
+- **Blocs spéciaux de RB1, 2026-10-31** : non cotés, pastille de leur couleur avec un « S »,
+  case dans l'éditeur (si `centres.blocs_speciaux`), `blocs.special`, cotation stockée V8.
+  Calcul : gelés pour les grimpeurs tant que moins de 20 grimpeurs hors essai
+  (`duelsGelesPourGrimpeurs`, `src/core/formulas/lib.ts`), rétroactif ensuite ; exclus de
+  l'étalonnage, des verdicts, du « plus dur envoyé » et des amorces des nouveaux.
 - Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
   l'accord de Rose Bloc pour un essai (étape 5).
 

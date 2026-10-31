@@ -33,6 +33,13 @@ export interface Bloc {
   /** Un bloc en salle a une duree de vie : les ouvertures tournent. */
   dateOuverture: string
   dateRetrait: string | null
+  /**
+   * Bloc special (Rose Bloc 1) : pas coté par l'ouvreur. Sa cotation officielle
+   * (V8) n'est qu'une amorce : elle n'entre ni dans l'etalonnage, ni dans les
+   * verdicts, ni dans le « plus dur envoye ». Tant qu'il n'est pas stabilise,
+   * il ne deplace la cote d'aucun grimpeur (`duelsGelesPourGrimpeurs`).
+   */
+  special?: boolean
 }
 
 /**

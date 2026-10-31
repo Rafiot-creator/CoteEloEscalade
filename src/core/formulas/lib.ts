@@ -291,7 +291,8 @@ export function amorcesGrimpeurs(
     const liste = premiersBlocs.get(d.grimpeurId) ?? []
     if (liste.length >= fenetre) continue
     const bloc = dataset.blocParId.get(d.blocId)
-    if (bloc) liste.push(bloc.indexOfficiel)
+    // La cotation d'un bloc special n'est qu'une amorce, pas un niveau.
+    if (bloc && !bloc.special) liste.push(bloc.indexOfficiel)
     premiersBlocs.set(d.grimpeurId, liste)
   }
 
@@ -362,6 +363,35 @@ export function duelsProvisoires(duels: Duel[], periode: number): Set<Duel> {
   return provisoires
 }
 
+// --- Blocs speciaux ---------------------------------------------------------
+
+/**
+ * Nombre de grimpeurs differents (duels qui comptent pour le bloc, donc hors
+ * periode d'essai) au-dela duquel la cote d'un bloc special est jugee
+ * stabilisee. Choix de Raphael (2026-10-31), voir DECISIONS.md.
+ */
+export const DUELS_STABILISATION_SPECIAL = 20
+
+/**
+ * Duels sur un bloc special pas encore stabilise : le bloc en apprend, la cote
+ * du grimpeur n'en bouge pas. Le compte porte sur tout l'historique, donc
+ * l'effet est retroactif : des que le bloc atteint le seuil, tous ses duels
+ * comptent pour les grimpeurs, y compris ceux des premiers.
+ */
+export function duelsGelesPourGrimpeurs(dataset: Dataset, duels: Duel[], provisoires: Set<Duel>): Set<Duel> {
+  const speciaux = new Set(dataset.blocs.filter((b) => b.special).map((b) => b.id))
+  const geles = new Set<Duel>()
+  if (!speciaux.size) return geles
+  const n = new Map<string, number>()
+  for (const d of duels) {
+    if (speciaux.has(d.blocId) && !provisoires.has(d)) n.set(d.blocId, (n.get(d.blocId) ?? 0) + 1)
+  }
+  for (const d of duels) {
+    if (speciaux.has(d.blocId) && (n.get(d.blocId) ?? 0) < DUELS_STABILISATION_SPECIAL) geles.add(d)
+  }
+  return geles
+}
+
 // --- Moteur Elo -------------------------------------------------------------
 
 export interface OptionsElo {
@@ -403,6 +433,11 @@ export interface OptionsElo {
    */
   provisoires?: Set<Duel>
   kNouveaux?: number
+  /**
+   * Duels sur un bloc special pas encore stabilise (`duelsGelesPourGrimpeurs`) :
+   * le bloc bouge, le grimpeur non (ni sa cote, ni ses effectifs).
+   */
+  geles?: Set<Duel>
   /**
    * Suivi en parallele du cote grimpeur, sans aucune influence sur le calcul :
    * ni sur `eg.rating`/`eb.rating`, ni sur les autres formules qui n'y passent
@@ -519,7 +554,8 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
       const kg = kEffectif(o.k, o.kMin, o.kDemiVie, eg.matchs) * (provisoire ? (o.kNouveaux ?? 1) : 1)
       const kb = kEffectif(o.k, o.kMin, o.kDemiVie, eb.matchs)
       const delta = score - attendu
-      const dg = kg * delta
+      const gele = o.geles?.has(d) ?? false
+      const dg = gele ? 0 : kg * delta
       const db = provisoire ? 0 : -kb * delta
 
       eg.rating += dg
@@ -532,13 +568,15 @@ export function moteurElo(dataset: Dataset, o: OptionsElo): SortieFormule {
       // amorce. C'est plus honnete que de le presenter comme bien documente.
       if (passe === 1 && !comptes.has(cle)) {
         comptes.add(cle)
-        eg.matchs += 1
-        if (d.gagne) eg.reussites += 1
+        if (!gele) {
+          eg.matchs += 1
+          if (d.gagne) eg.reussites += 1
+          o.observateurGrimpeur?.compte(d)
+        }
         if (!provisoire) {
           eb.matchs += 1
           if (d.gagne) eb.reussites += 1
         }
-        o.observateurGrimpeur?.compte(d)
       }
 
       deplacement += Math.abs(dg)

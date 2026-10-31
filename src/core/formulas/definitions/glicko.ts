@@ -7,6 +7,7 @@ import {
   amorcesGrimpeurs,
   construireDuels,
   diagnosticDuels,
+  duelsGelesPourGrimpeurs,
   duelsProvisoires,
   etatVide,
   fenetreAmorce,
@@ -306,6 +307,7 @@ const formule: Formule = {
     }
     const periode = p.periodeProvisoire as number
     const provisoires = duelsProvisoires(retenus, periode)
+    const geles = duelsGelesPourGrimpeurs(dataset, retenus, provisoires)
     const amorces = amorcesGrimpeurs(
       dataset,
       retenus,
@@ -398,6 +400,8 @@ const formule: Formule = {
           const eg = grimpeurs.get(d.grimpeurId)
           const eb = blocs.get(d.blocId)
           if (!eg || !eb) continue
+          // Bloc special pas encore stabilise : le grimpeur n'en apprend rien.
+          if (geles.has(d)) continue
           if (jouedAvance(eg.rating - eb.rating, d.gagne)) {
             if (dernierePasse) negliges += 1
             continue

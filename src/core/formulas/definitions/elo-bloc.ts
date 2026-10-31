@@ -6,6 +6,7 @@ import {
   amorcesGrimpeurs,
   construireDuels,
   diagnosticDuels,
+  duelsGelesPourGrimpeurs,
   duelsProvisoires,
   etatVide,
   fenetreAmorce,
@@ -280,6 +281,7 @@ const formule: Formule = {
 
     const affrontements = construireDuels(dataset.ascensions)
     const periode = p.periodeProvisoire as number
+    const provisoires = duelsProvisoires(affrontements.duels, periode)
     const amorces = amorcesGrimpeurs(
       dataset,
       affrontements.duels,
@@ -327,8 +329,9 @@ const formule: Formule = {
       amorce: p.amorce as string,
       ptsParCran: p.ptsParCran as number,
       score,
-      provisoires: duelsProvisoires(affrontements.duels, periode),
+      provisoires,
       kNouveaux: p.kNouveaux as number,
+      geles: duelsGelesPourGrimpeurs(dataset, affrontements.duels, provisoires),
       observateurGrimpeur,
     })
 

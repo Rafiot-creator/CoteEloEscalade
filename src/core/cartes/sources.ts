@@ -7,6 +7,7 @@ interface LigneCentre {
   taille_pastilles: number
   echelle: Echelle
   comp_wall: boolean
+  blocs_speciaux: boolean
 }
 interface LigneBloc {
   id: string
@@ -16,6 +17,7 @@ interface LigneBloc {
   cotation_officielle: string
   couleur: string
   secteur: string
+  special: boolean
 }
 
 /**
@@ -28,10 +30,10 @@ export const carteSupabase: CarteProvider = {
   id: 'supabase',
   async charger(centreId) {
     const [centre, blocs] = await Promise.all([
-      supabase.from('centres').select('fond, taille_pastilles, echelle, comp_wall').eq('id', centreId).maybeSingle<LigneCentre>(),
+      supabase.from('centres').select('fond, taille_pastilles, echelle, comp_wall, blocs_speciaux').eq('id', centreId).maybeSingle<LigneCentre>(),
       supabase
         .from('blocs')
-        .select('id, nom, x, y, cotation_officielle, couleur, secteur')
+        .select('id, nom, x, y, cotation_officielle, couleur, secteur, special')
         .eq('centre_id', centreId)
         .not('x', 'is', null)
         .order('id')
@@ -45,6 +47,7 @@ export const carteSupabase: CarteProvider = {
       ...(centre.data.taille_pastilles !== 1 ? { taillePastilles: centre.data.taille_pastilles } : {}),
       ...(centre.data.echelle !== 'v' ? { echelle: centre.data.echelle } : {}),
       ...(centre.data.comp_wall ? { compWall: true } : {}),
+      ...(centre.data.blocs_speciaux ? { blocsSpeciaux: true } : {}),
       blocs: (blocs.data ?? []).map((b) => ({
         id: b.id,
         nom: b.nom,
@@ -55,6 +58,7 @@ export const carteSupabase: CarteProvider = {
         // carte attend l'identifiant de PALETTE_COULEURS ('rouge').
         couleur: b.couleur.toLowerCase(),
         style: b.secteur,
+        ...(b.special ? { special: true } : {}),
       })),
     }
   },
@@ -68,7 +72,7 @@ export const carteSupabase: CarteProvider = {
  * ou null.
  */
 function champsBloc(b: Omit<BlocCarte, 'id'>) {
-  return { x: b.x, y: b.y, cotation: b.cotation, couleur: b.couleur, secteur: b.style, nom: b.nom ?? '' }
+  return { x: b.x, y: b.y, cotation: b.cotation, couleur: b.couleur, secteur: b.style, nom: b.nom ?? '', special: !!b.special }
 }
 
 export async function placerBloc(centreId: string, b: Omit<BlocCarte, 'id'>): Promise<{ id: string } | { erreur: string }> {

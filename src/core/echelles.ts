@@ -79,11 +79,16 @@ export function numeroPastille(cotation: string, echelle: Echelle): string {
   return depuisCotationV(cotation, echelle).replace(/^V/i, '')
 }
 
+/** Ce qu'affiche un bloc special (non cote) a la place de sa cote. */
+export const LIBELLE_SPECIAL = 'S'
+
 /**
  * Cote affichee d'un bloc en toutes lettres, dans l'echelle de son centre, ou
- * precedee d'une etoile pour un bloc du Comp Wall ('★12').
+ * precedee d'une etoile pour un bloc du Comp Wall ('★12'), ou 'S' pour un bloc
+ * special (non cote).
  */
-export function libelleCote(cotation: string, couleur: string, echelleCentre: Echelle): string {
+export function libelleCote(cotation: string, couleur: string, echelleCentre: Echelle, special = false): string {
+  if (special) return LIBELLE_SPECIAL
   const echelle = echelleDuBloc(couleur, echelleCentre)
   const etiquette = depuisCotationV(cotation, echelle)
   return echelle === 'comp-wall' ? `★${etiquette}` : etiquette

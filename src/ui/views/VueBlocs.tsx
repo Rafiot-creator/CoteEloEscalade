@@ -88,7 +88,7 @@ export function VueBlocs({
     for (const c of juresIndependants) {
       const seuil = resultats.get(c.formule.id)?.seuilDesaccord ?? SEUIL_DESACCORD
       for (const [id, b] of c.parBloc) {
-        const compte = b.fiable && Math.abs(b.ecart) >= seuil ? 1 : 0
+        const compte = b.fiable && !b.special && Math.abs(b.ecart) >= seuil ? 1 : 0
         m.set(id, (m.get(id) ?? 0) + compte)
       }
     }
@@ -100,10 +100,13 @@ export function VueBlocs({
   const signale = (b: LigneBloc) => (avisParBloc.get(b.id) ?? 0) > 0
   const affiches = seulsDesaccords ? audites.filter(signale) : audites
 
-  const sousCotes = audites.filter((b) => signale(b) && b.ecart > 0)
-  const surCotes = audites.filter((b) => signale(b) && b.ecart < 0)
-  const confirmes = audites.filter((b) => (avisParBloc.get(b.id) ?? 0) >= nbFormules && nbFormules > 1)
-  const ecarts = audites.map((b) => b.ecart)
+  // Les blocs speciaux (non cotes) sont listes, mais leur cotation affichee
+  // est fictive : ils n'entrent dans aucune statistique d'ecart.
+  const juges = audites.filter((b) => !b.special)
+  const sousCotes = juges.filter((b) => signale(b) && b.ecart > 0)
+  const surCotes = juges.filter((b) => signale(b) && b.ecart < 0)
+  const confirmes = juges.filter((b) => (avisParBloc.get(b.id) ?? 0) >= nbFormules && nbFormules > 1)
+  const ecarts = juges.map((b) => b.ecart)
   const ecartMedianAbs = mediane(ecarts.map(Math.abs))
 
   /** L'incertitude vient de la formule qui en produit une, quelle qu'elle soit. */
@@ -163,7 +166,7 @@ export function VueBlocs({
     {
       cle: 'officielle',
       titre: t('Affichée', 'Displayed'),
-      valeur: (b) => (maison ? libelleCote(b.cotationOfficielle, b.couleur, echelle) : b.cotationOfficielle),
+      valeur: (b) => (maison ? libelleCote(b.cotationOfficielle, b.couleur, echelle, b.special) : b.cotationOfficielle),
       // Un bloc du Comp Wall garde son numero etoile, sans cercle : ce n'est
       // pas une cote du gym.
       rendu: maison
@@ -171,7 +174,7 @@ export function VueBlocs({
             echelleDuBloc(b.couleur, echelle) === 'comp-wall' ? (
               libelleCote(b.cotationOfficielle, b.couleur, echelle)
             ) : (
-              <PastilleCote>{libelleCote(b.cotationOfficielle, b.couleur, echelle)}</PastilleCote>
+              <PastilleCote>{libelleCote(b.cotationOfficielle, b.couleur, echelle, b.special)}</PastilleCote>
             )
         : undefined,
       tri: (b) => b.indexOfficiel,
@@ -235,8 +238,9 @@ export function VueBlocs({
         'Calculated grade minus displayed grade, in V grades. Positive: the boulder resists more than its tag suggests. Negative: it is easier than announced.'
       ),
       valeur: (b) => b.ecart,
-      tri: (b) => b.ecart,
-      rendu: (b) => <Ecart valeur={b.ecart} />,
+      // Bloc special : pas de cotation affichee, donc pas d'ecart (en bas du tri).
+      tri: (b) => (b.special ? Number.NEGATIVE_INFINITY : b.ecart),
+      rendu: (b) => (b.special ? <span className="discret">—</span> : <Ecart valeur={b.ecart} />),
     },
     ...(nbFormules > 1
       ? [
@@ -250,6 +254,7 @@ export function VueBlocs({
             ),
             valeur: (b: LigneBloc) => avisParBloc.get(b.id) ?? 0,
             rendu: (b: LigneBloc) => {
+              if (b.special) return <span className="discret">{t('non coté', 'ungraded')}</span>
               const n = avisParBloc.get(b.id) ?? 0
               // Un bloc affiche ici est jugeable par toutes les formules, donc
               // aucune ne s'abstient : zero voix veut dire qu'elles confirment
@@ -390,12 +395,12 @@ export function VueBlocs({
           note={
             nbFormules > 1
               ? t(
-                  `sur ${nombre(audites.length)} blocs exploitables, signalés par au moins une des ${nbFormules} formules — dont ${nombre(confirmes.length)} par les deux`,
-                  `out of ${nombre(audites.length)} ratable boulders, flagged by at least one of the ${nbFormules} formulas — ${nombre(confirmes.length)} of them by both`
+                  `sur ${nombre(juges.length)} blocs exploitables, signalés par au moins une des ${nbFormules} formules — dont ${nombre(confirmes.length)} par les deux`,
+                  `out of ${nombre(juges.length)} ratable boulders, flagged by at least one of the ${nbFormules} formulas — ${nombre(confirmes.length)} of them by both`
                 )
               : t(
-                  `sur ${nombre(audites.length)} blocs exploitables — au moins ${nombre(SEUIL_DESACCORD, 2)} cote V d'écart`,
-                  `out of ${nombre(audites.length)} ratable boulders — at least ${nombre(SEUIL_DESACCORD, 2)} V grade of gap`
+                  `sur ${nombre(juges.length)} blocs exploitables — au moins ${nombre(SEUIL_DESACCORD, 2)} cote V d'écart`,
+                  `out of ${nombre(juges.length)} ratable boulders — at least ${nombre(SEUIL_DESACCORD, 2)} V grade of gap`
                 )
           }
         />
@@ -451,7 +456,7 @@ export function VueBlocs({
             />
           ) : (
             <Nuage
-              points={affiches.map((b) => ({
+              points={affiches.filter((b) => !b.special).map((b) => ({
                 cle: b.id,
                 nom: b.nom,
                 lieu: plusieursSalles ? `${b.gym} · ${b.secteur} · ${b.couleur}` : `${b.secteur} · ${b.couleur}`,

@@ -27,6 +27,11 @@ export interface BlocCarte {
   couleur: string
   /** Style du bloc (`STYLES_BLOC` : Physique, Technique, Coordo), ou vide. */
   style: string
+  /**
+   * Bloc special, non cote (Rose Bloc 1) : pastille de sa couleur avec un « S »,
+   * cotation stockee V8 (simple amorce). Voir `Bloc.special` (src/core/types.ts).
+   */
+  special?: boolean
 }
 
 export interface Carte {
@@ -48,6 +53,8 @@ export interface Carte {
    * couleur speciale `COULEUR_COMP_WALL` (pastille en etoile, numeros 1 a 24).
    */
   compWall?: boolean
+  /** Le centre a des blocs speciaux non cotes (Rose Bloc 1) : l'editeur propose l'option. */
+  blocsSpeciaux?: boolean
   blocs: BlocCarte[]
 }
 

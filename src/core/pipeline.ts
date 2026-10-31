@@ -46,6 +46,11 @@ export interface LigneBloc {
   /** Positif = plus dur que sa cotation. Negatif = plus facile. */
   ecart: number
   fiable: boolean
+  /**
+   * Bloc special, non cote (cf. `Bloc.special`) : sa cotation officielle est
+   * fictive, donc ni ecart ni verdict ne veulent rien dire pour lui.
+   */
+  special: boolean
 }
 
 export interface LigneGrimpeur {
@@ -163,7 +168,8 @@ export function executer(
   const pointsCalibrage: PointCalibrage[] = []
   for (const b of dataset.blocs) {
     const e = sortie.blocs.get(b.id)
-    if (e && e.matchs >= minMatchs) pointsCalibrage.push({ rating: e.rating, indexOfficiel: b.indexOfficiel })
+    // Un bloc special n'a pas de vraie cotation a laquelle s'etalonner.
+    if (e && e.matchs >= minMatchs && !b.special) pointsCalibrage.push({ rating: e.rating, indexOfficiel: b.indexOfficiel })
   }
   const calibrage = calibrer(pointsCalibrage, pc)
 
@@ -191,6 +197,7 @@ export function executer(
       cotationCalculee: cotationDIndex(indexCalcule),
       ecart: indexCalcule - b.indexOfficiel,
       fiable: (e?.matchs ?? 0) >= minMatchs,
+      special: !!b.special,
     }
   })
 
@@ -210,7 +217,8 @@ export function executer(
     gymsParGrimpeur.get(a.grimpeurId)!.add(b.gym)
     if (!blocsTentes.has(a.grimpeurId)) blocsTentes.set(a.grimpeurId, new Set())
     blocsTentes.get(a.grimpeurId)!.add(a.blocId)
-    if (a.resultat !== 'reussite') continue
+    // Envoyer un bloc special ne dit pas quelle cote on a envoyee.
+    if (a.resultat !== 'reussite' || b.special) continue
     const courant = meilleure.get(a.grimpeurId)
     if (courant === undefined || b.indexOfficiel > courant) meilleure.set(a.grimpeurId, b.indexOfficiel)
     if (estStyleConnu(b.secteur)) {
@@ -261,7 +269,7 @@ export function executer(
     }))
 
   // --- Resume -----------------------------------------------------------------
-  const audites = blocs.filter((b) => b.fiable)
+  const audites = blocs.filter((b) => b.fiable && !b.special)
   const reussitesTotal = dataset.ascensions.filter((a) => a.resultat === 'reussite').length
   const duels = new Set(dataset.ascensions.map((a) => a.grimpeurId + '|' + a.blocId)).size
   const duelsComptes = blocs.reduce((s, b) => s + b.matchs, 0)

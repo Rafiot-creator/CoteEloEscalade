@@ -4,6 +4,7 @@ import { cotationDIndex, ecartEnCrans, formaterIndex, indexDeCotation } from './
 import { depuisCotationV, echelleDuBloc, etiquettesEchelle, libelleCote, numeroPastille, versCotationV } from './echelles'
 import {
   ECHELLE_REFERENCE,
+  DUELS_STABILISATION_SPECIAL,
   amorceBloc,
   amorcesGrimpeurs,
   fenetreAmorce,
@@ -789,4 +790,65 @@ describe("periode d'essai des nouveaux grimpeurs", () => {
       sans.blocs.find((x) => x.id === onzieme.id)!.rating
     )
   }, 60_000)
+})
+
+describe('blocs speciaux (non cotes)', () => {
+  /** Le jeu livre, plus un bloc special essaye par `n` grimpeurs a la fin de l'historique. */
+  async function avecSpecial(n: number): Promise<Dataset> {
+    const ds = await dataset()
+    const fin = ds.ascensions[ds.ascensions.length - 1]
+    const special: Bloc = {
+      id: 'special',
+      nom: 'Special',
+      gym: ds.blocs[0].gym,
+      secteur: '',
+      couleur: 'Rose',
+      cotationOfficielle: 'V8',
+      indexOfficiel: 8,
+      dateOuverture: fin.date,
+      dateRetrait: null,
+      special: true,
+    }
+    const essais: Ascension[] = ds.grimpeurs.slice(0, n).map((g, i) => ({
+      ...fin,
+      grimpeurId: g.id,
+      blocId: 'special',
+      resultat: i % 2 ? 'echec' : 'reussite',
+      essais: 1,
+    }))
+    return {
+      ...ds,
+      blocs: [...ds.blocs, special],
+      ascensions: [...ds.ascensions, ...essais],
+      blocParId: new Map([...ds.blocParId, ['special', special]]),
+    }
+  }
+
+  for (const id of ['elo-bloc', 'glicko']) {
+    it(`${id} : ne deplace aucun grimpeur avant ${DUELS_STABILISATION_SPECIAL} grimpeurs, mais apprend`, async () => {
+      const f = FORMULES.find((x) => x.id === id)!
+      const params = paramsParDefaut(f.params)
+      const base = f.calculer(await dataset(), params)
+      const gele = f.calculer(await avecSpecial(DUELS_STABILISATION_SPECIAL - 1), params)
+      for (const [gid, e] of base.grimpeurs) expect(gele.grimpeurs.get(gid)!.rating).toBe(e.rating)
+      expect(gele.blocs.get('special')!.rating).not.toBe(8000)
+
+      const stabilise = f.calculer(await avecSpecial(DUELS_STABILISATION_SPECIAL), params)
+      const bouges = [...base.grimpeurs].filter(([gid, e]) => stabilise.grimpeurs.get(gid)!.rating !== e.rating)
+      expect(bouges.length).toBeGreaterThan(0)
+    })
+  }
+
+  it("n'entre ni dans l'etalonnage, ni dans les verdicts, ni dans le plus dur envoye", async () => {
+    const f = FORMULES.find((x) => x.id === 'elo-bloc')!
+    const base = executer(await dataset(), f, paramsParDefaut(f.params), {})
+    const avec = executer(await avecSpecial(30), f, paramsParDefaut(f.params), {})
+    const ligneSpeciale = avec.blocs.find((b) => b.id === 'special')!
+    expect(ligneSpeciale.special).toBe(true)
+    expect(ligneSpeciale.fiable).toBe(true)
+    expect(avec.resume.blocsAudites).toBe(base.resume.blocsAudites)
+    for (const g of base.grimpeurs) {
+      expect(avec.grimpeurs.find((x) => x.id === g.id)!.meilleureCotation).toBe(g.meilleureCotation)
+    }
+  })
 })

@@ -20,7 +20,7 @@ const tables = (centres: string[]) => [
     nom: 'blocs.csv',
     table: 'blocs',
     ordre: 'id',
-    colonnes: ['id', 'nom', 'gym', 'secteur', 'couleur', 'cotation_officielle', 'date_ouverture', 'date_retrait'],
+    colonnes: ['id', 'nom', 'gym', 'secteur', 'couleur', 'cotation_officielle', 'date_ouverture', 'date_retrait', 'special'],
     filtre: { colonne: 'centre_id', valeur: centres },
   },
   {

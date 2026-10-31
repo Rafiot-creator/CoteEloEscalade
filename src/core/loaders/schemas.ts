@@ -46,6 +46,8 @@ export const schemaBloc = z
     date_ouverture: dateIso.optional().default('1970-01-01'),
     // Un bloc encore en place n'a pas de date de retrait.
     date_retrait: z.union([dateIso, z.literal('')]).optional().default(''),
+    // Colonne de la base seulement (blocs speciaux) : absente des CSV de la Demo.
+    special: z.enum(['true', 'false', '']).optional().default(''),
   })
   .transform((r) => ({
     id: r.id,
@@ -57,6 +59,7 @@ export const schemaBloc = z
     indexOfficiel: indexDeCotation(r.cotation_officielle) as number,
     dateOuverture: r.date_ouverture,
     dateRetrait: r.date_retrait === '' ? null : r.date_retrait,
+    ...(r.special === 'true' ? { special: true } : {}),
   }))
 
 export const schemaAscension = z

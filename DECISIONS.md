@@ -204,6 +204,20 @@ chaque fonction revérifie le droit (`verifier_admin`). Né d'un cas réel : un 
 gardait son flash dans la fiche de Raphaël, et « Démonter » garde volontairement l'historique
 d'un bloc grimpé.
 
+**Les blocs spéciaux de RB1 n'ont pas de cote d'ouvreur** : amorce à 8000 (choix de Raphaël)
+et aucun effet sur les grimpeurs tant que 20 grimpeurs ne les ont pas essayés. Sans ce gel,
+un bloc parti de 8000 mais valant V3 ferait gagner beaucoup de points à ses premiers
+envoyeurs. Vingt *grimpeurs différents* (des duels) plutôt que vingt essais : vingt essais d'une
+seule personne n'apprennent presque rien sur le bloc. Les grimpeurs en période d'essai ne
+comptent pas, puisque leurs duels ne déplacent pas les blocs. **Rétroactif** (choix de Raphaël,
+sur recommandation) : le seuil est compté sur tout l'historique, donc une fois atteint, les
+duels des premiers comptent aussi, contre la cote stabilisée ; non rétroactif, les premiers à
+oser le bloc n'en auraient jamais tiré de points. Prix : la cote de ces premiers bouge un peu
+le jour où le bloc passe le seuil. Le V8 étant fictif, le bloc est écarté de tout ce qui prend
+la cotation affichée pour une référence (étalonnage, verdicts, « plus dur envoyé », niveau de
+départ estimé). Marqué par un drapeau à part et non par la couleur (comme le Comp Wall), parce
+que ces blocs ont une vraie couleur de prises.
+
 ---
 
 ## 3. Détecter les blocs mal cotés

@@ -1244,6 +1244,21 @@ Blocs, Administration) ; la colonne Calculée reste en 1-15 / V pour comparer av
 blocs. Un numéro déjà porté par un autre bloc du Comp Wall affiche un avertissement, pas un
 refus (pendant un remontage, l'ancien et le nouveau coexistent).
 
+**Blocs spéciaux de Rose Bloc 1** — *faits le 31 octobre 2026.* Des blocs que l'ouvreur ne cote
+pas. Ils gardent leur couleur de prises : la pastille montre un « S » à la place du chiffre
+(« S » aussi dans le popup, la colonne Affichée de Blocs et Administration). Marqués par une
+case « Bloc spécial (non coté) » dans l'éditeur, proposée seulement si
+`centres.blocs_speciaux` (RB1) ; colonne `blocs.special`, et `placer_bloc`/`modifier_bloc`
+enregistrent alors toujours V8 (`supabase/migrations/20261031000200_blocs_speciaux.sql`).
+Calcul : amorce à 8000 ; tant que moins de 20 grimpeurs (hors période d'essai,
+`DUELS_STABILISATION_SPECIAL`) l'ont essayé, le bloc apprend de chacun mais ne déplace la cote
+d'aucun grimpeur (`duelsGelesPourGrimpeurs`, Elo et Glicko) ; dès le 20e, toutes ses
+ascensions comptent, y compris celles des premiers (rétroactif, le site recalculant tout à
+chaque chargement). Son V8 fictif n'entre ni dans l'étalonnage, ni dans les verdicts et
+statistiques d'écart, ni dans le « plus dur envoyé », ni dans l'estimation du niveau de
+départ d'un nouveau. Testé : avec 19 grimpeurs, aucune cote de grimpeur ne change, le bloc si ;
+avec 20, elles bougent (`core.test.ts`, « blocs speciaux »).
+
 **Rôles prévus.** Visiteur (lecture), grimpeur (ses propres envois), admin d'un centre (les blocs
 et les résultats de ce centre), admin général (Raphaël). Le calcul des cotes reste dans le
 navigateur : il lit toutes les ascensions, qui doivent donc rester lisibles par tous. Ce qui
@@ -2050,3 +2065,7 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   Chrome : menu de Grimpeurs, cote par style, Carte Démo, aucun avertissement de style.
   `20261029000100_donnees_demo.sql` garde les anciens styles (une migration appliquée ne se
   modifie pas) ; la nouvelle migration les remplace juste après.
+- **Blocs spéciaux de Rose Bloc 1** (non cotés) : pastille de leur couleur avec un « S »,
+  amorce à 8000, sans effet sur la cote des grimpeurs avant 20 grimpeurs (puis rétroactif).
+  Détail dans « Base de données et multi-utilisateur (en cours) » ; pourquoi dans
+  `DECISIONS.md`.

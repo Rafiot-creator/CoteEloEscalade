@@ -4,10 +4,12 @@ import {
   depuisCotationV,
   echelleDuBloc,
   etiquettesEchelle,
+  LIBELLE_SPECIAL,
   libelleCote,
   numeroPastille,
   versCotationV,
 } from '../../core/echelles'
+import { DUELS_STABILISATION_SPECIAL } from '../../core/formulas/lib'
 import { chargerCarte, demonterBloc, modifierBloc, placerBloc } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import { STYLES_BLOC } from '../../core/stylesBloc'
@@ -740,7 +742,7 @@ export function VueCarte({
                         </span>
                       </>
                     ) : (
-                      numeroPastille(b.cotation, echelleCotes)
+                      b.special ? LIBELLE_SPECIAL : numeroPastille(b.cotation, echelleCotes)
                     )}
                   </div>
 
@@ -788,7 +790,7 @@ export function VueCarte({
                         transformOrigin: aGauche ? 'top right' : 'top left',
                       }}
                     >
-                      <div className="t">{b.nom || libelleCote(b.cotation, b.couleur, echelleCotes)}</div>
+                      <div className="t">{b.nom || libelleCote(b.cotation, b.couleur, echelleCotes, b.special)}</div>
                       <div className="l">
                         <span>{t('Statut', 'Status')}</span>
                         <b
@@ -812,7 +814,7 @@ export function VueCarte({
                       </div>
                       <div className="l">
                         <span>{t('Cotation', 'Grade')}</span>
-                        <b>{cote !== undefined ? `${libelleCote(b.cotation, b.couleur, echelleCotes)} (${nombre(cote)})` : libelleCote(b.cotation, b.couleur, echelleCotes)}</b>
+                        <b>{cote !== undefined ? `${libelleCote(b.cotation, b.couleur, echelleCotes, b.special)} (${nombre(cote)})` : libelleCote(b.cotation, b.couleur, echelleCotes, b.special)}</b>
                       </div>
                       <div className="l">
                         <span>{t('Couleur', 'Color')}</span>
@@ -953,6 +955,31 @@ export function VueCarte({
                 {blocSelectionne.couleur === COULEUR_COMP_WALL ? t('Numéro du Comp Wall', 'Comp Wall number') : t('Cotation', 'Grade')}
               </label>
             </div>
+            {(carte.blocsSpeciaux || blocSelectionne.special) && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '2px 0 6px' }}>
+                <input
+                  type="checkbox"
+                  checked={!!blocSelectionne.special}
+                  // La base enregistre V8 pour un bloc special ; en le
+                  // decochant, la cotation reste V8 jusqu'a ce qu'on en choisisse une.
+                  onChange={(e) =>
+                    modifierEtSauver(blocSelectionne, {
+                      special: e.currentTarget.checked,
+                      ...(e.currentTarget.checked ? { cotation: 'V8' } : {}),
+                    })
+                  }
+                />
+                {t('Bloc spécial (non coté)', 'Special boulder (ungraded)')}
+              </label>
+            )}
+            {blocSelectionne.special ? (
+              <p className="discret" style={{ margin: 0 }}>
+                {t(
+                  `Pastille « S ». Sa cote part de 8000 et ne touche la cote des grimpeurs qu'une fois essayé par ${DUELS_STABILISATION_SPECIAL} grimpeurs.`,
+                  `Shown as "S". Its rating starts at 8000 and only affects climbers' ratings once ${DUELS_STABILISATION_SPECIAL} climbers have tried it.`
+                )}
+              </p>
+            ) : (
             <select
               value={depuisCotationV(blocSelectionne.cotation, echelleDuBloc(blocSelectionne.couleur, echelleCotes))}
               onChange={(e) =>
@@ -967,6 +994,7 @@ export function VueCarte({
                 </option>
               ))}
             </select>
+            )}
             {blocSelectionne.couleur === COULEUR_COMP_WALL &&
               carte.blocs.some(
                 (o) => o.id !== blocSelectionne.id && o.couleur === COULEUR_COMP_WALL && o.cotation === blocSelectionne.cotation
