@@ -218,6 +218,19 @@ la cotation affichée pour une référence (étalonnage, verdicts, « plus dur e
 départ estimé). Marqué par un drapeau à part et non par la couleur (comme le Comp Wall), parce
 que ces blocs ont une vraie couleur de prises.
 
+**Glisser un bloc au doigt : un appui long d'une seconde** (proposé par Raphaël), plutôt qu'un
+glisser immédiat comme à la souris. Au doigt, le même geste sert déjà à faire défiler et
+zoomer la carte, ce dont Raphaël se sert en salle ; le délai sépare les deux sans rien retirer
+au tap (sélection). Rien n'est bloqué avant le déblocage : annuler un mouvement ferait
+abandonner à Chrome le défilement de tout le geste.
+
+**Les commentaires sont ouverts à tous, même sans compte**, parce qu'un problème de connexion
+fait justement partie de ce qu'on veut pouvoir signaler ; contre le spam, une limite de débit
+(par compte, et globale pour les visiteurs sans compte, que rien d'autre ne distingue côté
+base). Lus dans l'écran Administration, **sans courriel d'avertissement** (choix de Raphaël) :
+il faudrait une fonction côté serveur et le mot de passe d'application du Gmail du site. À
+reconsidérer si des messages restent sans réponse.
+
 ---
 
 ## 3. Détecter les blocs mal cotés

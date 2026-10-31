@@ -2093,3 +2093,7 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   vigueur le 31 octobre). Testé dans la base (transaction annulée) : champs invalides refusés,
   lecture refusée aux visiteurs, limite atteinte au 21e message anonyme, lecture et rangement
   par l'admin. Le glisser au doigt de la Carte a été confirmé par Raphaël sur son téléphone.
+- **Fin de session.** Tout ce qui précède a été testé par Raphaël sur le site en ligne. Il se dit
+  **prêt pour l'essai en salle** et entre les blocs de RB1 et RB2 sur place la semaine du
+  2 novembre 2026 (étape 5 de la base de données). Pourquoi des choix du jour : `DECISIONS.md`,
+  « Les échelles maison et les centres Rose Bloc ».
