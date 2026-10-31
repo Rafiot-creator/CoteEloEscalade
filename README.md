@@ -2121,3 +2121,17 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   `gym_principal`, préselection limitée aux centres branchés, niveau plafonné à V12, dernier
   centre et onglet retenus par appareil) : `DECISIONS.md`, « Les échelles maison et les
   centres Rose Bloc ».
+- **Tri des tableaux retenu**, signalé par Raphaël : trier Blocs par Calculée, changer d'onglet
+  puis revenir rendait l'ordre de départ (l'écran est démonté à chaque changement d'onglet).
+  Chaque tableau garde désormais son tri dans le navigateur, entre onglets et au
+  rafraîchissement, jusqu'à ce qu'on clique sur un autre en-tête : prop `memoire` de
+  `Tableau` (`src/ui/components/Tableau.tsx`), clés `cee-tri-<nom>` (`blocs`, `blocs-nuage`,
+  `blocs-classes`, `grimpeurs`, `progression`, `donnees`, `administration`), aides dans
+  `src/ui/memoire.ts`. Le classement de Grimpeurs, dont le tri est piloté depuis l'écran, retient
+  aussi le style choisi dans le menu de la colonne de cote (`cee-style-grimpeurs`), sans quoi le
+  tri par style aurait survécu à un aller-retour mais pas le style lui-même. Un tri retenu sur une
+  colonne absente (Écart ou Duels utiles, masquées en vue visiteur) retombe sur le tri par défaut
+  du tableau. **Tri par défaut de Blocs** : Calculée, du plus dur au plus facile, dans les deux
+  vues (auparavant Écart en accès complet, nom en vue visiteur), demandé par Raphaël. Politique
+  de confidentialité complétée (« Sur votre appareil »). Vérifié dans Chrome sans interface sur
+  le site compilé (aller-retour d'onglets et rafraîchissement, Blocs et Grimpeurs).

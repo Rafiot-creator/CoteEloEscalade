@@ -723,6 +723,12 @@ au rafraîchissement ; centre principal et flash en cote Rose Bloc (testé sur R
 salle** : il entre les blocs de RB1 et RB2 sur place la semaine du 2 novembre. À la reprise,
 lui demander d'abord comment s'est passée cette saisie, et ce qu'il y a dans les commentaires.
 
+**Tri des tableaux retenu, 2026-10-31** (commits `3924f33`, `9192504`, déploiement vérifié
+vert) : chaque tableau garde son tri entre onglets et au rafraîchissement (prop `memoire` de
+`Tableau`, `src/ui/memoire.ts`), ainsi que le style choisi dans le classement de Grimpeurs.
+Blocs se trie par défaut par Calculée, du plus dur au plus facile. Vérifié dans Chrome sans
+interface ; pas encore testé par Raphaël sur le site en ligne.
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son

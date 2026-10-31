@@ -235,6 +235,15 @@ reconsidérer si des messages restent sans réponse.
 c'est une commodité d'affichage, utile aussi sans compte, et propre à chaque appareil (on ne
 regarde pas forcément le même centre au téléphone en salle et à l'ordinateur).
 
+**Le tri des tableaux est retenu de la même façon** (navigateur, par appareil), tableau par
+tableau, et non un seul tri partagé : les colonnes diffèrent d'un tableau à l'autre. Il est
+retenu au clic, pas seulement le temps de la visite : changer d'onglet démonte l'écran, garder
+le tri en mémoire de la page seule n'aurait pas survécu au rafraîchissement, que Raphaël
+attendait aussi (« tant que l'utilisateur n'a pas demandé autre chose »). Le style choisi dans
+le classement de Grimpeurs suit le même chemin, puisqu'il fait partie du tri. Par défaut,
+Blocs se trie par **Calculée décroissante**, pour tout le monde : c'est la question qu'on se pose
+d'abord devant la liste (quels sont les plus durs), l'écart restant à un clic en accès complet.
+
 **Le centre principal demandé à l'inscription va dans `grimpeurs.gym_principal`**, champ qui
 existait déjà et que la colonne « Salle » des classements affiche : pas de nouvelle colonne,
 mais une donnée publique, ce que le formulaire et la politique de confidentialité annoncent. Il
