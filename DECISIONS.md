@@ -244,6 +244,13 @@ le classement de Grimpeurs suit le même chemin, puisqu'il fait partie du tri. P
 Blocs se trie par **Calculée décroissante**, pour tout le monde : c'est la question qu'on se pose
 d'abord devant la liste (quels sont les plus durs), l'écart restant à un clic en accès complet.
 
+**« Voir mes résultats » (écran Blocs) ne dit rien par la couleur seule** : en plus de la teinte
+verte, jaune ou rouge proposée par Raphaël, un symbole (⚡, ✓, ✗) précède le nom du bloc, le vert
+et le rouge se confondant pour une partie des daltoniens. Il montre le **statut le plus récent**,
+comme la Carte, pour rester cohérent avec le choix de pouvoir changer d'avis dans les deux sens.
+Le grimpeur est **le même que sur la Carte** (compte connecté, sinon nom choisi sur la Carte),
+plutôt qu'un second sélecteur de nom sur l'écran Blocs.
+
 **Le centre principal demandé à l'inscription va dans `grimpeurs.gym_principal`**, champ qui
 existait déjà et que la colonne « Salle » des classements affiche : pas de nouvelle colonne,
 mais une donnée publique, ce que le formulaire et la politique de confidentialité annoncent. Il

@@ -2135,3 +2135,15 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   vues (auparavant Écart en accès complet, nom en vue visiteur), demandé par Raphaël. Politique
   de confidentialité complétée (« Sur votre appareil »). Vérifié dans Chrome sans interface sur
   le site compilé (aller-retour d'onglets et rafraîchissement, Blocs et Grimpeurs).
+- **« Voir mes résultats » sur l'écran Blocs**, proposé par Raphaël : une case au-dessus du
+  tableau teinte chaque bloc déjà tenté par le grimpeur (vert flash, jaune réussi, rouge échec,
+  avec un ⚡, ✓ ou ✗ devant le nom et une petite légende à côté de la case). Statut le plus
+  récent, comme le popup de la Carte (`Atelier.envoisConnus`). Le grimpeur est le même que sur
+  la Carte : le compte connecté pour un centre branché, sinon le nom choisi dans l'onglet Carte
+  (`lireGrimpeurChoisi`, `src/App.tsx`) ; sans nom, la case est grisée avec une phrase qui dit
+  comment l'activer. Case retenue dans le navigateur (`cee-voir-mes-resultats`). Nouvelle prop
+  `classeLigne` de `Tableau` ; teintes en `color-mix` sur `--bon`, `--attention` et
+  `--critique` (`styles.css`), lisibles dans les deux thèmes. Un bloc tenté sans assez de duels
+  n'est pas dans le tableau, donc pas surligné. Vérifié dans Chrome sans interface sur la Démo
+  (Victor Bergeron : 1 flash, 10 réussis, 13 échecs sur les 25 premiers ; thèmes clair et sombre,
+  390 px sans débordement) ; pas encore essayé avec un compte connecté sur RB1/RB2.

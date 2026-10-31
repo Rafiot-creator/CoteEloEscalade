@@ -727,7 +727,12 @@ lui demander d'abord comment s'est passée cette saisie, et ce qu'il y a dans le
 vert) : chaque tableau garde son tri entre onglets et au rafraîchissement (prop `memoire` de
 `Tableau`, `src/ui/memoire.ts`), ainsi que le style choisi dans le classement de Grimpeurs.
 Blocs se trie par défaut par Calculée, du plus dur au plus facile. Vérifié dans Chrome sans
-interface ; pas encore testé par Raphaël sur le site en ligne.
+interface ; confirmé par Raphaël sur le site en ligne.
+
+**« Voir mes résultats », 2026-10-31** (commit `2bf7f77`, déploiement vérifié vert) : case
+au-dessus du tableau Blocs qui teinte les blocs tentés par le grimpeur (vert flash, jaune
+réussi, rouge échec, plus ⚡/✓/✗), même grimpeur que la Carte. Vérifié sur la Démo dans Chrome
+sans interface ; **reste à essayer avec un compte connecté sur RB1/RB2** (Rafiot).
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
