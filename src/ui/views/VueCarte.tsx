@@ -292,6 +292,11 @@ export function VueCarte({
   // toute taille. Confirme par Raphael : meme contour visible sur PC, juste
   // beaucoup plus fin.
   const EPAISSEUR_CONTOUR = Math.max(1, Math.round(RAYON * 0.1))
+  // Anneau vert d'un bloc envoye : deux fois plus epais que le contour de
+  // selection, pour se voir d'un coup d'oeil (demande de Raphael, 2026-10-31),
+  // la pastille gardant desormais sa couleur pleine. Toujours proportionnel a
+  // RAYON : 4px sur bureau, 2px au plancher sur telephone.
+  const EPAISSEUR_ENVOYE = Math.max(2, Math.round(RAYON * 0.2))
 
   const coteParId = useMemo(() => {
     const m = new Map<string, number>()
@@ -735,6 +740,7 @@ export function VueCarte({
               const cote = coteParId.get(b.id)
               const etoile = b.couleur === COULEUR_COMP_WALL
               const contour = selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : null
+              const epaisseur = selection === b.id ? EPAISSEUR_CONTOUR : EPAISSEUR_ENVOYE
               return (
                 <div
                   key={b.id}
@@ -776,7 +782,7 @@ export function VueCarte({
                       boxShadow: etoile
                         ? 'none'
                         : [
-                            contour ? `0 0 0 ${EPAISSEUR_CONTOUR}px ${contour}` : null,
+                            contour ? `0 0 0 ${epaisseur}px ${contour}` : null,
                             '0 1px 4px rgba(0,0,0,0.35)',
                             'inset -3px -3px 6px rgba(0,0,0,0.4)',
                             'inset 2px 2px 4px rgba(255,255,255,0.3)',
@@ -792,8 +798,6 @@ export function VueCarte({
                       textShadow: couleur.texte === '#fff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
                       cursor: edition ? 'grab' : 'pointer',
                       touchAction: 'manipulation',
-                      opacity: fait ? 0.85 : 1,
-                      filter: fait ? 'grayscale(0.4) saturate(0.7)' : undefined,
                       // Appui long en edition : sans ca, le telephone selectionne
                       // le chiffre ou affiche sa bulle au lieu de laisser glisser.
                       userSelect: 'none',
@@ -809,7 +813,7 @@ export function VueCarte({
                       <>
                         {/* Un peu plus grande que la pastille ronde : une
                             etoile n'a de place pour le numero qu'en son centre. */}
-                        <FondEtoile taille={Math.round(RAYON * 2.6)} contour={EPAISSEUR_CONTOUR} couleurContour={contour} />
+                        <FondEtoile taille={Math.round(RAYON * 2.6)} contour={epaisseur} couleurContour={contour} />
                         <span style={{ position: 'relative', fontSize: Math.max(Math.round(6 * FACTEUR), Math.round(RAYON * 0.55)), marginTop: RAYON * 0.12 }}>
                           {numeroPastille(b.cotation, 'comp-wall')}
                         </span>
