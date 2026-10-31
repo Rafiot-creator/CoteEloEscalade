@@ -612,8 +612,8 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   `request.jwt.claims`, terminé par `raise exception` pour tout annuler.
 - **Étape 3 faite le 2026-10-29** (outils de l'ouvreur : table `ouvreurs`, fonctions
   `placer_bloc`/`modifier_bloc`/`demonter_bloc`, édition de la Carte enregistrée dans la base).
-  « Rafiot » est admin général. Testé par Raphaël sur Rose Bloc 1. Glisser un bloc : souris
-  seulement. Nommer un ouvreur : SQL donné dans le README.
+  « Rafiot » est admin général. Testé par Raphaël sur Rose Bloc 1. Glisser un bloc : souris,
+  ou au doigt après un appui d'une seconde (depuis le 2026-10-31). Nommer un ouvreur : SQL donné dans le README.
 - **Connexion Google + mot de passe faite le 2026-10-29** (lien par courriel retiré). Bouton
   officiel de Google (`BoutonGoogle.tsx`) pour que Google affiche « Cote Elo Escalade » et non
   le domaine Supabase. Détail, réglages Google Cloud et procédure de suppression de compte dans
@@ -688,8 +688,8 @@ la période d'essai (10 blocs) se compte par groupe. L'écran Blocs présélecti
 choisie dans le menu (filtre de salle existant). **Pour les futurs centres, Raphaël veut
 appliquer les pistes du 18 septembre** (README, « uniformiser les cotes entre centres ») plutôt
 que d'empiler des groupes. Les autres centres du menu n'ont que leur carte. Un bloc sans assez de duels n'apparaît pas dans
-l'écran Blocs (`fiable`), comme sur la Démo. Limites connues restantes : glisser un
-bloc à la souris seulement (pas au doigt), pas d'écran pour nommer un ouvreur ni pour
+l'écran Blocs (`fiable`), comme sur la Démo. Limites connues restantes :
+pas d'écran pour nommer un ouvreur ni pour
 supprimer un compte (SQL dans le README), et au lancement tout le monde sera en période
 d'essai en même temps (coût mesuré dans `DECISIONS.md`).
 
@@ -716,6 +716,11 @@ régénérée (style et nom seulement), Carte Démo à trois murs, migration
 `20261031000100_styles_physique_technique_coordo.sql` (vérification des styles + 369 blocs de
 la Démo). Les blocs de RB1/RB2 n'avaient pas de style : à donner dans l'éditeur en les posant,
 sinon ils n'entrent dans aucune cote par style.
+
+**Saisie sur place prévue la semaine du 2 novembre 2026** : Raphaël va entrer tous les blocs
+de RB1 et RB2 au téléphone, en vue d'un vrai essai en salle (étape 5). Le glisser au doigt
+(appui d'une seconde, `debuterAppuiLong` dans `VueCarte.tsx`) a été fait juste avant ; pas
+encore testé sur un vrai téléphone. Retours de cette saisie à traiter en priorité.
 
 **Suite de la base de données** (voir ci-dessus) : étape 5 (essai dans un vrai centre, une fois
 l'accord de Rose Bloc obtenu ; voir « Avant l'étape 5 » plus haut) ou vérification de la

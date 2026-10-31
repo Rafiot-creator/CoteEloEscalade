@@ -1198,7 +1198,7 @@ refusées.
    de la base affiché, puis carte relue. Sur la Démo, Blocs et Grimpeurs se rechargent après un
    changement qui touche au calcul. Ces deux écrans ne lisent que les blocs du centre `demo`.
    Testé dans la base (deux comptes fictifs, transaction annulée) et par Raphaël sur Rose Bloc 1.
-   **Limites** : glisser un bloc à la souris seulement (pas au doigt) ; pas d'écran pour nommer
+   **Limites** : pas d'écran pour nommer
    un ouvreur, à faire en SQL :
    `insert into public.ouvreurs (user_id, centre_id) select p.user_id, '<centre>' from public.profils p join public.grimpeurs g on g.id = p.grimpeur_id where g.nom = '<pseudo>';`
 4. **Temps réel** — *fait le 30 octobre 2026.* `ascensions` et `blocs` ajoutées à la
@@ -2069,3 +2069,14 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   amorce à 8000, sans effet sur la cote des grimpeurs avant 20 grimpeurs (puis rétroactif).
   Détail dans « Base de données et multi-utilisateur (en cours) » ; pourquoi dans
   `DECISIONS.md`.
+- **Glisser un bloc au doigt**, avant la saisie des blocs de RB1 et RB2 sur place au
+  téléphone : en édition (ouvreur ou admin), un appui d'une seconde sur une pastille la
+  débloque (elle grossit, le téléphone vibre s'il le peut), puis elle suit le doigt ; la
+  position est enregistrée au relâcher. Proposé par Raphaël. Un tap sélectionne toujours le
+  bloc, un doigt qui bouge tout de suite fait défiler la page comme avant (rien n'est bloqué
+  avant le déblocage : annuler un mouvement ferait abandonner à Chrome le défilement de tout le
+  geste), et un appui long sans bouger ouvre l'éditeur. Menu contextuel et sélection du chiffre
+  désactivés sur les pastilles en édition. Comme à la souris, un bloc déplacé n'est pas
+  sélectionné : l'éditeur ferait défiler la page en plein glisser (bug vu en test et corrigé).
+  Vérifié dans un téléphone simulé (Pixel 5, Chrome sans interface) ; le défilement réel au doigt
+  ne se simule pas fidèlement, à confirmer sur un vrai téléphone.

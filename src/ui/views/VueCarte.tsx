@@ -123,6 +123,11 @@ function fondMetal(id: string): string {
   return `${BRILLANT}, ${infoCouleur(id).fond}`
 }
 
+/** Appui long qui debloque une pastille pour la deplacer au doigt (edition). */
+const DELAI_APPUI_LONG = 1000
+/** Au-dela de ce deplacement (px) avant le delai, c'est un defilement, pas un appui. */
+const TOLERANCE_APPUI_LONG = 10
+
 function nouvelId(): string {
   return `b${Date.now().toString(36)}${Math.round(Math.random() * 1000)}`
 }
@@ -209,6 +214,8 @@ export function VueCarte({
   const zoneRef = useRef<HTMLDivElement>(null)
   const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
+  /** Bloc debloque par un appui long, en train de suivre le doigt. */
+  const [glisseTactile, setGlisseTactile] = useState<string | null>(null)
   const nomAuFocus = useRef('')
   const [largeurCarte, setLargeurCarte] = useState(640)
 
@@ -549,6 +556,60 @@ export function VueCarte({
     window.addEventListener('mouseup', relacher)
   }
 
+  // Glisser au doigt (demande de Raphael pour saisir les blocs en salle, au
+  // telephone) : un appui long debloque la pastille, qui suit ensuite le doigt.
+  // Le delai laisse le reste intact : un tap selectionne toujours le bloc, et
+  // un doigt qui bouge tout de suite fait defiler ou zoomer la page comme
+  // avant. Le defilement n'est bloque qu'une fois la pastille debloquee (sans
+  // jamais annuler un mouvement avant : Chrome abandonnerait alors le
+  // defilement de tout le geste).
+  const debuterAppuiLong = (id: string) => (e: React.TouchEvent) => {
+    if (!edition || e.touches.length !== 1) return
+    const { clientX: x0, clientY: y0 } = e.touches[0]
+    let actif = false
+    let position: { x: number; y: number } | null = null
+    const nettoyer = () => {
+      window.clearTimeout(minuterie)
+      window.removeEventListener('touchmove', bouger)
+      window.removeEventListener('touchend', finir)
+      window.removeEventListener('touchcancel', finir)
+    }
+    const bouger = (ev: TouchEvent) => {
+      const t = ev.touches[0]
+      if (!t) return
+      if (!actif) {
+        if (Math.hypot(t.clientX - x0, t.clientY - y0) > TOLERANCE_APPUI_LONG) nettoyer()
+        return
+      }
+      ev.preventDefault()
+      position = relatif(t.clientX, t.clientY)
+      modifier(id, position)
+    }
+    const finir = (ev: TouchEvent) => {
+      nettoyer()
+      if (!actif) return
+      // Pas de clic simule apres le glisser.
+      if (ev.cancelable) ev.preventDefault()
+      glisse.current = null
+      setGlisseTactile(null)
+      const depart = carte.blocs.find((b) => b.id === id)
+      if (position && depart) sauver({ ...depart, ...position }, false)
+      // Comme a la souris : un bloc deplace n'est pas selectionne (l'editeur
+      // ferait defiler la page), un appui long sans bouger le selectionne.
+      else setSelection(id)
+    }
+    const minuterie = window.setTimeout(() => {
+      actif = true
+      glisse.current = { id, deplace: true }
+      setGlisseTactile(id)
+      setSurvole(null)
+      navigator.vibrate?.(30)
+    }, DELAI_APPUI_LONG)
+    window.addEventListener('touchmove', bouger, { passive: false })
+    window.addEventListener('touchend', finir)
+    window.addEventListener('touchcancel', finir)
+  }
+
   const exporter = () => {
     telecharger(`carte-${centreId}.json`, JSON.stringify(carte, null, 2), 'application/json')
   }
@@ -625,8 +686,8 @@ export function VueCarte({
         sousTitre={
           edition
             ? t(
-                "Cliquer sur la carte pour ajouter un bloc. Cliquer un bloc existant pour le modifier, ou le glisser pour le repositionner. Majuscule (shift) + clic sur un bloc pour l'enregistrer en flash, réussi ou échec.",
-                "Click the map to add a boulder. Click an existing boulder to edit it, or drag it to reposition. Shift + click a boulder to log it as a flash, a send or a fail."
+                "Cliquer sur la carte pour ajouter un bloc. Cliquer un bloc existant pour le modifier, ou le glisser pour le repositionner (au doigt : appuyer une seconde dessus, puis glisser). Majuscule (shift) + clic sur un bloc pour l'enregistrer en flash, réussi ou échec.",
+                "Click the map to add a boulder. Click an existing boulder to edit it, or drag it to reposition (by touch: press it for a second, then drag). Shift + click a boulder to log it as a flash, a send or a fail."
               )
             : t(
                 "Survolez ou cliquez un bloc pour l'enregistrer en flash, réussi ou échec.",
@@ -683,6 +744,9 @@ export function VueCarte({
                 >
                   <div
                     onMouseDown={debuterGlisse(b.id)}
+                    onTouchStart={debuterAppuiLong(b.id)}
+                    // Un appui long ouvrirait sinon le menu contextuel du navigateur.
+                    onContextMenu={edition ? (e) => e.preventDefault() : undefined}
                     onClick={(e) => {
                       e.stopPropagation()
                       if (edition) {
@@ -730,6 +794,15 @@ export function VueCarte({
                       touchAction: 'manipulation',
                       opacity: fait ? 0.85 : 1,
                       filter: fait ? 'grayscale(0.4) saturate(0.7)' : undefined,
+                      // Appui long en edition : sans ca, le telephone selectionne
+                      // le chiffre ou affiche sa bulle au lieu de laisser glisser.
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                      WebkitTouchCallout: 'none',
+                      // Pastille debloquee au doigt : elle grossit pour le signaler.
+                      transform: glisseTactile === b.id ? 'scale(1.4)' : undefined,
+                      transition: 'transform 120ms',
+                      zIndex: glisseTactile === b.id ? 2 : undefined,
                     }}
                   >
                     {etoile ? (
