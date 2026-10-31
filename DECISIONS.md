@@ -231,6 +231,24 @@ base). Lus dans l'écran Administration, **sans courriel d'avertissement** (choi
 il faudrait une fonction côté serveur et le mot de passe d'application du Gmail du site. À
 reconsidérer si des messages restent sans réponse.
 
+**Le dernier centre et le dernier onglet sont retenus dans le navigateur**, pas dans le compte :
+c'est une commodité d'affichage, utile aussi sans compte, et propre à chaque appareil (on ne
+regarde pas forcément le même centre au téléphone en salle et à l'ordinateur).
+
+**Le centre principal demandé à l'inscription va dans `grimpeurs.gym_principal`**, champ qui
+existait déjà et que la colonne « Salle » des classements affiche : pas de nouvelle colonne,
+mais une donnée publique, ce que le formulaire et la politique de confidentialité annoncent. Il
+n'entre dans aucun calcul, donc il reste modifiable à volonté (contrairement au niveau de
+flash, figé pour qu'on ne puisse pas retoucher sa cote de départ). Il ne présélectionne un
+centre que si celui-ci est branché sur le calcul (RB1, RB2) : ouvrir par défaut un centre qui
+n'a qu'une carte vide n'aiderait personne.
+
+**Le niveau de flash peut se donner en cote Rose Bloc**, convertie en V par la même formule que
+la carte, donc à deux décimales ; le niveau déclaré (flash + 1 cote V) est plafonné à V12, le
+haut de l'échelle, sans quoi un flash 14 ou 15 de Rose Bloc (V11,5, V12,39) sortirait de
+l'échelle. Les deux tombent alors au même départ, 12 000 : un écart négligeable pour une
+poignée de grimpeurs, que le calcul corrige de toute façon.
+
 ---
 
 ## 3. Détecter les blocs mal cotés

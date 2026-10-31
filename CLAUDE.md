@@ -660,7 +660,9 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   `definir_centre_principal`), qui présélectionne un centre branché (RB1/RB2) après
   l'inscription et à la première visite sur un appareil ; niveau de flash en V ou en 1-15 pour
   un centre Rose Bloc (`niveau_depuis_flash` fractionnaire, niveau plafonné à V12). Migration
-  `20261031000400_centre_principal.sql`.
+  `20261031000400_centre_principal.sql`. Testé par Raphaël sur Rafiot (choix du centre dans le
+  panneau du compte) ; une vraie inscription de bout en bout reste à tester (prévue avec un
+  second compte).
 - Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
   l'accord de Rose Bloc pour un essai (étape 5).
 
@@ -717,7 +719,7 @@ vérifié vert, migrations appliquées jusqu'à `20261031000400_centre_principal
 chaque fois testé par Raphaël lui-même sur le site en ligne : styles Physique, Technique,
 Coordo ; blocs spéciaux de RB1 ; glisser un bloc au doigt (sur son téléphone) ; onglet
 Commentaires (message test reçu dans Administration) ; dernier centre et dernier onglet retenus
-au rafraîchissement. **Raphaël se dit prêt pour l'essai en
+au rafraîchissement ; centre principal et flash en cote Rose Bloc (testé sur Rafiot). **Raphaël se dit prêt pour l'essai en
 salle** : il entre les blocs de RB1 et RB2 sur place la semaine du 2 novembre. À la reprise,
 lui demander d'abord comment s'est passée cette saisie, et ce qu'il y a dans les commentaires.
 

@@ -2115,3 +2115,9 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   déclaré à V12 (flash 14 ou 15 de Rose Bloc). Migration
   `20261031000400_centre_principal.sql`, testée dans la base (transaction annulée, compte
   fictif) ; formulaire vérifié au format téléphone.
+- **Fin de session (suite).** Centre principal et flash en cote Rose Bloc testés par Raphaël
+  sur Rafiot (choix du centre dans le panneau du compte) ; une vraie inscription de bout en
+  bout reste à tester, avec un second compte. Pourquoi de ces choix (centre dans
+  `gym_principal`, préselection limitée aux centres branchés, niveau plafonné à V12, dernier
+  centre et onglet retenus par appareil) : `DECISIONS.md`, « Les échelles maison et les
+  centres Rose Bloc ».
