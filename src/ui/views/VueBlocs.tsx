@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { depuisCotationV, etiquetteDIndex, type Echelle } from '../../core/echelles'
+import { echelleDuBloc, etiquetteDIndex, libelleCote, type Echelle } from '../../core/echelles'
 import { FORMULES } from '../../core/formulas/registry'
 import { versCsv } from '../../core/loaders/csv'
 import { SEUIL_DESACCORD, type LigneBloc, type Resultat } from '../../core/pipeline'
@@ -154,7 +154,7 @@ export function VueBlocs({
     {
       cle: 'couleur',
       titre: t('Couleur', 'Color'),
-      valeur: (b) => b.couleur,
+      valeur: (b) => (echelleDuBloc(b.couleur, echelle) === 'comp-wall' ? 'Comp Wall' : b.couleur),
       aide: t(
         "Couleur des prises. Métadonnée d'affichage : elle n'entre dans aucun calcul.",
         "Hold color. Display metadata only: it plays no part in any calculation."
@@ -163,8 +163,17 @@ export function VueBlocs({
     {
       cle: 'officielle',
       titre: t('Affichée', 'Displayed'),
-      valeur: (b) => (maison ? depuisCotationV(b.cotationOfficielle, echelle) : b.cotationOfficielle),
-      rendu: maison ? (b) => <PastilleCote>{depuisCotationV(b.cotationOfficielle, echelle)}</PastilleCote> : undefined,
+      valeur: (b) => (maison ? libelleCote(b.cotationOfficielle, b.couleur, echelle) : b.cotationOfficielle),
+      // Un bloc du Comp Wall garde son numero etoile, sans cercle : ce n'est
+      // pas une cote du gym.
+      rendu: maison
+        ? (b) =>
+            echelleDuBloc(b.couleur, echelle) === 'comp-wall' ? (
+              libelleCote(b.cotationOfficielle, b.couleur, echelle)
+            ) : (
+              <PastilleCote>{libelleCote(b.cotationOfficielle, b.couleur, echelle)}</PastilleCote>
+            )
+        : undefined,
       tri: (b) => b.indexOfficiel,
       aide: t(
         "La cotation annoncée par l'ouvreur. C'est elle que le site met à l'épreuve, pas elle qui sert de référence.",

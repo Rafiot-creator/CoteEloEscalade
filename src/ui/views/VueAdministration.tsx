@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { depuisCotationV, type Echelle } from '../../core/echelles'
+import { libelleCote, type Echelle } from '../../core/echelles'
 import { supabase } from '../../core/supabase'
 import { Carte } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
@@ -17,6 +17,7 @@ interface BlocTrouve {
   nom: string
   centre_id: string
   cotation_officielle: string
+  couleur: string
   date_retrait: string | null
 }
 interface LigneAscension {
@@ -76,7 +77,7 @@ export function VueAdministration({ apresModification }: { apresModification?: (
         supabase.from('grimpeurs').select('id, nom').ilike('nom', `%${q}%`).order('nom').limit(20),
         supabase
           .from('blocs')
-          .select('id, nom, centre_id, cotation_officielle, date_retrait')
+          .select('id, nom, centre_id, cotation_officielle, couleur, date_retrait')
           .or(`nom.ilike.*${q}*,id.ilike.*${q}*`)
           .order('centre_id')
           .order('nom')
@@ -106,7 +107,7 @@ export function VueAdministration({ apresModification }: { apresModification?: (
       selection.genre === 'grimpeur'
         ? supabase
             .from('ascensions')
-            .select('id, date, resultat, essais, blocs(id, nom, centre_id, cotation_officielle, date_retrait)')
+            .select('id, date, resultat, essais, blocs(id, nom, centre_id, cotation_officielle, couleur, date_retrait)')
             .eq('grimpeur_id', selection.id)
         : supabase
             .from('ascensions')
@@ -156,7 +157,7 @@ export function VueAdministration({ apresModification }: { apresModification?: (
     echec: t('Échoué', 'Failed'),
   }
   const nomCentre = (id: string) => centres.get(id)?.nom ?? id
-  const cotation = (b: BlocTrouve) => depuisCotationV(b.cotation_officielle, centres.get(b.centre_id)?.echelle ?? 'v')
+  const cotation = (b: BlocTrouve) => libelleCote(b.cotation_officielle, b.couleur, centres.get(b.centre_id)?.echelle ?? 'v')
   const etat = (b: BlocTrouve) => (b.date_retrait ? t(`démonté le ${b.date_retrait}`, `taken down ${b.date_retrait}`) : t('en place', 'up'))
 
   const supprimerBloc = async (b: BlocTrouve, nAscensions: number | null) => {

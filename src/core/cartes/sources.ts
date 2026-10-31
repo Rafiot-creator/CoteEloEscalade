@@ -6,6 +6,7 @@ interface LigneCentre {
   fond: string | null
   taille_pastilles: number
   echelle: Echelle
+  comp_wall: boolean
 }
 interface LigneBloc {
   id: string
@@ -27,7 +28,7 @@ export const carteSupabase: CarteProvider = {
   id: 'supabase',
   async charger(centreId) {
     const [centre, blocs] = await Promise.all([
-      supabase.from('centres').select('fond, taille_pastilles, echelle').eq('id', centreId).maybeSingle<LigneCentre>(),
+      supabase.from('centres').select('fond, taille_pastilles, echelle, comp_wall').eq('id', centreId).maybeSingle<LigneCentre>(),
       supabase
         .from('blocs')
         .select('id, nom, x, y, cotation_officielle, couleur, secteur')
@@ -43,6 +44,7 @@ export const carteSupabase: CarteProvider = {
       ...(centre.data.fond ? { fond: centre.data.fond } : {}),
       ...(centre.data.taille_pastilles !== 1 ? { taillePastilles: centre.data.taille_pastilles } : {}),
       ...(centre.data.echelle !== 'v' ? { echelle: centre.data.echelle } : {}),
+      ...(centre.data.comp_wall ? { compWall: true } : {}),
       blocs: (blocs.data ?? []).map((b) => ({
         id: b.id,
         nom: b.nom,

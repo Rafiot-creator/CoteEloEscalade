@@ -39,7 +39,7 @@ rejetées). Ne pas ré-expliquer ce qui y est déjà écrit.**
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test                # 70 tests sur le cœur de calcul
+npm test                # 71 tests sur le cœur de calcul
 npm run build           # site statique dans dist/
 npm run data:generate   # régénère le jeu de données de démonstration
 ```
@@ -638,6 +638,14 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   (`VueAdministration.tsx`, `compte.estAdmin`) pour modifier/effacer une ascension ou
   supprimer un bloc (démontés compris), via les fonctions `admin_*` de
   `20261030000300_administration.sql`.
+- **Comp Wall de RB2, 2026-10-31** : 24 blocs numérotés 1-24 (du plus facile au plus dur),
+  sans autre cote. Conversion choisie par Raphaël : 1 = cote 1 du gym, 24 = cote 15, en
+  progression régulière, puis Rose Bloc → V (14 → V7, 24 → V12,39 ; échelle `'comp-wall'`,
+  `src/core/echelles.ts`). Un bloc en fait partie par la couleur spéciale `comp-wall`
+  (choisie dans l'éditeur, pas selon la position : erreur trop coûteuse), proposée seulement
+  si `centres.comp_wall`. Pastille en étoile noire, numéro blanc (`FondEtoile`,
+  `VueCarte.tsx`) ; « ★12 » dans Blocs, Administration et le popup ; colonne Calculée en
+  1-15 / V comme les autres. Numéro déjà pris : avertissement, pas refus (remontages).
 - Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
   l'accord de Rose Bloc pour un essai (étape 5).
 

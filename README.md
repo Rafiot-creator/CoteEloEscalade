@@ -1225,6 +1225,22 @@ inconnu refusé, les trois actions font ce qu'elles disent. Après un changement
 l'admin recalcule ; les autres le voient à leur prochain chargement (les suppressions ne sont
 pas diffusées en temps réel).
 
+**Comp Wall de Rose Bloc 2** — *fait le 31 octobre 2026.* Ce mur numérote ses 24 blocs de 1 (le
+plus facile) à 24 (le plus dur), sans autre cote. Conversion choisie par Raphaël : 1 = cote 1
+du gym, 24 = cote 15, en progression régulière (0,61 cote du gym par numéro), puis la
+conversion Rose Bloc vers V, soit V = (numéro − 1) × 14/23 ÷ 1,13 (14 → V7, 16 → V8,08,
+24 → V12,39). La base garde la cote V, comme pour tout bloc. Un bloc appartient au Comp Wall
+par une couleur spéciale, `comp-wall` (stockée `Comp-wall`), choisie par l'ouvreur dans
+l'éditeur plutôt que déduite de la position : un même chiffre vaut près de 4 cotes V d'écart
+selon le système (★12 = V5,92, 12 du gym = V9,73), une bascule involontaire en bordure du mur
+coûterait trop cher. La couleur n'est proposée que si `centres.comp_wall` (Rose Bloc 2
+seulement, `supabase/migrations/20261031000000_comp_wall.sql`). Pastille : étoile noire
+(`#100c08`, le noir des pastilles rondes) et numéro blanc, dessinée en SVG pour que le contour
+de sélection ou d'envoi suive les branches. Ailleurs : « ★12 » (popup, colonne Affichée de
+Blocs, Administration) ; la colonne Calculée reste en 1-15 / V pour comparer avec les autres
+blocs. Un numéro déjà porté par un autre bloc du Comp Wall affiche un avertissement, pas un
+refus (pendant un remontage, l'ancien et le nouveau coexistent).
+
 **Rôles prévus.** Visiteur (lecture), grimpeur (ses propres envois), admin d'un centre (les blocs
 et les résultats de ce centre), admin général (Raphaël). Le calcul des cotes reste dans le
 navigateur : il lit toutes les ascensions, qui doivent donc rester lisibles par tous. Ce qui
@@ -2006,3 +2022,8 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
 - **Écran Administration**, demandé par Raphaël après avoir démonté son bloc test de Rose
   Bloc 1 (son flash restait dans sa fiche) : corriger ou effacer une ascension, supprimer un
   bloc pour de bon. Détail dans « Base de données et multi-utilisateur (en cours) ».
+
+### 2026-10-31
+
+- **Comp Wall de Rose Bloc 2** : pastilles en étoile numérotées de 1 à 24 et conversion propre
+  vers V. Détail dans « Base de données et multi-utilisateur (en cours) ».

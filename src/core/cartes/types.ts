@@ -43,6 +43,11 @@ export interface Carte {
    * 'v' par defaut. `BlocCarte.cotation` reste toujours une cotation V.
    */
   echelle?: Echelle
+  /**
+   * Le centre a un Comp Wall (Rose Bloc 2) : la carte propose a l'ouvreur la
+   * couleur speciale `COULEUR_COMP_WALL` (pastille en etoile, numeros 1 a 24).
+   */
+  compWall?: boolean
   blocs: BlocCarte[]
 }
 

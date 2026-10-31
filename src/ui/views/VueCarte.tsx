@@ -1,5 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { depuisCotationV, etiquettesEchelle, numeroPastille, versCotationV } from '../../core/echelles'
+import {
+  COULEUR_COMP_WALL,
+  depuisCotationV,
+  echelleDuBloc,
+  etiquettesEchelle,
+  libelleCote,
+  numeroPastille,
+  versCotationV,
+} from '../../core/echelles'
 import { chargerCarte, demonterBloc, modifierBloc, placerBloc } from '../../core/cartes/sources'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import { STYLES_BLOC } from '../../core/stylesBloc'
@@ -43,8 +51,69 @@ const PALETTE_COULEURS = [
 const POPUP_LARGEUR = 190
 const POPUP_HAUTEUR = 175
 
+/**
+ * Bloc du Comp Wall (Rose Bloc 2, numeros 1 a 24, src/core/echelles.ts) :
+ * pastille en etoile du meme noir que la couleur 'noir', choisie par Raphael
+ * pour qu'on ne puisse pas la confondre avec une pastille ronde. Hors de
+ * PALETTE_COULEURS : ce n'est pas une couleur de prises, et seuls les centres
+ * qui ont un Comp Wall la proposent (`Carte.compWall`).
+ */
+const INFO_COMP_WALL = { id: COULEUR_COMP_WALL, fr: 'Comp Wall ★', en: 'Comp Wall ★', fond: '#100c08', texte: '#fff' }
+
 function infoCouleur(id: string) {
+  if (id === COULEUR_COMP_WALL) return INFO_COMP_WALL
   return PALETTE_COULEURS.find((c) => c.id === id) ?? PALETTE_COULEURS[1]
+}
+
+/** Sommets d'une etoile a cinq branches, pointe en haut, dans une boite 0-100. */
+const POINTS_ETOILE = Array.from({ length: 10 }, (_, i) => {
+  const r = i % 2 ? 26 : 49
+  const a = (Math.PI / 5) * i - Math.PI / 2
+  return `${(50 + r * Math.cos(a)).toFixed(1)},${(52 + r * Math.sin(a)).toFixed(1)}`
+}).join(' ')
+
+/**
+ * Fond en etoile, dessine en SVG plutot que par `clip-path` sur la pastille :
+ * un `clip-path` couperait aussi le contour (`box-shadow`) qui signale un bloc
+ * selectionne ou envoye. Ici le contour suit les branches de l'etoile.
+ * `taille` : cote du carre en pixels ; `contour` en pixels a l'ecran.
+ */
+function FondEtoile({ taille, contour, couleurContour }: { taille: number; contour: number; couleurContour: string | null }) {
+  const trait = couleurContour ? (contour * 2 * 100) / taille : 0
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      width={taille}
+      height={taille}
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        marginLeft: -taille / 2,
+        marginTop: -taille / 2,
+        overflow: 'visible',
+        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+        pointerEvents: 'none',
+      }}
+    >
+      <defs>
+        <radialGradient id="etoile-brillant" cx="0.36" cy="0.3" r="0.6">
+          <stop offset="0" stopColor="#fff" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <polygon
+        points={POINTS_ETOILE}
+        fill={INFO_COMP_WALL.fond}
+        stroke={couleurContour ?? 'none'}
+        strokeWidth={trait}
+        strokeLinejoin="round"
+        paintOrder="stroke"
+      />
+      <polygon points={POINTS_ETOILE} fill="url(#etoile-brillant)" />
+    </svg>
+  )
 }
 
 /** Couleur de base + reflet lustre, pour un rendu "metal" plutot que plat. */
@@ -601,6 +670,8 @@ export function VueCarte({
               const fait = statut === 'flash' || statut === 'reussi' || !!suivi[b.id]
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
+              const etoile = b.couleur === COULEUR_COMP_WALL
+              const contour = selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : null
               return (
                 <div
                   key={b.id}
@@ -628,7 +699,7 @@ export function VueCarte({
                       marginLeft: -RAYON,
                       marginTop: -RAYON,
                       borderRadius: '50%',
-                      background: fondMetal(b.couleur),
+                      background: etoile ? 'none' : fondMetal(b.couleur),
                       // Contour colore reserve aux etats qui comptent
                       // (selectionne, envoye) plutot que present par defaut
                       // sur chaque pastille : Raphael l'a signale comme un
@@ -636,18 +707,16 @@ export function VueCarte({
                       // pastilles, sans utilite pour celles qui n'ont ni
                       // statut ni selection. Aucun contour ajoute dans ce cas
                       // (juste l'ombre portee normale plus bas).
-                      boxShadow: [
-                        selection === b.id
-                          ? `0 0 0 ${EPAISSEUR_CONTOUR}px var(--encre)`
-                          : fait
-                            ? `0 0 0 ${EPAISSEUR_CONTOUR}px var(--bon)`
-                            : null,
-                        '0 1px 4px rgba(0,0,0,0.35)',
-                        'inset -3px -3px 6px rgba(0,0,0,0.4)',
-                        'inset 2px 2px 4px rgba(255,255,255,0.3)',
-                      ]
-                        .filter(Boolean)
-                        .join(', '),
+                      boxShadow: etoile
+                        ? 'none'
+                        : [
+                            contour ? `0 0 0 ${EPAISSEUR_CONTOUR}px ${contour}` : null,
+                            '0 1px 4px rgba(0,0,0,0.35)',
+                            'inset -3px -3px 6px rgba(0,0,0,0.4)',
+                            'inset 2px 2px 4px rgba(255,255,255,0.3)',
+                          ]
+                            .filter(Boolean)
+                            .join(', '),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -661,7 +730,18 @@ export function VueCarte({
                       filter: fait ? 'grayscale(0.4) saturate(0.7)' : undefined,
                     }}
                   >
-                    {numeroPastille(b.cotation, echelleCotes)}
+                    {etoile ? (
+                      <>
+                        {/* Un peu plus grande que la pastille ronde : une
+                            etoile n'a de place pour le numero qu'en son centre. */}
+                        <FondEtoile taille={Math.round(RAYON * 2.6)} contour={EPAISSEUR_CONTOUR} couleurContour={contour} />
+                        <span style={{ position: 'relative', fontSize: Math.max(Math.round(6 * FACTEUR), Math.round(RAYON * 0.55)), marginTop: RAYON * 0.12 }}>
+                          {numeroPastille(b.cotation, 'comp-wall')}
+                        </span>
+                      </>
+                    ) : (
+                      numeroPastille(b.cotation, echelleCotes)
+                    )}
                   </div>
 
                   {survole === b.id && (() => {
@@ -708,7 +788,7 @@ export function VueCarte({
                         transformOrigin: aGauche ? 'top right' : 'top left',
                       }}
                     >
-                      <div className="t">{b.nom || depuisCotationV(b.cotation, echelleCotes)}</div>
+                      <div className="t">{b.nom || libelleCote(b.cotation, b.couleur, echelleCotes)}</div>
                       <div className="l">
                         <span>{t('Statut', 'Status')}</span>
                         <b
@@ -732,7 +812,7 @@ export function VueCarte({
                       </div>
                       <div className="l">
                         <span>{t('Cotation', 'Grade')}</span>
-                        <b>{cote !== undefined ? `${depuisCotationV(b.cotation, echelleCotes)} (${nombre(cote)})` : depuisCotationV(b.cotation, echelleCotes)}</b>
+                        <b>{cote !== undefined ? `${libelleCote(b.cotation, b.couleur, echelleCotes)} (${nombre(cote)})` : libelleCote(b.cotation, b.couleur, echelleCotes)}</b>
                       </div>
                       <div className="l">
                         <span>{t('Couleur', 'Color')}</span>
@@ -841,24 +921,65 @@ export function VueCarte({
                   }}
                 />
               ))}
+              {carte.compWall && (
+                // Changer de couleur garde la cotation V : seul le numero
+                // affiche change (un 15 du gym devient le ★24).
+                <button
+                  title={t(INFO_COMP_WALL.fr, INFO_COMP_WALL.en)}
+                  aria-pressed={blocSelectionne.couleur === COULEUR_COMP_WALL}
+                  onClick={() => modifierEtSauver(blocSelectionne, { couleur: COULEUR_COMP_WALL })}
+                  style={{
+                    position: 'relative',
+                    width: 28,
+                    height: 28,
+                    border: 'none',
+                    padding: 0,
+                    background: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <FondEtoile
+                    taille={34}
+                    contour={2}
+                    couleurContour={blocSelectionne.couleur === COULEUR_COMP_WALL ? 'var(--encre)' : null}
+                  />
+                </button>
+              )}
             </div>
           </div>
           <div className="param">
             <div className="param-tete">
-              <label>{t('Cotation', 'Grade')}</label>
+              <label>
+                {blocSelectionne.couleur === COULEUR_COMP_WALL ? t('Numéro du Comp Wall', 'Comp Wall number') : t('Cotation', 'Grade')}
+              </label>
             </div>
             <select
-              value={depuisCotationV(blocSelectionne.cotation, echelleCotes)}
+              value={depuisCotationV(blocSelectionne.cotation, echelleDuBloc(blocSelectionne.couleur, echelleCotes))}
               onChange={(e) =>
-                modifierEtSauver(blocSelectionne, { cotation: versCotationV(e.currentTarget.value, echelleCotes) })
+                modifierEtSauver(blocSelectionne, {
+                  cotation: versCotationV(e.currentTarget.value, echelleDuBloc(blocSelectionne.couleur, echelleCotes)),
+                })
               }
             >
-              {etiquettesEchelle(echelleCotes).map((c) => (
+              {etiquettesEchelle(echelleDuBloc(blocSelectionne.couleur, echelleCotes)).map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
               ))}
             </select>
+            {blocSelectionne.couleur === COULEUR_COMP_WALL &&
+              carte.blocs.some(
+                (o) => o.id !== blocSelectionne.id && o.couleur === COULEUR_COMP_WALL && o.cotation === blocSelectionne.cotation
+              ) && (
+                // Simple avertissement, pas un refus : pendant un remontage,
+                // l'ancien et le nouveau bloc d'un numero coexistent un moment.
+                <p className="note" style={{ color: 'var(--critique)', margin: '4px 0 0' }}>
+                  {t(
+                    'Ce numéro est déjà utilisé par un autre bloc du Comp Wall.',
+                    'This number is already used by another Comp Wall boulder.'
+                  )}
+                </p>
+              )}
           </div>
           <div className="param">
             <div className="param-tete">

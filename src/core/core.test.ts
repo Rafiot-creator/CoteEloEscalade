@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { calibrer } from './calibrage'
 import { cotationDIndex, ecartEnCrans, formaterIndex, indexDeCotation } from './cotations'
-import { depuisCotationV, etiquettesEchelle, numeroPastille, versCotationV } from './echelles'
+import { depuisCotationV, echelleDuBloc, etiquettesEchelle, libelleCote, numeroPastille, versCotationV } from './echelles'
 import {
   ECHELLE_REFERENCE,
   amorceBloc,
@@ -94,6 +94,23 @@ describe('cotations', () => {
     expect(versCotationV('V4', 'v')).toBe('V4')
     expect(numeroPastille('V4', 'v')).toBe('4')
     expect(numeroPastille('V4.42', 'rose-bloc')).toBe('6')
+  })
+
+  it('convertit les numeros du Comp Wall (1 a 24) en cotation V et retour', () => {
+    expect(versCotationV('1', 'comp-wall')).toBe('V0')
+    expect(versCotationV('14', 'comp-wall')).toBe('V7')
+    expect(versCotationV('16', 'comp-wall')).toBe('V8.08')
+    expect(versCotationV('24', 'comp-wall')).toBe('V12.39')
+    for (const e of etiquettesEchelle('comp-wall')) {
+      const v = versCotationV(e, 'comp-wall')
+      expect(indexDeCotation(v)).not.toBeNull()
+      expect(depuisCotationV(v, 'comp-wall')).toBe(e)
+    }
+    // Un bloc du Comp Wall est reconnu a sa couleur, quelle que soit la casse.
+    expect(echelleDuBloc('Comp-wall', 'rose-bloc')).toBe('comp-wall')
+    expect(echelleDuBloc('noir', 'rose-bloc')).toBe('rose-bloc')
+    expect(libelleCote('V7', 'comp-wall', 'rose-bloc')).toBe('★14')
+    expect(libelleCote('V7', 'noir', 'rose-bloc')).toBe('9')
   })
 
   it('affiche la fraction plutot que de la masquer', () => {
