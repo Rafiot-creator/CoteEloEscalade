@@ -2080,3 +2080,16 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   sélectionné : l'éditeur ferait défiler la page en plein glisser (bug vu en test et corrigé).
   Vérifié dans un téléphone simulé (Pixel 5, Chrome sans interface) ; le défilement réel au doigt
   ne se simule pas fidèlement, à confirmer sur un vrai téléphone.
+- **Onglet Commentaires** : n'importe qui, même sans compte (un problème de connexion doit
+  pouvoir se signaler), envoie un problème, une suggestion ou autre chose (2000 caractères au
+  plus), avec un courriel facultatif pour la réponse ; centre choisi, pseudonyme si connecté,
+  appareil/navigateur et date sont joints d'office (et annoncés sous le formulaire). Table
+  `commentaires` illisible directement ; `envoyer_commentaire` vérifie les champs et limite le
+  débit (10 messages par heure par compte, 20 par heure pour tous les visiteurs sans compte) ;
+  Raphaël les lit et les range (« Traité ») en haut de l'écran Administration
+  (`supabase/migrations/20261031000300_commentaires.sql`). Pas d'avertissement par courriel,
+  choix de Raphaël (il faudrait une fonction côté serveur et le mot de passe d'application du
+  Gmail du site, qu'il entrerait lui-même). Politique de confidentialité mise à jour (en
+  vigueur le 31 octobre). Testé dans la base (transaction annulée) : champs invalides refusés,
+  lecture refusée aux visiteurs, limite atteinte au 21e message anonyme, lecture et rangement
+  par l'admin. Le glisser au doigt de la Carte a été confirmé par Raphaël sur son téléphone.

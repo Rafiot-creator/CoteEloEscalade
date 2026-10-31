@@ -240,7 +240,7 @@ p { margin: 0; }
 input[type='range'] { width: 100%; accent-color: var(--serie-1); margin: 5px 0 0; }
 input[type='checkbox'] { accent-color: var(--serie-1); width: 15px; height: 15px; }
 
-select, input[type='search'], input[type='text'] {
+select, input[type='search'], input[type='text'], input[type='email'], textarea {
   font: inherit;
   font-size: 13px;
   color: var(--encre);

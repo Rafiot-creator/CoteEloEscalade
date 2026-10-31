@@ -651,6 +651,10 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   Calcul : gelés pour les grimpeurs tant que moins de 20 grimpeurs hors essai
   (`duelsGelesPourGrimpeurs`, `src/core/formulas/lib.ts`), rétroactif ensuite ; exclus de
   l'étalonnage, des verdicts, du « plus dur envoyé » et des amorces des nouveaux.
+- **Commentaires, 2026-10-31** : onglet ouvert à tous, même sans compte
+  (`VueCommentaires.tsx`), lus et rangés en haut de l'écran Administration ; table
+  `commentaires` sans accès direct, `envoyer_commentaire` avec limites de débit. Pas de
+  courriel d'avertissement (choix de Raphaël). Politique de confidentialité mise à jour.
 - Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
   l'accord de Rose Bloc pour un essai (étape 5).
 
@@ -719,8 +723,9 @@ sinon ils n'entrent dans aucune cote par style.
 
 **Saisie sur place prévue la semaine du 2 novembre 2026** : Raphaël va entrer tous les blocs
 de RB1 et RB2 au téléphone, en vue d'un vrai essai en salle (étape 5). Le glisser au doigt
-(appui d'une seconde, `debuterAppuiLong` dans `VueCarte.tsx`) a été fait juste avant ; pas
-encore testé sur un vrai téléphone. Retours de cette saisie à traiter en priorité.
+(appui d'une seconde, `debuterAppuiLong` dans `VueCarte.tsx`) a été fait juste avant et
+confirmé par Raphaël sur son téléphone. Retours de cette saisie à traiter en priorité, ainsi que
+les messages de l'onglet Commentaires.
 
 **Suite de la base de données** (voir ci-dessus) : étape 5 (essai dans un vrai centre, une fois
 l'accord de Rose Bloc obtenu ; voir « Avant l'étape 5 » plus haut) ou vérification de la

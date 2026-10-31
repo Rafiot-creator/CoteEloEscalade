@@ -269,6 +269,8 @@ export function VueAdministration({ apresModification }: { apresModification?: (
 
   return (
     <div className="large">
+      <SectionCommentaires />
+
       <div className="barre-outils">
         <input
           type="search"
@@ -344,5 +346,97 @@ export function VueAdministration({ apresModification }: { apresModification?: (
         </Carte>
       )}
     </div>
+  )
+}
+
+interface Commentaire {
+  id: number
+  cree_le: string
+  type: 'probleme' | 'suggestion' | 'autre'
+  message: string
+  courriel: string | null
+  pseudo: string | null
+  centre: string | null
+  appareil: string | null
+  traite: boolean
+}
+
+/**
+ * Messages de l'onglet Commentaires, du plus recent au plus ancien. Les
+ * messages traites sont caches par defaut. Lecture et rangement par des
+ * fonctions reservees a l'admin (supabase/migrations/20261031000300_commentaires.sql).
+ */
+function SectionCommentaires() {
+  const { t } = useLangue()
+  const [commentaires, setCommentaires] = useState<Commentaire[] | null>(null)
+  const [voirTraites, setVoirTraites] = useState(false)
+  const [erreur, setErreur] = useState<string | null>(null)
+  const [generation, setGeneration] = useState(0)
+
+  useEffect(() => {
+    let vivant = true
+    void supabase
+      .rpc('admin_lister_commentaires')
+      .then(({ data, error }) => {
+        if (!vivant) return
+        if (error) setErreur(error.message)
+        // Du plus recent au plus ancien ; le numero departage deux messages de la meme seconde.
+        setCommentaires([...((data as Commentaire[] | null) ?? [])].sort((x, y) => y.id - x.id))
+      })
+    return () => {
+      vivant = false
+    }
+  }, [generation])
+
+  const marquer = async (c: Commentaire, traite: boolean) => {
+    setErreur(null)
+    const { error } = await supabase.rpc('admin_marquer_commentaire', { commentaire: c.id, traite })
+    if (error) setErreur(error.message)
+    setGeneration((g) => g + 1)
+  }
+
+  const libelle = { probleme: t('Problème', 'Problem'), suggestion: t('Suggestion', 'Suggestion'), autre: t('Autre', 'Other') }
+  const aTraiter = (commentaires ?? []).filter((c) => !c.traite)
+  const affiches = voirTraites ? (commentaires ?? []) : aTraiter
+
+  return (
+    <Carte
+      titre={t(`Commentaires (${aTraiter.length} à traiter)`, `Feedback (${aTraiter.length} to handle)`)}
+      actions={
+        <label className="discret" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+          <input type="checkbox" checked={voirTraites} onChange={(e) => setVoirTraites(e.currentTarget.checked)} />
+          {t('Voir aussi les messages traités', 'Also show handled messages')}
+        </label>
+      }
+    >
+      {erreur && <p style={{ color: 'var(--critique)' }}>{erreur}</p>}
+      {commentaires === null ? (
+        <p className="vide">{t('Chargement…', 'Loading…')}</p>
+      ) : affiches.length === 0 ? (
+        <p className="vide">{t('Aucun message à traiter.', 'No messages to handle.')}</p>
+      ) : (
+        affiches.map((c) => (
+          <div key={c.id} className="param" style={{ opacity: c.traite ? 0.6 : 1 }}>
+            <div className="param-tete">
+              <label>
+                <b>{libelle[c.type]}</b> · {new Date(c.cree_le).toLocaleString()}
+                {c.pseudo ? ` · ${c.pseudo}` : ` · ${t('sans compte', 'no account')}`}
+                {c.centre ? ` · ${c.centre}` : ''}
+              </label>
+              <button className="bouton" onClick={() => void marquer(c, !c.traite)}>
+                {c.traite ? t('Rouvrir', 'Reopen') : t('Traité', 'Handled')}
+              </button>
+            </div>
+            <p style={{ whiteSpace: 'pre-wrap', margin: '6px 0' }}>{c.message}</p>
+            {c.courriel && (
+              <p className="param-aide">
+                {t('Répondre à', 'Reply to')} <a href={`mailto:${c.courriel}`}>{c.courriel}</a>
+              </p>
+            )}
+            {c.appareil && <p className="param-aide">{c.appareil}</p>}
+          </div>
+        ))
+      )}
+    </Carte>
   )
 }

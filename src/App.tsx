@@ -10,6 +10,7 @@ import { VueFichiers } from './ui/views/VueFichiers'
 import { VueFormules } from './ui/views/VueFormules'
 import { VueGrimpeurs } from './ui/views/VueGrimpeurs'
 import { VueAdministration } from './ui/views/VueAdministration'
+import { VueCommentaires } from './ui/views/VueCommentaires'
 import { VueBlocs } from './ui/views/VueBlocs'
 
 const ONGLETS = [
@@ -19,6 +20,7 @@ const ONGLETS = [
   { id: 'formules', fr: 'Formules', en: 'Formulas', reserve: true },
   { id: 'donnees', fr: 'Données', en: 'Data', reserve: true },
   { id: 'fichiers', fr: 'Fichiers', en: 'Files', reserve: true },
+  { id: 'commentaires', fr: 'Commentaires', en: 'Feedback', reserve: false },
   // Compte admin general seulement (`compte.estAdmin`), independant de l'acces complet.
   { id: 'administration', fr: 'Administration', en: 'Admin', reserve: 'admin' },
 ] as const
@@ -75,7 +77,7 @@ function Contenu() {
   const onglets = ONGLETS.filter(ongletVisible)
   const [onglet, setOnglet] = useState<OngletId>('blocs')
   // Onglets qui ne montrent pas le calcul du centre choisi.
-  const horsCalcul = onglet === 'carte' || onglet === 'administration'
+  const horsCalcul = onglet === 'carte' || onglet === 'administration' || onglet === 'commentaires'
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
   const centre = CENTRES.find((c) => c.id === centreId) ?? CENTRES[0]
   const [blocCible, setBlocCible] = useState<string | null>(null)
@@ -175,6 +177,8 @@ function Contenu() {
         )}
 
         {onglet === 'administration' && <VueAdministration apresModification={atelier.recharger} />}
+
+        {onglet === 'commentaires' && <VueCommentaires centre={centre.fr} pseudo={compte.grimpeur?.nom ?? null} />}
 
         {onglet === 'carte' && (
           <VueCarte
