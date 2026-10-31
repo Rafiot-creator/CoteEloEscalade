@@ -47,6 +47,32 @@ type CentreId = (typeof CENTRES)[number]['id']
 // leur carte.
 const GROUPES_CALCUL: CentreId[][] = [['demo'], ['rose-bloc-1', 'rose-bloc-2']]
 
+/**
+ * Dernier centre et dernier onglet consultes, retenus dans ce navigateur pour
+ * qu'un rafraichissement y ramene (demande de Raphael : sans ca, tout le monde
+ * retombait sur la Demo). Simple commodite : si le stockage est indisponible
+ * (navigation privee), on repart des valeurs par defaut.
+ */
+const CLE_CENTRE = 'cee-centre'
+const CLE_ONGLET = 'cee-onglet'
+
+function lireMemoire<T extends string>(cle: string, valides: readonly T[], defaut: T): T {
+  try {
+    const v = localStorage.getItem(cle)
+    return v !== null && (valides as readonly string[]).includes(v) ? (v as T) : defaut
+  } catch {
+    return defaut
+  }
+}
+
+function ecrireMemoire(cle: string, valeur: string) {
+  try {
+    localStorage.setItem(cle, valeur)
+  } catch {
+    // Stockage indisponible : rien a retenir.
+  }
+}
+
 export function App() {
   return (
     <LangueProvider>
@@ -57,7 +83,10 @@ export function App() {
 
 function Contenu() {
   const compte = useCompte()
-  const [centreId, setCentreId] = useState<CentreId>('demo')
+  const [centreId, setCentreId] = useState<CentreId>(() =>
+    lireMemoire(CLE_CENTRE, CENTRES.map((c) => c.id), 'demo')
+  )
+  useEffect(() => ecrireMemoire(CLE_CENTRE, centreId), [centreId])
   const groupeCalcul = GROUPES_CALCUL.find((g) => g.includes(centreId))
   const donneesBranchees = !!groupeCalcul
   const atelier = useAtelier(compte.grimpeur, groupeCalcul ?? [centreId])
@@ -75,7 +104,10 @@ function Contenu() {
   const ongletVisible = (o: (typeof ONGLETS)[number]) =>
     o.reserve === 'admin' ? compte.estAdmin && !apercuVisiteur : vueComplete || !o.reserve
   const onglets = ONGLETS.filter(ongletVisible)
-  const [onglet, setOnglet] = useState<OngletId>('blocs')
+  const [onglet, setOnglet] = useState<OngletId>(() =>
+    lireMemoire(CLE_ONGLET, ONGLETS.map((o) => o.id), 'blocs')
+  )
+  useEffect(() => ecrireMemoire(CLE_ONGLET, onglet), [onglet])
   // Onglets qui ne montrent pas le calcul du centre choisi.
   const horsCalcul = onglet === 'carte' || onglet === 'administration' || onglet === 'commentaires'
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
@@ -87,9 +119,13 @@ function Contenu() {
   }
 
   useEffect(() => {
+    // Attendre de savoir qui est connecte : sinon l'onglet Administration,
+    // retenu d'une visite precedente, serait ecarte avant que la session ne
+    // dise que le compte est admin.
+    if (!compte.pret) return
     const courant = ONGLETS.find((o) => o.id === onglet)
     if (courant && !ongletVisible(courant)) setOnglet('blocs')
-  }, [vueComplete, onglet, compte.estAdmin, apercuVisiteur])
+  }, [vueComplete, onglet, compte.estAdmin, compte.pret, apercuVisiteur])
 
   useEffect(() => {
     const racine = document.documentElement
@@ -176,7 +212,7 @@ function Contenu() {
           />
         )}
 
-        {onglet === 'administration' && <VueAdministration apresModification={atelier.recharger} />}
+        {onglet === 'administration' && compte.estAdmin && <VueAdministration apresModification={atelier.recharger} />}
 
         {onglet === 'commentaires' && <VueCommentaires centre={centre.fr} pseudo={compte.grimpeur?.nom ?? null} />}
 

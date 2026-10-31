@@ -2097,3 +2097,9 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   **prêt pour l'essai en salle** et entre les blocs de RB1 et RB2 sur place la semaine du
   2 novembre 2026 (étape 5 de la base de données). Pourquoi des choix du jour : `DECISIONS.md`,
   « Les échelles maison et les centres Rose Bloc ».
+- **Dernier centre et dernier onglet retenus** dans le navigateur (`localStorage`, clés
+  `cee-centre` et `cee-onglet`, `src/App.tsx`) : un rafraîchissement ramène là où on était, au
+  lieu de la Démo, signalé par Raphaël. Une valeur inconnue ou un onglet auquel on n'a plus
+  droit retombe sur la Démo ou sur Blocs ; la vérification de l'onglet attend que la session
+  soit lue (sinon l'onglet Administration d'un admin serait écarté au rechargement).
+  Mentionné dans la politique de confidentialité (« Sur votre appareil »).
