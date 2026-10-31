@@ -13,6 +13,7 @@ import { Tableau, type Colonne } from '../components/Tableau'
 import { dateCourte, nombre, pourcent } from '../format'
 import { bilingue, useLangue } from '../langue'
 import { echantillonner } from '../etat'
+import { useChoixMemorise, useTriMemorise } from '../memoire'
 
 /** Au-dela, les teintes ne se distinguent plus de facon fiable. */
 const MAX_SERIES = 4
@@ -57,12 +58,13 @@ export function VueGrimpeurs({
   const melangeBloc = resultats.get('melange')
   const eloParGrimpeur = useMemo(() => new Map((eloBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [eloBloc])
   const melangeParGrimpeur = useMemo(() => new Map((melangeBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [melangeBloc])
-  const [styleSelectionne, setStyleSelectionne] = useState('')
+  // Style choisi et tri retenus dans ce navigateur (voir `memoire.ts`).
+  const [styleSelectionne, setStyleSelectionne] = useChoixMemorise<string>('cee-style-grimpeurs', ['', ...STYLES_BLOC], '')
   // Tri du tableau Classement, pilote depuis ici pour que choisir un style
   // dans le menu deroulant de la colonne "Cote par style" retrie aussitot le
   // classement sur cette colonne, sans empecher un clic manuel sur un autre
   // en-tete (cf. `onTri` sur `Tableau`).
-  const [triClassement, setTriClassement] = useState<{ cle: string; sens: 1 | -1 }>({ cle: 'rang', sens: 1 })
+  const [triClassement, setTriClassement] = useTriMemorise('grimpeurs', { cle: 'rang', sens: 1 })
 
   /**
    * Duels/reussites d'un grimpeur pour le style choisi, pour les colonnes a
@@ -447,6 +449,7 @@ function TableauProgression({ series }: { series: Serie[] }) {
       ]}
       cleLigne={(l) => `${l.nom}-${l.t}`}
       triInitial={{ cle: 'date', sens: 1 }}
+      memoire="progression"
       pageTaille={20}
       videMessage={t('Sélectionner au moins un grimpeur.', 'Select at least one climber.')}
     />

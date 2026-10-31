@@ -12,34 +12,6 @@ import { nombre, pourcent, signe, telecharger } from '../format'
 import { bilingue, useLangue } from '../langue'
 
 /**
- * Tri du tableau des blocs, retenu dans ce navigateur : un aller-retour vers un
- * autre onglet (qui démonte cet écran) ou un rafraîchissement le conserve tant
- * que l'utilisateur n'en choisit pas un autre (demande de Raphaël). Par défaut :
- * Calculée, du plus dur au plus facile.
- */
-type TriBlocs = { cle: string; sens: 1 | -1 }
-const CLE_TRI = 'cee-tri-blocs'
-const TRI_DEFAUT: TriBlocs = { cle: 'calculee', sens: -1 }
-
-function lireTri(): TriBlocs {
-  try {
-    const v = JSON.parse(localStorage.getItem(CLE_TRI) ?? 'null')
-    if (v && typeof v.cle === 'string' && (v.sens === 1 || v.sens === -1)) return { cle: v.cle, sens: v.sens }
-  } catch {
-    // Stockage indisponible ou valeur illisible : tri par défaut.
-  }
-  return TRI_DEFAUT
-}
-
-function ecrireTri(tri: TriBlocs) {
-  try {
-    localStorage.setItem(CLE_TRI, JSON.stringify(tri))
-  } catch {
-    // Stockage indisponible : le tri ne survivra pas au changement d'onglet.
-  }
-}
-
-/**
  * L'ecran qui repond a la question du projet : les cotations affichees en salle
  * tiennent-elles face a ce que les grimpeurs envoient reellement ?
  */
@@ -69,14 +41,6 @@ export function VueBlocs({
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
   const [tableauNuage, setTableauNuage] = useState(false)
   const [tableauHisto, setTableauHisto] = useState(false)
-  const [tri, setTri] = useState(lireTri)
-  const changerTri = (nouveau: TriBlocs) => {
-    setTri(nouveau)
-    ecrireTri(nouveau)
-  }
-  // Vue visiteur : Écart et Duels utiles sont masquées. Un tri retenu sur
-  // l'une d'elles (choisi en accès complet) retombe sur le tri par défaut.
-  const triAffiche = simplifie && (tri.cle === 'ecart' || tri.cle === 'matchs') ? TRI_DEFAUT : tri
 
   const plusieursSalles = resultat.resume.gyms.length > 1
   const gyms = useMemo(
@@ -418,8 +382,10 @@ export function VueBlocs({
               : colonnes
           }
           cleLigne={(b) => b.id}
-          tri={triAffiche}
-          onTri={changerTri}
+          // Par defaut : Calculee, du plus dur au plus facile. Un tri retenu sur
+          // une colonne masquee en vue visiteur y retombe.
+          triInitial={{ cle: 'calculee', sens: -1 }}
+          memoire="blocs"
           pageTaille={25}
         />
       </Carte>
@@ -489,6 +455,7 @@ export function VueBlocs({
               )}
               cleLigne={(b) => b.id}
               triInitial={{ cle: 'ecart', sens: -1 }}
+              memoire="blocs-nuage"
               pageTaille={12}
             />
           ) : (
@@ -583,6 +550,7 @@ function TableauClasses({ ecarts }: { ecarts: number[] }) {
       ]}
       cleLigne={(l) => String(l.debut)}
       triInitial={{ cle: 'classe', sens: 1 }}
+      memoire="blocs-classes"
       pageTaille={20}
     />
   )

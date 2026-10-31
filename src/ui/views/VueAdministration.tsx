@@ -340,6 +340,7 @@ export function VueAdministration({ apresModification }: { apresModification?: (
               colonnes={colonnesAscensions}
               cleLigne={(a) => String(a.id)}
               triInitial={{ cle: 'date', sens: -1 }}
+              memoire="administration"
               videMessage={t('Aucune ascension.', 'No ascents.')}
             />
           )}

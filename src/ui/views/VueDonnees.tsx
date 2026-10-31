@@ -248,6 +248,7 @@ export function VueDonnees({
             colonnes={colAscensions}
             cleLigne={(a) => String(a.rang)}
             triInitial={{ cle: 'date', sens: -1 }}
+            memoire="donnees"
           />
         )}
       </Carte>

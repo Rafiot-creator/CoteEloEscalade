@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { useInfobulle } from '../charts/base'
 import { nombre } from '../format'
 import { useLangue } from '../langue'
+import { useTriMemorise } from '../memoire'
 
 export interface Colonne<T> {
   cle: string
@@ -41,6 +42,12 @@ interface Props<T> {
    */
   tri?: { cle: string; sens: 1 | -1 }
   onTri?: (tri: { cle: string; sens: 1 | -1 }) => void
+  /**
+   * Nom sous lequel retenir le tri choisi dans ce navigateur (voir
+   * `memoire.ts`) : il survit a un changement d'onglet et a un
+   * rafraichissement. Sans nom, le tri repart de `triInitial` a chaque montage.
+   */
+  memoire?: string
   /** Nombre de lignes affichees d'un coup. */
   pageTaille?: number
   videMessage?: string
@@ -66,12 +73,17 @@ export function Tableau<T>({
   triInitial,
   tri: triPilote,
   onTri,
+  memoire,
   pageTaille = 50,
   videMessage,
   enEvidence,
 }: Props<T>) {
-  const [triInterne, setTriInterne] = useState(triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 })
-  const tri = triPilote ?? triInterne
+  const triDefaut = triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 }
+  const [triInterne, setTriInterne] = useTriMemorise(memoire, triDefaut)
+  // Un tri retenu sur une colonne absente (ex. masquee en vue visiteur)
+  // retombe sur le tri par defaut plutot que sur l'ordre brut des lignes.
+  const triVoulu = triPilote ?? triInterne
+  const tri = colonnes.some((c) => c.cle === triVoulu.cle) ? triVoulu : triDefaut
   const changerTri = onTri ?? setTriInterne
   const [limite, setLimite] = useState(pageTaille)
   const { montrer, cacher, noeud } = useInfobulle()
