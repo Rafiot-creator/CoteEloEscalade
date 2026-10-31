@@ -941,8 +941,10 @@ visiteur.
 
 ### Cartes disponibles aujourd'hui
 
-- **Démo** — un plan inventé (`public/cartes/demo.svg`), quatre bandes murales reprenant les
-  quatre styles du jeu de données (`src/core/stylesBloc.ts` — Dalle, Coordo, Dévers, Joker ;
+- **Démo** — un plan inventé (`public/cartes/demo.svg`), trois bandes murales reprenant les
+  trois styles du jeu de données (`src/core/stylesBloc.ts` — Physique en haut, Technique en bas,
+  Coordo à gauche ; la bande de droite est devenue des vestiaires. Quatre bandes du 17 septembre
+  au 31 octobre 2026 (Dalle, Coordo, Dévers, Joker),
   neuf bandes plus fines du 16 au 17 septembre 2026, huit avant ça). 50 blocs y sont placés, un
   échantillon proportionnel par style (méthode du plus grand reste,
   `scripts/generer-carte-demo.mjs`) tiré des 369 du jeu de démonstration pour rester lisible ; les
@@ -971,8 +973,9 @@ visiteur.
 ## La cote par style
 
 Un bloc a un **style** (`secteur` dans les données, colonne « Style » à l'affichage) : un
-vocabulaire contrôlé déclaré dans `src/core/stylesBloc.ts` — Dalle, Coordo, Dévers, Joker depuis
-le 17 septembre 2026 (neuf valeurs plus fines du 16 au 17 septembre, huit avant ça — voir
+vocabulaire contrôlé déclaré dans `src/core/stylesBloc.ts` — **Physique, Technique, Coordo** depuis
+le 31 octobre 2026 ; Dalle, Coordo, Dévers, Joker du 17 septembre au 31 octobre
+(neuf valeurs plus fines du 16 au 17 septembre 2026, huit avant ça — voir
 DECISIONS.md pour l'historique si besoin). Une valeur hors de cette liste n'est pas rejetée au
 chargement, juste signalée en avertissement (écran **Fichiers**) : elle continue de compter dans
 la cote globale, mais n'apparaît dans aucune ventilation par style.
@@ -2034,3 +2037,16 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   une nouvelle nomenclature des styles de bloc**, qui remplacera Dalle, Coordo, Dévers et
   Joker (liste pas encore donnée). Restent aussi l'étape 5 (essai dans un vrai centre) et les
   limites connues : glisser un bloc au doigt, nommer un ouvreur sans SQL.
+- **Nouvelle nomenclature des styles : Physique, Technique, Coordo** (au lieu de Dalle, Coordo,
+  Dévers, Joker), demandée par Raphaël, pour tous les centres (une seule liste,
+  `STYLES_BLOC`). Jeu de la Démo régénéré : seuls le style et le nom des blocs changent
+  (préfixes PH-, TE-, CO-), ascensions et grimpeurs identiques au caractère près, donc mêmes
+  cotes globales ; 126 Physique, 125 Technique, 118 Coordo. Carte Démo à trois murs (Physique
+  en haut, Technique en bas, Coordo à gauche, vestiaires à droite), 50 pastilles replacées
+  (36,5 unités de séparation minimale). Base : `verifier_champs_bloc` n'accepte plus que les
+  trois styles, et les 369 blocs de la Démo reprennent style, nom et position
+  (`supabase/migrations/20261031000100_styles_physique_technique_coordo.sql`, produite par un
+  script ponctuel). Aucun bloc de Rose Bloc n'avait de style : rien à convertir. Vérifié dans
+  Chrome : menu de Grimpeurs, cote par style, Carte Démo, aucun avertissement de style.
+  `20261029000100_donnees_demo.sql` garde les anciens styles (une migration appliquée ne se
+  modifie pas) ; la nouvelle migration les remplace juste après.

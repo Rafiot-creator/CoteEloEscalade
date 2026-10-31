@@ -2,20 +2,344 @@
   "fond": "cartes/demo.svg",
   "blocs": [
     {
+      "id": "b0097",
+      "nom": "TE-0097",
+      "x": 0.0605,
+      "y": 0.8949,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Technique"
+    },
+    {
+      "id": "b0232",
+      "nom": "TE-0232",
+      "x": 0.1143,
+      "y": 0.9085,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Technique"
+    },
+    {
+      "id": "b0170",
+      "nom": "TE-0170",
+      "x": 0.1755,
+      "y": 0.9136,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Technique"
+    },
+    {
+      "id": "b0200",
+      "nom": "TE-0200",
+      "x": 0.2205,
+      "y": 0.9196,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Technique"
+    },
+    {
+      "id": "b0120",
+      "nom": "TE-0120",
+      "x": 0.2772,
+      "y": 0.8996,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Technique"
+    },
+    {
+      "id": "b0305",
+      "nom": "TE-0305",
+      "x": 0.3328,
+      "y": 0.9047,
+      "cotation": "V5",
+      "couleur": "bleu",
+      "style": "Technique"
+    },
+    {
+      "id": "b0085",
+      "nom": "TE-0085",
+      "x": 0.3944,
+      "y": 0.9002,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0205",
+      "nom": "TE-0205",
+      "x": 0.4436,
+      "y": 0.9072,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0379",
+      "nom": "TE-0379",
+      "x": 0.4921,
+      "y": 0.9032,
+      "cotation": "V9",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0285",
+      "nom": "TE-0285",
+      "x": 0.5592,
+      "y": 0.8996,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0297",
+      "nom": "TE-0297",
+      "x": 0.6003,
+      "y": 0.9033,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0282",
+      "nom": "TE-0282",
+      "x": 0.6602,
+      "y": 0.9088,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Technique"
+    },
+    {
+      "id": "b0382",
+      "nom": "TE-0382",
+      "x": 0.7227,
+      "y": 0.9111,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Technique"
+    },
+    {
+      "id": "b0335",
+      "nom": "TE-0335",
+      "x": 0.7762,
+      "y": 0.9123,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0044",
+      "nom": "TE-0044",
+      "x": 0.8297,
+      "y": 0.8986,
+      "cotation": "V6",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0138",
+      "nom": "TE-0138",
+      "x": 0.8914,
+      "y": 0.9145,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Technique"
+    },
+    {
+      "id": "b0220",
+      "nom": "TE-0220",
+      "x": 0.9326,
+      "y": 0.9185,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Technique"
+    },
+    {
+      "id": "b0313",
+      "nom": "PH-0313",
+      "x": 0.0614,
+      "y": 0.0855,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Physique"
+    },
+    {
       "id": "b0296",
-      "nom": "CO-0296",
-      "x": 0.0542,
-      "y": 0.2113,
+      "nom": "PH-0296",
+      "x": 0.1224,
+      "y": 0.0817,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Physique"
+    },
+    {
+      "id": "b0222",
+      "nom": "PH-0222",
+      "x": 0.1647,
+      "y": 0.0964,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Physique"
+    },
+    {
+      "id": "b0396",
+      "nom": "PH-0396",
+      "x": 0.2263,
+      "y": 0.0867,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Physique"
+    },
+    {
+      "id": "b0260",
+      "nom": "PH-0260",
+      "x": 0.2862,
+      "y": 0.0892,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Physique"
+    },
+    {
+      "id": "b0216",
+      "nom": "PH-0216",
+      "x": 0.3324,
+      "y": 0.0903,
+      "cotation": "V8",
+      "couleur": "rouge",
+      "style": "Physique"
+    },
+    {
+      "id": "b0160",
+      "nom": "PH-0160",
+      "x": 0.3933,
+      "y": 0.0913,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Physique"
+    },
+    {
+      "id": "b0196",
+      "nom": "PH-0196",
+      "x": 0.4521,
+      "y": 0.0935,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Physique"
+    },
+    {
+      "id": "b0269",
+      "nom": "PH-0269",
+      "x": 0.496,
+      "y": 0.0918,
+      "cotation": "V9",
+      "couleur": "noir",
+      "style": "Physique"
+    },
+    {
+      "id": "b0149",
+      "nom": "PH-0149",
+      "x": 0.563,
+      "y": 0.0929,
+      "cotation": "V10",
+      "couleur": "noir",
+      "style": "Physique"
+    },
+    {
+      "id": "b0093",
+      "nom": "PH-0093",
+      "x": 0.6151,
+      "y": 0.0838,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Physique"
+    },
+    {
+      "id": "b0151",
+      "nom": "PH-0151",
+      "x": 0.661,
+      "y": 0.0819,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Physique"
+    },
+    {
+      "id": "b0201",
+      "nom": "PH-0201",
+      "x": 0.7161,
+      "y": 0.0953,
+      "cotation": "V3",
+      "couleur": "vert",
+      "style": "Physique"
+    },
+    {
+      "id": "b0372",
+      "nom": "PH-0372",
+      "x": 0.7753,
+      "y": 0.0943,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Physique"
+    },
+    {
+      "id": "b0116",
+      "nom": "PH-0116",
+      "x": 0.8214,
+      "y": 0.0971,
+      "cotation": "V7",
+      "couleur": "noir",
+      "style": "Physique"
+    },
+    {
+      "id": "b0281",
+      "nom": "PH-0281",
+      "x": 0.883,
+      "y": 0.0798,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Physique"
+    },
+    {
+      "id": "b0134",
+      "nom": "PH-0134",
+      "x": 0.9401,
+      "y": 0.0955,
+      "cotation": "V6",
+      "couleur": "bleu",
+      "style": "Physique"
+    },
+    {
+      "id": "b0103",
+      "nom": "CO-0103",
+      "x": 0.0538,
+      "y": 0.2062,
+      "cotation": "V4",
+      "couleur": "bleu",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0286",
+      "nom": "CO-0286",
+      "x": 0.0919,
+      "y": 0.2067,
       "cotation": "V7",
       "couleur": "rouge",
       "style": "Coordo"
     },
     {
-      "id": "b0222",
-      "nom": "CO-0222",
-      "x": 0.0907,
-      "y": 0.2125,
-      "cotation": "V2",
+      "id": "b0177",
+      "nom": "CO-0177",
+      "x": 0.0539,
+      "y": 0.2897,
+      "cotation": "V7",
+      "couleur": "rouge",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0271",
+      "nom": "CO-0271",
+      "x": 0.0909,
+      "y": 0.2902,
+      "cotation": "V1",
       "couleur": "jaune",
       "style": "Coordo"
     },
@@ -23,61 +347,52 @@
       "id": "b0342",
       "nom": "CO-0342",
       "x": 0.0532,
-      "y": 0.3077,
+      "y": 0.3737,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Coordo"
     },
     {
-      "id": "b0200",
-      "nom": "CO-0200",
-      "x": 0.0908,
-      "y": 0.3092,
-      "cotation": "V2",
+      "id": "b0353",
+      "nom": "CO-0353",
+      "x": 0.0915,
+      "y": 0.3732,
+      "cotation": "V5",
       "couleur": "jaune",
-      "style": "Coordo"
-    },
-    {
-      "id": "b0396",
-      "nom": "CO-0396",
-      "x": 0.0537,
-      "y": 0.4036,
-      "cotation": "V6",
-      "couleur": "bleu",
-      "style": "Coordo"
-    },
-    {
-      "id": "b0260",
-      "nom": "CO-0260",
-      "x": 0.0917,
-      "y": 0.4038,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Coordo"
-    },
-    {
-      "id": "b0160",
-      "nom": "CO-0160",
-      "x": 0.054,
-      "y": 0.4999,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Coordo"
-    },
-    {
-      "id": "b0196",
-      "nom": "CO-0196",
-      "x": 0.0918,
-      "y": 0.5,
-      "cotation": "V7",
-      "couleur": "rouge",
       "style": "Coordo"
     },
     {
       "id": "b0030",
       "nom": "CO-0030",
       "x": 0.0542,
-      "y": 0.597,
+      "y": 0.4591,
+      "cotation": "V2",
+      "couleur": "jaune",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0374",
+      "nom": "CO-0374",
+      "x": 0.0919,
+      "y": 0.4586,
+      "cotation": "V4",
+      "couleur": "vert",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0239",
+      "nom": "CO-0239",
+      "x": 0.0541,
+      "y": 0.543,
+      "cotation": "V1",
+      "couleur": "jaune",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0021",
+      "nom": "CO-0021",
+      "x": 0.0909,
+      "y": 0.5427,
       "cotation": "V2",
       "couleur": "jaune",
       "style": "Coordo"
@@ -85,371 +400,56 @@
     {
       "id": "b0180",
       "nom": "CO-0180",
-      "x": 0.0915,
-      "y": 0.5965,
+      "x": 0.054,
+      "y": 0.6265,
       "cotation": "V1",
       "couleur": "jaune",
       "style": "Coordo"
     },
     {
-      "id": "b0372",
-      "nom": "CO-0372",
-      "x": 0.0539,
-      "y": 0.692,
-      "cotation": "V2",
-      "couleur": "jaune",
+      "id": "b0059",
+      "nom": "CO-0059",
+      "x": 0.0917,
+      "y": 0.6266,
+      "cotation": "V10",
+      "couleur": "noir",
       "style": "Coordo"
     },
     {
-      "id": "b0138",
-      "nom": "CO-0138",
-      "x": 0.0919,
-      "y": 0.6924,
-      "cotation": "V8",
-      "couleur": "rouge",
-      "style": "Coordo"
-    },
-    {
-      "id": "b0134",
-      "nom": "CO-0134",
+      "id": "b0324",
+      "nom": "CO-0324",
       "x": 0.0539,
-      "y": 0.788,
-      "cotation": "V6",
+      "y": 0.7103,
+      "cotation": "V5",
       "couleur": "bleu",
+      "style": "Coordo"
+    },
+    {
+      "id": "b0215",
+      "nom": "CO-0215",
+      "x": 0.0907,
+      "y": 0.7094,
+      "cotation": "V7",
+      "couleur": "rouge",
       "style": "Coordo"
     },
     {
       "id": "b0392",
       "nom": "CO-0392",
-      "x": 0.0916,
-      "y": 0.788,
+      "x": 0.0541,
+      "y": 0.794,
       "cotation": "V4",
       "couleur": "vert",
       "style": "Coordo"
     },
     {
-      "id": "b0286",
-      "nom": "JO-0286",
-      "x": 0.0845,
-      "y": 0.9138,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Joker"
-    },
-    {
-      "id": "b0232",
-      "nom": "JO-0232",
-      "x": 0.1477,
-      "y": 0.9089,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Joker"
-    },
-    {
-      "id": "b0170",
-      "nom": "JO-0170",
-      "x": 0.2335,
-      "y": 0.9154,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Joker"
-    },
-    {
-      "id": "b0216",
-      "nom": "JO-0216",
-      "x": 0.3018,
-      "y": 0.9039,
-      "cotation": "V8",
-      "couleur": "rouge",
-      "style": "Joker"
-    },
-    {
-      "id": "b0120",
-      "nom": "JO-0120",
-      "x": 0.3786,
-      "y": 0.8975,
-      "cotation": "V10",
-      "couleur": "noir",
-      "style": "Joker"
-    },
-    {
-      "id": "b0374",
-      "nom": "JO-0374",
-      "x": 0.4718,
-      "y": 0.9166,
-      "cotation": "V4",
-      "couleur": "vert",
-      "style": "Joker"
-    },
-    {
-      "id": "b0282",
-      "nom": "JO-0282",
-      "x": 0.5337,
-      "y": 0.9093,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Joker"
-    },
-    {
-      "id": "b0382",
-      "nom": "JO-0382",
-      "x": 0.6212,
-      "y": 0.9122,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Joker"
-    },
-    {
-      "id": "b0044",
-      "nom": "JO-0044",
-      "x": 0.6957,
-      "y": 0.8961,
+      "id": "b0295",
+      "nom": "CO-0295",
+      "x": 0.0906,
+      "y": 0.7934,
       "cotation": "V6",
-      "couleur": "rouge",
-      "style": "Joker"
-    },
-    {
-      "id": "b0324",
-      "nom": "JO-0324",
-      "x": 0.7739,
-      "y": 0.9152,
-      "cotation": "V5",
       "couleur": "bleu",
-      "style": "Joker"
-    },
-    {
-      "id": "b0220",
-      "nom": "JO-0220",
-      "x": 0.8422,
-      "y": 0.9217,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Joker"
-    },
-    {
-      "id": "b0116",
-      "nom": "JO-0116",
-      "x": 0.9175,
-      "y": 0.9125,
-      "cotation": "V7",
-      "couleur": "noir",
-      "style": "Joker"
-    },
-    {
-      "id": "b0313",
-      "nom": "DA-0313",
-      "x": 0.0696,
-      "y": 0.0834,
-      "cotation": "V3",
-      "couleur": "vert",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0271",
-      "nom": "DA-0271",
-      "x": 0.1362,
-      "y": 0.0939,
-      "cotation": "V1",
-      "couleur": "jaune",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0305",
-      "nom": "DA-0305",
-      "x": 0.2099,
-      "y": 0.0898,
-      "cotation": "V5",
-      "couleur": "bleu",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0205",
-      "nom": "DA-0205",
-      "x": 0.2832,
-      "y": 0.0929,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0149",
-      "nom": "DA-0149",
-      "x": 0.3675,
-      "y": 0.0929,
-      "cotation": "V10",
-      "couleur": "noir",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0379",
-      "nom": "DA-0379",
-      "x": 0.4184,
-      "y": 0.0878,
-      "cotation": "V9",
-      "couleur": "rouge",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0151",
-      "nom": "DA-0151",
-      "x": 0.496,
-      "y": 0.0788,
-      "cotation": "V3",
-      "couleur": "vert",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0021",
-      "nom": "DA-0021",
-      "x": 0.5657,
-      "y": 0.1051,
-      "cotation": "V2",
-      "couleur": "jaune",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0201",
-      "nom": "DA-0201",
-      "x": 0.6395,
-      "y": 0.096,
-      "cotation": "V3",
-      "couleur": "vert",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0059",
-      "nom": "DA-0059",
-      "x": 0.7211,
-      "y": 0.1039,
-      "cotation": "V10",
-      "couleur": "noir",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0367",
-      "nom": "DA-0367",
-      "x": 0.7927,
-      "y": 0.0901,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0363",
-      "nom": "DA-0363",
-      "x": 0.8622,
-      "y": 0.1087,
-      "cotation": "V4",
-      "couleur": "vert",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0287",
-      "nom": "DA-0287",
-      "x": 0.9196,
-      "y": 0.1004,
-      "cotation": "V8",
-      "couleur": "rouge",
-      "style": "Dalle"
-    },
-    {
-      "id": "b0103",
-      "nom": "DÉ-0103",
-      "x": 0.9276,
-      "y": 0.1944,
-      "cotation": "V4",
-      "couleur": "bleu",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0097",
-      "nom": "DÉ-0097",
-      "x": 0.9268,
-      "y": 0.2514,
-      "cotation": "V9",
-      "couleur": "noir",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0177",
-      "nom": "DÉ-0177",
-      "x": 0.9281,
-      "y": 0.3149,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0085",
-      "nom": "DÉ-0085",
-      "x": 0.9289,
-      "y": 0.3754,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0353",
-      "nom": "DÉ-0353",
-      "x": 0.9286,
-      "y": 0.435,
-      "cotation": "V5",
-      "couleur": "jaune",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0269",
-      "nom": "DÉ-0269",
-      "x": 0.9261,
-      "y": 0.4996,
-      "cotation": "V9",
-      "couleur": "noir",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0093",
-      "nom": "DÉ-0093",
-      "x": 0.9295,
-      "y": 0.5578,
-      "cotation": "V3",
-      "couleur": "vert",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0285",
-      "nom": "DÉ-0285",
-      "x": 0.9291,
-      "y": 0.6194,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0297",
-      "nom": "DÉ-0297",
-      "x": 0.9242,
-      "y": 0.6817,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0239",
-      "nom": "DÉ-0239",
-      "x": 0.9292,
-      "y": 0.7487,
-      "cotation": "V1",
-      "couleur": "jaune",
-      "style": "Dévers"
-    },
-    {
-      "id": "b0335",
-      "nom": "DÉ-0335",
-      "x": 0.9285,
-      "y": 0.807,
-      "cotation": "V7",
-      "couleur": "rouge",
-      "style": "Dévers"
+      "style": "Coordo"
     }
   ]
 }

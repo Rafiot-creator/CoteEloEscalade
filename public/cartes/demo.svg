@@ -16,12 +16,15 @@
   <rect x="420" y="500" width="160" height="40" rx="10" fill="none" stroke="#222" stroke-width="2"/>
   <text x="500" y="525" text-anchor="middle" font-size="16" fill="#333" letter-spacing="1">ACCUEIL</text>
 
-  <!-- Etiquettes des quatre styles de mur (src/core/stylesBloc.ts), dans la
+  <!-- Bande de droite : pas un mur d escalade depuis le passage a trois styles. -->
+  <rect x="872" y="106" width="126" height="488" fill="#eceae3"/>
+  <text x="935" y="350" text-anchor="middle" font-size="16" fill="#777" letter-spacing="1" transform="rotate(-90 935 350)">VESTIAIRES</text>
+
+  <!-- Etiquettes des trois styles de mur (src/core/stylesBloc.ts), dans la
        marge de 25 unites entre le bord exterieur et les zones de placement
        des pastilles (ZONES, generer-carte-demo.mjs) : jamais recouvertes,
        contrairement a un premier essai centre dans la bande elle-meme. -->
-  <text x="500" y="16" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1">DALLE</text>
-  <text x="988" y="350" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 988 350)">DEVERS</text>
-  <text x="500" y="694" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1">JOKER</text>
+  <text x="500" y="16" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1">PHYSIQUE</text>
+  <text x="500" y="694" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1">TECHNIQUE</text>
   <text x="13" y="350" text-anchor="middle" font-size="16" font-weight="700" fill="#333" letter-spacing="1" transform="rotate(-90 13 350)">COORDO</text>
 </svg>

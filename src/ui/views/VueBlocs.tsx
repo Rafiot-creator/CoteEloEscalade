@@ -149,7 +149,7 @@ export function VueBlocs({
       cle: 'secteur',
       titre: t('Style', 'Style'),
       valeur: (b) => b.secteur,
-      aide: t('Type de mur ou de mouvement du bloc (dévers, dalle, toit...).', "The boulder's wall type or movement style (overhang, slab, roof...)."),
+      aide: t('Style du bloc : Physique, Technique ou Coordo.', "The boulder's style: Physique (physical), Technique or Coordo (coordination)."),
     },
     {
       cle: 'couleur',

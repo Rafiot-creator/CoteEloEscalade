@@ -705,13 +705,12 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**Annoncé par Raphaël le 2026-10-31 : nouvelle nomenclature des styles de bloc.** Les quatre
-styles actuels (Dalle, Coordo, Dévers, Joker, `STYLES_BLOC`) vont être remplacés ; la liste
-n'a pas encore été donnée, la lui demander. Endroits à changer, comme le 17 septembre :
-`src/core/stylesBloc.ts`, le générateur et `data/blocs.csv` de la Démo, la Carte Démo (une
-bande murale par style), et cette fois aussi la base (`verifier_champs_bloc`, nouvelle
-migration, plus les blocs déjà enregistrés sur RB1/RB2 et la Démo à convertir — demander à
-Raphaël la correspondance entre anciens et nouveaux styles).
+**Styles de bloc, 2026-10-31 : Physique, Technique, Coordo** (une seule liste pour tous les
+centres, `STYLES_BLOC`), remplacent Dalle, Coordo, Dévers, Joker. Fait et poussé : Démo
+régénérée (style et nom seulement), Carte Démo à trois murs, migration
+`20261031000100_styles_physique_technique_coordo.sql` (vérification des styles + 369 blocs de
+la Démo). Les blocs de RB1/RB2 n'avaient pas de style : à donner dans l'éditeur en les posant,
+sinon ils n'entrent dans aucune cote par style.
 
 **Suite de la base de données** (voir ci-dessus) : étape 5 (essai dans un vrai centre, une fois
 l'accord de Rose Bloc obtenu ; voir « Avant l'étape 5 » plus haut) ou vérification de la

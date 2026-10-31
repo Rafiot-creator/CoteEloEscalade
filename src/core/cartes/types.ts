@@ -25,7 +25,7 @@ export interface BlocCarte {
    * `PALETTE_COULEURS` (src/ui/views/VueCarte.tsx), ex. 'bleu', 'noir'.
    */
   couleur: string
-  /** Style du bloc (dalle, devers, nom du secteur...). Texte libre. */
+  /** Style du bloc (`STYLES_BLOC` : Physique, Technique, Coordo), ou vide. */
   style: string
 }
 

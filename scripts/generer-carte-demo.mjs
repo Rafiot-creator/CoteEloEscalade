@@ -26,10 +26,11 @@ const COULEUR_PAR_NOM = { Bleu: 'bleu', Vert: 'vert', Jaune: 'jaune', Rouge: 'ro
 // demi-douzaine), et une bande etroite en une seule colonne ne suffit plus a
 // garder SEPARATION_MIN sur toute sa longueur. Elargir permet a la grille de
 // passer a deux colonnes, ce qui suffit (verifie programmatiquement).
+// Trois styles depuis le 2026-10-31 (Physique, Technique, Coordo) : la bande
+// de droite n'est plus un mur d'escalade (vestiaires, dans demo.svg).
 const ZONES = {
-  Dalle: { x0: 25, x1: 975, y0: 25, y1: 105 },
-  Dévers: { x0: 880, x1: 975, y0: 105, y1: 595 },
-  Joker: { x0: 25, x1: 975, y0: 595, y1: 675 },
+  Physique: { x0: 25, x1: 975, y0: 25, y1: 105 },
+  Technique: { x0: 25, x1: 975, y0: 595, y1: 675 },
   Coordo: { x0: 25, x1: 120, y0: 105, y1: 595 },
 }
 const LARGEUR = 1000

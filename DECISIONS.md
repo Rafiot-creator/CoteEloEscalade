@@ -193,6 +193,11 @@ d'essai de 10 blocs se compte par groupe. **Pour les centres suivants, Raphaël 
 empiler des groupes** mais appliquer les pistes du 18 septembre (§ 7, « Uniformiser les cotes
 entre centres »).
 
+**Une seule liste de styles pour tous les centres** (Physique, Technique, Coordo depuis le 31
+octobre 2026, troisième vocabulaire après huit puis neuf puis quatre valeurs). Contrairement à
+l'échelle, le style n'est pas traduit par centre : la cote par style compare des grimpeurs entre
+eux sur une même liste. Une liste par centre ne serait à faire que si un centre en demandait une.
+
 **Corriger les données passe par des fonctions réservées à l'admin général**, comme toute
 écriture depuis l'étape 2 : l'écran Administration ne touche jamais les tables directement, et
 chaque fonction revérifie le droit (`verifier_admin`). Né d'un cas réel : un bloc test démonté
