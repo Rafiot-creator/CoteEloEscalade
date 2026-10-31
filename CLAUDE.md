@@ -655,6 +655,10 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   (`VueCommentaires.tsx`), lus et rangés en haut de l'écran Administration ; table
   `commentaires` sans accès direct, `envoyer_commentaire` avec limites de débit. Pas de
   courriel d'avertissement (choix de Raphaël). Politique de confidentialité mise à jour.
+- **Centre principal et flash en cote Rose Bloc, 2026-10-31** : question du centre à
+  l'inscription (, public, modifiable), qui présélectionne un centre
+  branché (RB1/RB2) ; niveau de flash en V ou en 1-15 pour un centre Rose Bloc
+  ( fractionnaire, niveau plafonné à V12).
 - Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
   l'accord de Rose Bloc pour un essai (étape 5).
 
@@ -706,7 +710,7 @@ de ces choix : `DECISIONS.md`, « Les échelles maison et les centres Rose Bloc 
 est bloqué par le garde-fou du mode auto à chaque nouvelle migration : l'accord de Raphaël
 vaut pour une migration, le redemander pour la suivante.
 
-**Suite et fin de la session du 2026-10-31.** Dernier commit de code `d5b49d7`, déploiement
+**Suite et fin de la session du 2026-10-31.** Dernier commit de code : voir `git log` (centre principal fait après `d5b49d7`), déploiement
 vérifié vert, migrations appliquées jusqu'à `20261031000300_commentaires.sql`. Fait ensuite,
 chaque fois testé par Raphaël lui-même sur le site en ligne : styles Physique, Technique,
 Coordo ; blocs spéciaux de RB1 ; glisser un bloc au doigt (sur son téléphone) ; onglet

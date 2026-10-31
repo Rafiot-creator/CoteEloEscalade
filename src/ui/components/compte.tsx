@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { etiquettesEchelle, versCotationV, type Echelle } from '../../core/echelles'
+import { supabase } from '../../core/supabase'
 import type { Compte } from '../compte'
 import { useLangue } from '../langue'
 import { BoutonGoogle } from './BoutonGoogle'
@@ -12,6 +14,62 @@ export function libelleCompte(compte: Compte, t: (fr: string, en: string) => str
 
 const INCONNU = 'inconnu'
 
+interface CentreInscription {
+  id: string
+  nom: string
+  echelle: Echelle
+}
+
+/** Centres proposes comme centre principal (table `centres`, sans la Demo). */
+function useCentres(): CentreInscription[] {
+  const [centres, setCentres] = useState<CentreInscription[]>([])
+  useEffect(() => {
+    void supabase
+      .from('centres')
+      .select('id, nom, echelle')
+      .neq('id', 'demo')
+      .order('nom')
+      .returns<CentreInscription[]>()
+      .then(({ data }) => setCentres(data ?? []))
+  }, [])
+  return centres
+}
+
+const AUCUN_CENTRE = 'aucun'
+
+/**
+ * Centre ou l'on grimpe le plus souvent : preselectionne ce centre a la
+ * premiere visite, et s'affiche dans la colonne « Salle » des classements.
+ * `valeur` : id du centre, AUCUN_CENTRE, ou '' tant que rien n'est choisi.
+ */
+function ChoixCentre({ centres, valeur, onChange }: { centres: CentreInscription[]; valeur: string; onChange: (v: string) => void }) {
+  const { t } = useLangue()
+  return (
+    <>
+      <label htmlFor="choix-centre" style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>
+        {t('Dans quel centre grimpez-vous le plus souvent ?', 'Which gym do you climb at most often?')}
+      </label>
+      <select id="choix-centre" value={valeur} onChange={(e) => onChange(e.currentTarget.value)} style={{ minWidth: 220 }}>
+        <option value="" disabled>
+          {t('Choisir…', 'Choose…')}
+        </option>
+        {centres.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.nom}
+          </option>
+        ))}
+        <option value={AUCUN_CENTRE}>{t('Un autre centre', 'Another gym')}</option>
+      </select>
+      <p className="param-aide" style={{ margin: '4px 0 0' }}>
+        {t(
+          'Affiché dans les classements, à côté de votre pseudonyme. Modifiable ensuite.',
+          'Shown in the rankings, next to your username. Can be changed later.'
+        )}
+      </p>
+    </>
+  )
+}
+
 /**
  * La question du niveau de flash. La cote de depart du grimpeur sera un cran
  * au-dessus (flash V4 -> depart a 5000, cf. supabase/migrations/), puisqu'une
@@ -22,24 +80,58 @@ function ChoixFlash({
   valeur,
   onChange,
   sansInconnu = false,
+  echelleCentre = 'v',
 }: {
   valeur: string
   onChange: (v: string) => void
   sansInconnu?: boolean
+  /**
+   * Echelle du centre principal : dans un centre Rose Bloc, le grimpeur peut
+   * repondre en cote 1-15, convertie en V (src/core/echelles.ts). `valeur`
+   * reste toujours une cote V.
+   */
+  echelleCentre?: Echelle
 }) {
   const { t } = useLangue()
+  const [echelle, setEchelle] = useState<Echelle>('v')
+  const echelleAffichee = echelleCentre === 'v' ? 'v' : echelle
+  const options =
+    echelleAffichee === 'v'
+      ? Array.from({ length: 12 }, (_, i) => ({ valeur: `V${i}`, libelle: `V${i}` }))
+      : etiquettesEchelle(echelleAffichee).map((n) => ({ valeur: versCotationV(n, echelleAffichee), libelle: n }))
+  const changerEchelle = (e: Echelle) => {
+    setEchelle(e)
+    if (valeur !== INCONNU) onChange('')
+  }
   return (
     <>
       <label htmlFor="choix-flash" style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>
         {t('Quelle cote flashez-vous habituellement ?', 'What grade do you usually flash?')}
       </label>
+      {echelleCentre !== 'v' && (
+        <div style={{ display: 'flex', gap: 14, fontSize: 13, marginBottom: 4 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <input type="radio" name="echelle-flash" checked={echelleAffichee === 'v'} onChange={() => changerEchelle('v')} />
+            {t('Cote V', 'V grade')}
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <input
+              type="radio"
+              name="echelle-flash"
+              checked={echelleAffichee !== 'v'}
+              onChange={() => changerEchelle(echelleCentre)}
+            />
+            {t('Cote Rose Bloc (1 à 15)', 'Rose Bloc grade (1 to 15)')}
+          </label>
+        </div>
+      )}
       <select id="choix-flash" value={valeur} onChange={(e) => onChange(e.currentTarget.value)} style={{ minWidth: 220 }}>
         <option value="" disabled>
           {t('Choisir…', 'Choose…')}
         </option>
-        {Array.from({ length: 12 }, (_, i) => `V${i}`).map((v) => (
-          <option key={v} value={v}>
-            {v}
+        {options.map((o) => (
+          <option key={o.valeur} value={o.valeur}>
+            {o.libelle}
           </option>
         ))}
         {!sansInconnu && <option value={INCONNU}>{t('Je ne sais pas', "I don't know")}</option>}
@@ -59,8 +151,20 @@ function ChoixFlash({
  * -> pseudonyme (premiere connexion seulement) -> connecte. Sert aussi a
  * choisir un nouveau mot de passe au retour du lien « mot de passe oublie ».
  */
-export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresProfil: () => void }) {
+export function PanneauCompte({
+  compte,
+  apresProfil,
+}: {
+  compte: Compte
+  /** `centre` : centre principal choisi a la creation du profil, s'il y en a un. */
+  apresProfil: (centre?: string | null) => void
+}) {
   const { t } = useLangue()
+  const centres = useCentres()
+  // Centre principal : id, AUCUN_CENTRE, ou '' tant que rien n'est choisi.
+  const [centre, setCentre] = useState('')
+  const echelleCentre = centres.find((c) => c.id === centre)?.echelle ?? 'v'
+  const centreConnu = centre && centre !== AUCUN_CENTRE ? centre : null
   const [courriel, setCourriel] = useState('')
   const [motDePasse, setMotDePasse] = useState('')
   const [mode, setMode] = useState<'connexion' | 'inscription' | 'oubli'>('connexion')
@@ -160,6 +264,19 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
                 `Account ${compte.courriel ?? ''}. Your sends on the Map are saved in the database under this username. Your email is never shown.`
               )}
             </p>
+            <div style={{ marginBottom: 12 }}>
+              {/* Enregistre au changement : n'entre dans aucun calcul, rien a confirmer. */}
+              <ChoixCentre
+                centres={centres}
+                valeur={centres.find((c) => c.nom === compte.grimpeur?.gymPrincipal)?.id ?? (compte.grimpeur.gymPrincipal ? '' : AUCUN_CENTRE)}
+                onChange={(v) =>
+                  void agir(
+                    () => compte.definirCentre(v === AUCUN_CENTRE ? null : v),
+                    () => setInfo(t('Centre enregistré.', 'Gym saved.'))
+                  )
+                }
+              />
+            </div>
             {!compte.grimpeur.niveauDeclare && (
               // Compte cree avant la question du flash : il peut la donner une fois.
               <form
@@ -173,7 +290,12 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
                     })
                 }}
               >
-                <ChoixFlash valeur={flash} onChange={setFlash} sansInconnu />
+                <ChoixFlash
+                  valeur={flash}
+                  onChange={setFlash}
+                  sansInconnu
+                  echelleCentre={centres.find((c) => c.nom === compte.grimpeur?.gymPrincipal)?.echelle ?? 'v'}
+                />
                 <div className="barre-outils" style={{ marginTop: 6 }}>
                   <button className="bouton" type="submit" disabled={occupe || !flash}>
                     {t('Enregistrer mon niveau', 'Save my level')}
@@ -189,7 +311,10 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              void agir(() => compte.creerProfil(pseudo, flash && flash !== INCONNU ? flash : null), apresProfil)
+              void agir(
+                () => compte.creerProfil(pseudo, flash && flash !== INCONNU ? flash : null, centreConnu),
+                () => apresProfil(centreConnu)
+              )
             }}
           >
             <h2>{t('Choisissez un pseudonyme', 'Pick a username')}</h2>
@@ -211,10 +336,21 @@ export function PanneauCompte({ compte, apresProfil }: { compte: Compte; apresPr
               />
             </div>
             <div style={{ margin: '12px 0 8px' }}>
-              <ChoixFlash valeur={flash} onChange={setFlash} />
+              <ChoixCentre
+                centres={centres}
+                valeur={centre}
+                onChange={(v) => {
+                  // Une cote 1-15 n'a plus de sens si le centre change d'echelle.
+                  if ((centres.find((c) => c.id === v)?.echelle ?? 'v') !== echelleCentre) setFlash('')
+                  setCentre(v)
+                }}
+              />
+            </div>
+            <div style={{ margin: '12px 0 8px' }}>
+              <ChoixFlash valeur={flash} onChange={setFlash} echelleCentre={echelleCentre} />
             </div>
             <div className="barre-outils">
-              <button className="bouton" type="submit" disabled={occupe || pseudo.trim().length < 2 || !flash}>
+              <button className="bouton" type="submit" disabled={occupe || pseudo.trim().length < 2 || !flash || !centre}>
                 {t('Valider', 'Confirm')}
               </button>
               <button className="bouton discret" type="button" onClick={() => void compte.deconnecter()}>

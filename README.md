@@ -2103,3 +2103,15 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   droit retombe sur la Démo ou sur Blocs ; la vérification de l'onglet attend que la session
   soit lue (sinon l'onglet Administration d'un admin serait écarté au rechargement).
   Mentionné dans la politique de confidentialité (« Sur votre appareil »).
+- **Centre principal à l'inscription** : nouvelle question « Dans quel centre grimpez-vous le
+  plus souvent ? » (obligatoire, avec « Un autre centre »), rangée dans `grimpeurs.gym_principal`
+  (déjà affiché dans la colonne Salle des classements ; annoncé sous la question et dans la
+  politique de confidentialité), modifiable ensuite dans le panneau du compte
+  (`definir_centre_principal`). Si c'est un centre branché (RB1, RB2), il devient le centre
+  affiché après l'inscription, et à la première visite sur un nouvel appareil d'un compte déjà
+  connecté. **Niveau de flash en cote Rose Bloc** : pour un centre principal Rose Bloc, choix
+  « Cote V » ou « Cote Rose Bloc (1 à 15) », converti en V par `versCotationV` ;
+  `niveau_depuis_flash` accepte désormais une cote V à deux décimales et plafonne le niveau
+  déclaré à V12 (flash 14 ou 15 de Rose Bloc). Migration
+  `20261031000400_centre_principal.sql`, testée dans la base (transaction annulée, compte
+  fictif) ; formulaire vérifié au format téléphone.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAccesComplet } from './ui/acces'
 import { useCompte } from './ui/compte'
 import { PanneauCompte, libelleCompte } from './ui/components/compte'
@@ -83,10 +83,24 @@ export function App() {
 
 function Contenu() {
   const compte = useCompte()
+  // Aucun centre retenu dans ce navigateur : premiere visite sur cet appareil.
+  const [premiereVisite] = useState(() => lireMemoire(CLE_CENTRE, CENTRES.map((c) => c.id), '') === '')
   const [centreId, setCentreId] = useState<CentreId>(() =>
     lireMemoire(CLE_CENTRE, CENTRES.map((c) => c.id), 'demo')
   )
   useEffect(() => ecrireMemoire(CLE_CENTRE, centreId), [centreId])
+  /** Centre principal d'un grimpeur, s'il fait partie des centres branches sur le calcul. */
+  const centreBranche = (id: string | null | undefined) =>
+    GROUPES_CALCUL.flat().find((c) => c === id && c !== 'demo') ?? null
+  // Premiere visite sur un appareil, deja connecte : le centre principal du
+  // compte plutot que la Demo (s'il est branche, comme RB1 et RB2).
+  const centrePrincipalApplique = useRef(false)
+  useEffect(() => {
+    if (!premiereVisite || centrePrincipalApplique.current || !compte.grimpeur) return
+    centrePrincipalApplique.current = true
+    const c = centreBranche(CENTRES.find((x) => x.fr === compte.grimpeur?.gymPrincipal)?.id)
+    if (c) setCentreId(c)
+  }, [premiereVisite, compte.grimpeur])
   const groupeCalcul = GROUPES_CALCUL.find((g) => g.includes(centreId))
   const donneesBranchees = !!groupeCalcul
   const atelier = useAtelier(compte.grimpeur, groupeCalcul ?? [centreId])
@@ -205,9 +219,12 @@ function Contenu() {
         {panneauCompte && (
           <PanneauCompte
             compte={compte}
-            apresProfil={() => {
+            apresProfil={(centre) => {
               atelier.recharger()
               setPanneauCompte(false)
+              // Inscription : le centre principal choisi devient le centre affiche.
+              const c = centreBranche(centre)
+              if (c) setCentreId(c)
             }}
           />
         )}

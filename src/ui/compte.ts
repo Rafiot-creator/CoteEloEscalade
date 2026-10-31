@@ -27,7 +27,8 @@ export interface Compte {
   courriel: string | null
   /** Grimpeur du compte, une fois le pseudonyme choisi. */
   /** `niveauDeclare` : cote de depart declaree (flash + 1, cf. supabase/migrations/), null si aucune. */
-  grimpeur: { id: string; nom: string; niveauDeclare: string | null } | null
+  /** `gymPrincipal` : nom du centre ou il grimpe le plus souvent ('' : aucun ou autre). */
+  grimpeur: { id: string; nom: string; niveauDeclare: string | null; gymPrincipal: string } | null
   /**
    * Le compte peut-il placer, modifier et demonter les blocs de ce centre ?
    * Table `ouvreurs` (cf. supabase/migrations/) ; la base le reverifie de
@@ -51,8 +52,13 @@ export interface Compte {
   inscrire: (courriel: string, motDePasse: string) => Promise<{ erreur: string | null; confirmer: boolean }>
   oublie: (courriel: string) => Promise<string | null>
   changerMotDePasse: (motDePasse: string) => Promise<string | null>
-  /** `flash` : cote flashee habituellement (ex. 'V4'), ou null si le grimpeur ne sait pas. */
-  creerProfil: (pseudo: string, flash: string | null) => Promise<string | null>
+  /**
+   * `flash` : cote V flashee habituellement (ex. 'V4', ou 'V5.31' depuis une cote Rose Bloc),
+   * ou null si le grimpeur ne sait pas. `centre` : id du centre principal, ou null.
+   */
+  creerProfil: (pseudo: string, flash: string | null, centre: string | null) => Promise<string | null>
+  /** Change le centre principal (id, ou null pour aucun). */
+  definirCentre: (centre: string | null) => Promise<string | null>
   /** Pour un compte sans niveau declare (cree avant la question), une seule fois. */
   declarerFlash: (flash: string) => Promise<string | null>
   deconnecter: () => Promise<void>
@@ -83,7 +89,7 @@ export function useCompte(): Compte {
   const [profilLuPour, setProfilLuPour] = useState<string | null | undefined>(undefined)
   const [userId, setUserId] = useState<string | null>(null)
   const [courriel, setCourriel] = useState<string | null>(null)
-  const [grimpeur, setGrimpeur] = useState<{ id: string; nom: string; niveauDeclare: string | null } | null>(null)
+  const [grimpeur, setGrimpeur] = useState<Compte['grimpeur']>(null)
   // Centres ou le compte est ouvreur ; `null` dans la liste : tous les centres.
   const [centresOuvreur, setCentresOuvreur] = useState<(string | null)[]>([])
   const { langue } = useLangue()
@@ -113,13 +119,23 @@ export function useCompte(): Compte {
     const [{ data }, { data: droits }] = await Promise.all([
       supabase
         .from('profils')
-        .select('grimpeur_id, grimpeurs(nom, niveau_declare)')
+        .select('grimpeur_id, grimpeurs(nom, niveau_declare, gym_principal)')
         .eq('user_id', userId)
-        .maybeSingle<{ grimpeur_id: string; grimpeurs: { nom: string; niveau_declare: string | null } | null }>(),
+        .maybeSingle<{
+          grimpeur_id: string
+          grimpeurs: { nom: string; niveau_declare: string | null; gym_principal: string } | null
+        }>(),
       supabase.from('ouvreurs').select('centre_id').eq('user_id', userId).returns<{ centre_id: string | null }[]>(),
     ])
     setGrimpeur(
-      data ? { id: data.grimpeur_id, nom: data.grimpeurs?.nom ?? '', niveauDeclare: data.grimpeurs?.niveau_declare ?? null } : null
+      data
+        ? {
+            id: data.grimpeur_id,
+            nom: data.grimpeurs?.nom ?? '',
+            niveauDeclare: data.grimpeurs?.niveau_declare ?? null,
+            gymPrincipal: data.grimpeurs?.gym_principal ?? '',
+          }
+        : null
     )
     setCentresOuvreur((droits ?? []).map((d) => d.centre_id))
     setProfilLuPour(userId)
@@ -170,8 +186,8 @@ export function useCompte(): Compte {
   }, [message])
 
   const creerProfil = useCallback(
-    async (pseudo: string, flash: string | null) => {
-      const { error } = await supabase.rpc('creer_profil', { pseudo, flash })
+    async (pseudo: string, flash: string | null, centre: string | null) => {
+      const { error } = await supabase.rpc('creer_profil', { pseudo, flash, centre })
       if (error) return error.message
       await lireProfil()
       return null
@@ -182,6 +198,16 @@ export function useCompte(): Compte {
   const declarerFlash = useCallback(
     async (flash: string) => {
       const { error } = await supabase.rpc('declarer_flash', { flash })
+      if (error) return error.message
+      await lireProfil()
+      return null
+    },
+    [lireProfil]
+  )
+
+  const definirCentre = useCallback(
+    async (centre: string | null) => {
+      const { error } = await supabase.rpc('definir_centre_principal', { centre })
       if (error) return error.message
       await lireProfil()
       return null
@@ -200,5 +226,5 @@ export function useCompte(): Compte {
 
   const estAdmin = centresOuvreur.includes(null)
   return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, estAdmin, recuperation,
-    connecterGoogle, connecterJetonGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, declarerFlash, deconnecter }
+    connecterGoogle, connecterJetonGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, definirCentre, declarerFlash, deconnecter }
 }
