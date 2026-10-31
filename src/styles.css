@@ -310,6 +310,21 @@ table.donnees td.principal { font-weight: 500; }
 table.donnees tbody tr.en-evidence,
 table.donnees tbody tr.en-evidence:hover { background: color-mix(in srgb, var(--bon) 16%, transparent); }
 table.donnees tbody tr.en-evidence td { font-weight: 600; }
+/* "Voir mes resultats" (ecran Blocs) : teinte pale, le texte reste lisible dans les deux themes. */
+table.donnees tbody tr.envoi-flash, table.donnees tbody tr.envoi-flash:hover { background: color-mix(in srgb, var(--bon) 20%, transparent); }
+table.donnees tbody tr.envoi-reussi, table.donnees tbody tr.envoi-reussi:hover { background: color-mix(in srgb, var(--attention) 26%, transparent); }
+table.donnees tbody tr.envoi-echec, table.donnees tbody tr.envoi-echec:hover { background: color-mix(in srgb, var(--critique) 18%, transparent); }
+.symbole-envoi { display: inline-block; width: 1.3em; font-weight: 700; }
+.symbole-envoi.flash { color: var(--bon); }
+.symbole-envoi.reussi { color: color-mix(in srgb, var(--attention) 70%, var(--encre)); }
+.symbole-envoi.echec { color: var(--critique); }
+.case-resultats { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+.case-resultats:has(input:disabled) { cursor: default; opacity: 0.6; }
+.legende-envois { display: inline-flex; gap: 6px; font-size: 12px; }
+.legende-envois > span { padding: 2px 8px; border-radius: 999px; }
+.legende-envois .envoi-flash { background: color-mix(in srgb, var(--bon) 20%, transparent); }
+.legende-envois .envoi-reussi { background: color-mix(in srgb, var(--attention) 26%, transparent); }
+.legende-envois .envoi-echec { background: color-mix(in srgb, var(--critique) 18%, transparent); }
 table.donnees tbody tr.saut td { text-align: center; color: var(--encre-3); padding: 2px; }
 table.donnees tbody tr.saut:hover { background: none; }
 .tri { color: var(--encre-3); margin-left: 3px; }

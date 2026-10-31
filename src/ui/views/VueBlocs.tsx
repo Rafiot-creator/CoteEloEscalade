@@ -10,6 +10,16 @@ import { Carte, LegendeCote, PastilleCote, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { nombre, pourcent, signe, telecharger } from '../format'
 import { bilingue, useLangue } from '../langue'
+import type { StatutEnvoi } from '../etat'
+import { useChoixMemorise } from '../memoire'
+
+/**
+ * "Voir mes resultats" : chaque ligne d'un bloc deja tente par le grimpeur
+ * est teintee (vert flash, jaune reussi, rouge echec) et son nom precede d'un
+ * symbole, pour ne rien dire par la couleur seule. Statut le plus recent,
+ * comme sur la Carte (`Atelier.envoisConnus`).
+ */
+const SYMBOLE_ENVOI: Record<StatutEnvoi, string> = { flash: '⚡', reussi: '✓', echec: '✗' }
 
 /**
  * L'ecran qui repond a la question du projet : les cotations affichees en salle
@@ -22,6 +32,8 @@ export function VueBlocs({
   onVoirBlocSurCarte,
   echelle = 'v',
   salleParDefaut,
+  envois,
+  grimpeurNom,
 }: {
   resultat: Resultat
   /** Toutes les formules, pour afficher leurs cotes cote a cote. */
@@ -34,6 +46,10 @@ export function VueBlocs({
   echelle?: Echelle
   /** Salle preselectionnee dans le filtre quand le calcul en couvre plusieurs (celle choisie dans le menu). */
   salleParDefaut?: string
+  /** Statut le plus recent de chaque bloc tente par le grimpeur (voir `grimpeurNom`). */
+  envois?: Map<string, StatutEnvoi>
+  /** Grimpeur dont on peut montrer les resultats : compte connecte, ou nom choisi sur la Carte. */
+  grimpeurNom?: string
 }) {
   const { langue, t } = useLangue()
   const maison = echelle !== 'v'
@@ -41,6 +57,11 @@ export function VueBlocs({
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
   const [tableauNuage, setTableauNuage] = useState(false)
   const [tableauHisto, setTableauHisto] = useState(false)
+  const [voirResultats, setVoirResultats] = useChoixMemorise('cee-voir-mes-resultats', ['0', '1'] as const, '0')
+  const resultatsPossibles = !!grimpeurNom && !!envois
+  const mesEnvois = voirResultats === '1' && resultatsPossibles ? envois : undefined
+  const libelleEnvoi = (s: StatutEnvoi) =>
+    s === 'flash' ? t('Flash', 'Flash') : s === 'reussi' ? t('Réussi', 'Sent') : t('Échoué', 'Failed')
 
   const plusieursSalles = resultat.resume.gyms.length > 1
   const gyms = useMemo(
@@ -130,13 +151,25 @@ export function VueBlocs({
         "Identifiant du bloc au mur, tel qu'il figure sur son étiquette.",
         'The boulder\'s identifier on the wall, as it appears on its tag.'
       ),
-      rendu: onVoirBlocSurCarte
-        ? (b) => (
-            <button className="lien-bloc" onClick={() => onVoirBlocSurCarte(b.id)}>
-              {b.nom}
-            </button>
-          )
-        : undefined,
+      rendu: (b) => {
+        const statut = mesEnvois?.get(b.id)
+        return (
+          <>
+            {statut && (
+              <span className={`symbole-envoi ${statut}`} title={libelleEnvoi(statut)} aria-label={libelleEnvoi(statut)}>
+                {SYMBOLE_ENVOI[statut]}
+              </span>
+            )}
+            {onVoirBlocSurCarte ? (
+              <button className="lien-bloc" onClick={() => onVoirBlocSurCarte(b.id)}>
+                {b.nom}
+              </button>
+            ) : (
+              b.nom
+            )}
+          </>
+        )
+      },
     },
     ...(plusieursSalles
       ? [
@@ -331,6 +364,33 @@ export function VueBlocs({
             )}
           </span>
         )}
+        <label className="case-resultats">
+          <input
+            type="checkbox"
+            checked={voirResultats === '1' && resultatsPossibles}
+            disabled={!resultatsPossibles}
+            onChange={(e) => setVoirResultats(e.currentTarget.checked ? '1' : '0')}
+          />
+          {t('Voir mes résultats', 'Show my results')}
+          {resultatsPossibles && <span className="discret"> ({grimpeurNom})</span>}
+        </label>
+        {!resultatsPossibles && (
+          <span className="discret" style={{ fontSize: 12 }}>
+            {t(
+              "Connectez-vous, ou choisissez votre nom dans l'onglet Carte, pour voir vos résultats.",
+              'Sign in, or pick your name in the Map tab, to see your results.'
+            )}
+          </span>
+        )}
+        {mesEnvois && (
+          <span className="legende-envois">
+            {(['flash', 'reussi', 'echec'] as const).map((s) => (
+              <span key={s} className={`envoi-${s}`}>
+                {SYMBOLE_ENVOI[s]} {libelleEnvoi(s)}
+              </span>
+            ))}
+          </span>
+        )}
         <span className="espace" />
         {!simplifie && (
           <button
@@ -386,6 +446,7 @@ export function VueBlocs({
           // une colonne masquee en vue visiteur y retombe.
           triInitial={{ cle: 'calculee', sens: -1 }}
           memoire="blocs"
+          classeLigne={mesEnvois ? (b) => { const s = mesEnvois.get(b.id); return s ? `envoi-${s}` : undefined } : undefined}
           pageTaille={25}
         />
       </Carte>

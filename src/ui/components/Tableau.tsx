@@ -48,6 +48,8 @@ interface Props<T> {
    * rafraichissement. Sans nom, le tri repart de `triInitial` a chaque montage.
    */
   memoire?: string
+  /** Classe CSS supplementaire par ligne (ex. teinte des resultats du grimpeur). */
+  classeLigne?: (ligne: T) => string | undefined
   /** Nombre de lignes affichees d'un coup. */
   pageTaille?: number
   videMessage?: string
@@ -74,6 +76,7 @@ export function Tableau<T>({
   tri: triPilote,
   onTri,
   memoire,
+  classeLigne,
   pageTaille = 50,
   videMessage,
   enEvidence,
@@ -108,7 +111,10 @@ export function Tableau<T>({
   const horsPage = indexEvidence >= limite ? triees[indexEvidence] : null
 
   const ligne = (l: T) => (
-    <tr key={cleLigne(l)} className={cleLigne(l) === enEvidence ? 'en-evidence' : undefined}>
+    <tr
+      key={cleLigne(l)}
+      className={[cleLigne(l) === enEvidence ? 'en-evidence' : '', classeLigne?.(l) ?? ''].filter(Boolean).join(' ') || undefined}
+    >
       {colonnes.map((c) => {
         const v = c.valeur(l)
         return (

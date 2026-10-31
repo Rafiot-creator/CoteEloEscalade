@@ -12,6 +12,7 @@ import { VueGrimpeurs } from './ui/views/VueGrimpeurs'
 import { VueAdministration } from './ui/views/VueAdministration'
 import { VueCommentaires } from './ui/views/VueCommentaires'
 import { VueBlocs } from './ui/views/VueBlocs'
+import { lireGrimpeurChoisi } from './ui/suivi'
 
 const ONGLETS = [
   { id: 'blocs', fr: 'Blocs', en: 'Boulders', reserve: false },
@@ -104,6 +105,7 @@ function Contenu() {
   const groupeCalcul = GROUPES_CALCUL.find((g) => g.includes(centreId))
   const donneesBranchees = !!groupeCalcul
   const atelier = useAtelier(compte.grimpeur, groupeCalcul ?? [centreId])
+  const grimpeurResultats = (donneesBranchees ? compte.grimpeur?.nom : undefined) ?? (lireGrimpeurChoisi(centreId) || undefined)
   const [panneauCompte, setPanneauCompte] = useState(false)
   // Retour du lien du courriel, premiere connexion : il manque le pseudonyme.
   // Ou retour du lien « mot de passe oublie » : il manque le nouveau mot de passe.
@@ -293,6 +295,10 @@ function Contenu() {
                 onVoirBlocSurCarte={voirBlocSurCarte}
                 echelle={atelier.echelle}
                 salleParDefaut={centre.fr}
+                // Meme grimpeur que sur la Carte : le compte connecte, sinon le nom
+                // choisi sur la Carte (retenu par centre dans ce navigateur).
+                grimpeurNom={grimpeurResultats}
+                envois={donneesBranchees && grimpeurResultats ? atelier.envoisConnus(grimpeurResultats) : undefined}
                 key={centreId}
               />
             )}
