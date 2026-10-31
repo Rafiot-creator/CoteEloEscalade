@@ -39,7 +39,7 @@ rejetées). Ne pas ré-expliquer ce qui y est déjà écrit.**
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test                # 68 tests sur le cœur de calcul
+npm test                # 70 tests sur le cœur de calcul
 npm run build           # site statique dans dist/
 npm run data:generate   # régénère le jeu de données de démonstration
 ```
@@ -634,6 +634,10 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
   de V8). Traduction à l'affichage et à la saisie seulement (`src/core/echelles.ts`,
   `VueCarte.tsx`). Édition de la Carte en 1-15 pas encore testée avec un vrai compte
   d'ouvreur.
+- **Écran Administration, 2026-10-30** : onglet réservé à l'admin général connecté
+  (`VueAdministration.tsx`, `compte.estAdmin`) pour modifier/effacer une ascension ou
+  supprimer un bloc (démontés compris), via les fonctions `admin_*` de
+  `20261030000300_administration.sql`.
 - Tranché par Raphaël : **inscription ouverte à tous, avec pseudonymes**. Reste ouvert :
   l'accord de Rose Bloc pour un essai (étape 5).
 

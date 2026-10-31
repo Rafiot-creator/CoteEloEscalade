@@ -9,6 +9,7 @@ import { VueDonnees } from './ui/views/VueDonnees'
 import { VueFichiers } from './ui/views/VueFichiers'
 import { VueFormules } from './ui/views/VueFormules'
 import { VueGrimpeurs } from './ui/views/VueGrimpeurs'
+import { VueAdministration } from './ui/views/VueAdministration'
 import { VueBlocs } from './ui/views/VueBlocs'
 
 const ONGLETS = [
@@ -18,6 +19,8 @@ const ONGLETS = [
   { id: 'formules', fr: 'Formules', en: 'Formulas', reserve: true },
   { id: 'donnees', fr: 'Données', en: 'Data', reserve: true },
   { id: 'fichiers', fr: 'Fichiers', en: 'Files', reserve: true },
+  // Compte admin general seulement (`compte.estAdmin`), independant de l'acces complet.
+  { id: 'administration', fr: 'Administration', en: 'Admin', reserve: 'admin' },
 ] as const
 
 type OngletId = (typeof ONGLETS)[number]['id']
@@ -67,8 +70,12 @@ function Contenu() {
   const { langue, definir, t } = useLangue()
   const [apercuVisiteur, setApercuVisiteur] = useState(false)
   const vueComplete = accesComplet && !apercuVisiteur
-  const onglets = ONGLETS.filter((o) => vueComplete || !o.reserve)
+  const ongletVisible = (o: (typeof ONGLETS)[number]) =>
+    o.reserve === 'admin' ? compte.estAdmin && !apercuVisiteur : vueComplete || !o.reserve
+  const onglets = ONGLETS.filter(ongletVisible)
   const [onglet, setOnglet] = useState<OngletId>('blocs')
+  // Onglets qui ne montrent pas le calcul du centre choisi.
+  const horsCalcul = onglet === 'carte' || onglet === 'administration'
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
   const centre = CENTRES.find((c) => c.id === centreId) ?? CENTRES[0]
   const [blocCible, setBlocCible] = useState<string | null>(null)
@@ -79,8 +86,8 @@ function Contenu() {
 
   useEffect(() => {
     const courant = ONGLETS.find((o) => o.id === onglet)
-    if (courant?.reserve && !vueComplete) setOnglet('blocs')
-  }, [vueComplete, onglet])
+    if (courant && !ongletVisible(courant)) setOnglet('blocs')
+  }, [vueComplete, onglet, compte.estAdmin, apercuVisiteur])
 
   useEffect(() => {
     const racine = document.documentElement
@@ -167,6 +174,8 @@ function Contenu() {
           />
         )}
 
+        {onglet === 'administration' && <VueAdministration apresModification={atelier.recharger} />}
+
         {onglet === 'carte' && (
           <VueCarte
             centreId={centreId}
@@ -190,7 +199,7 @@ function Contenu() {
           />
         )}
 
-        {onglet !== 'carte' && !donneesBranchees && (
+        {!horsCalcul && !donneesBranchees && (
           <div className="large">
             <div className="carte">
               <h2>{t(`Pas encore de données pour ${centre.fr}`, `No data yet for ${centre.en}`)}</h2>
@@ -204,7 +213,7 @@ function Contenu() {
           </div>
         )}
 
-        {onglet !== 'carte' && donneesBranchees && atelier.erreur && (
+        {!horsCalcul && donneesBranchees && atelier.erreur && (
           <div className="large">
             <div className="carte" style={{ borderColor: 'var(--critique)' }}>
               <h2>{t('Le chargement a échoué', 'Loading failed')}</h2>
@@ -213,11 +222,11 @@ function Contenu() {
           </div>
         )}
 
-        {onglet !== 'carte' && donneesBranchees && atelier.chargement && (
+        {!horsCalcul && donneesBranchees && atelier.chargement && (
           <p className="vide">{t('Chargement des fichiers…', 'Loading files…')}</p>
         )}
 
-        {onglet !== 'carte' && donneesBranchees && atelier.dataset && atelier.resultat && (
+        {!horsCalcul && donneesBranchees && atelier.dataset && atelier.resultat && (
           <>
             {onglet === 'blocs' && (
               <VueBlocs

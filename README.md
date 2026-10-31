@@ -1212,6 +1212,19 @@ refusées.
    temporaires dans la base, annulées ensuite) puis par Raphaël sur deux fenêtres.
 5. **Essai dans un vrai centre** (Rose Bloc 1 ou 2).
 
+**Écran Administration** — *fait le 30 octobre 2026.* Onglet visible seulement pour l'admin
+général connecté (ligne de `ouvreurs` sans centre ; jamais en aperçu visiteur),
+`src/ui/views/VueAdministration.tsx`. Recherche d'un grimpeur ou d'un bloc (démontés compris),
+liste de ses ascensions tous centres confondus ; modifier le résultat (flash, réussi, échoué),
+effacer une ascension, supprimer un bloc pour de bon avec ses ascensions (à la différence de
+« Démonter », qui garde l'historique d'un bloc grimpé). Les écritures passent par
+`admin_modifier_ascension`, `admin_supprimer_ascension` et `admin_supprimer_bloc`
+(`supabase/migrations/20261030000300_administration.sql`), qui vérifient elles-mêmes le droit
+(`verifier_admin`). Testé dans la base (transaction annulée) : compte non admin refusé, type
+inconnu refusé, les trois actions font ce qu'elles disent. Après un changement, la page de
+l'admin recalcule ; les autres le voient à leur prochain chargement (les suppressions ne sont
+pas diffusées en temps réel).
+
 **Rôles prévus.** Visiteur (lecture), grimpeur (ses propres envois), admin d'un centre (les blocs
 et les résultats de ce centre), admin général (Raphaël). Le calcul des cotes reste dans le
 navigateur : il lit toutes les ascensions, qui doivent donc rester lisibles par tous. Ce qui
@@ -1990,3 +2003,6 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   ajoutés (68). Testé par Raphaël avec Rafiot (flash V6, passage du 8e au 10e bloc). Bug
   trouvé en route et corrigé : les boutons d'envoi de la Carte se désactivaient pour un compte
   en période d'essai, absent de la liste des noms connus.
+- **Écran Administration**, demandé par Raphaël après avoir démonté son bloc test de Rose
+  Bloc 1 (son flash restait dans sa fiche) : corriger ou effacer une ascension, supprimer un
+  bloc pour de bon. Détail dans « Base de données et multi-utilisateur (en cours) ».

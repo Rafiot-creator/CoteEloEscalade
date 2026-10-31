@@ -34,6 +34,8 @@ export interface Compte {
    * toute facon a chaque ecriture.
    */
   peutOuvrir: (centreId: string) => boolean
+  /** Admin general (ligne de `ouvreurs` sans centre) : ecran Administration. La base le reverifie aussi. */
+  estAdmin: boolean
   /**
    * Retour du lien « mot de passe oublie » : la session est ouverte, il reste
    * a choisir un nouveau mot de passe.
@@ -196,6 +198,7 @@ export function useCompte(): Compte {
     [centresOuvreur]
   )
 
-  return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, recuperation,
+  const estAdmin = centresOuvreur.includes(null)
+  return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, estAdmin, recuperation,
     connecterGoogle, connecterJetonGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, declarerFlash, deconnecter }
 }
