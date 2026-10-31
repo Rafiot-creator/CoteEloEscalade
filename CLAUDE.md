@@ -706,11 +706,12 @@ de ces choix : `DECISIONS.md`, « Les échelles maison et les centres Rose Bloc 
 est bloqué par le garde-fou du mode auto à chaque nouvelle migration : l'accord de Raphaël
 vaut pour une migration, le redemander pour la suivante.
 
-**Suite et fin de la session du 2026-10-31.** Dernier commit de code `7e54b01`, déploiement
+**Suite et fin de la session du 2026-10-31.** Dernier commit de code `d5b49d7`, déploiement
 vérifié vert, migrations appliquées jusqu'à `20261031000300_commentaires.sql`. Fait ensuite,
 chaque fois testé par Raphaël lui-même sur le site en ligne : styles Physique, Technique,
 Coordo ; blocs spéciaux de RB1 ; glisser un bloc au doigt (sur son téléphone) ; onglet
-Commentaires (message test reçu dans Administration). **Raphaël se dit prêt pour l'essai en
+Commentaires (message test reçu dans Administration) ; dernier centre et dernier onglet retenus
+au rafraîchissement. **Raphaël se dit prêt pour l'essai en
 salle** : il entre les blocs de RB1 et RB2 sur place la semaine du 2 novembre. À la reprise,
 lui demander d'abord comment s'est passée cette saisie, et ce qu'il y a dans les commentaires.
 
