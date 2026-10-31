@@ -688,6 +688,15 @@ bloc à la souris seulement (pas au doigt), pas d'écran pour nommer un ouvreur 
 supprimer un compte (SQL dans le README), et au lancement tout le monde sera en période
 d'essai en même temps (coût mesuré dans `DECISIONS.md`).
 
+**Fin de session du 2026-10-31** (commencée le 30). Tout est poussé (dernier commit de code
+`4d8ef2c`), déploiement vérifié vert, migrations appliquées jusqu'à
+`20261031000000_comp_wall.sql`. Fait : échelle 1-15 de Rose Bloc, branchement de RB1/RB2
+(cote commune), pastille encerclée dans Blocs, écran Administration (Raphaël y a supprimé son
+bloc test lui-même), Comp Wall de RB2 (Raphaël y a placé un vrai bloc avec succès). Pourquoi
+de ces choix : `DECISIONS.md`, « Les échelles maison et les centres Rose Bloc ». Le `db push`
+est bloqué par le garde-fou du mode auto à chaque nouvelle migration : l'accord de Raphaël
+vaut pour une migration, le redemander pour la suivante.
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
@@ -695,6 +704,14 @@ ordinateur, n'existe que quand le serveur de dev tourne) et le site publié : à
 pour présenter les prochains aperçus.
 
 ## Prochaine étape
+
+**Annoncé par Raphaël le 2026-10-31 : nouvelle nomenclature des styles de bloc.** Les quatre
+styles actuels (Dalle, Coordo, Dévers, Joker, `STYLES_BLOC`) vont être remplacés ; la liste
+n'a pas encore été donnée, la lui demander. Endroits à changer, comme le 17 septembre :
+`src/core/stylesBloc.ts`, le générateur et `data/blocs.csv` de la Démo, la Carte Démo (une
+bande murale par style), et cette fois aussi la base (`verifier_champs_bloc`, nouvelle
+migration, plus les blocs déjà enregistrés sur RB1/RB2 et la Démo à convertir — demander à
+Raphaël la correspondance entre anciens et nouveaux styles).
 
 **Suite de la base de données** (voir ci-dessus) : étape 5 (essai dans un vrai centre, une fois
 l'accord de Rose Bloc obtenu ; voir « Avant l'étape 5 » plus haut) ou vérification de la

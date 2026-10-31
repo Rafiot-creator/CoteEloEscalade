@@ -2027,3 +2027,10 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
 
 - **Comp Wall de Rose Bloc 2** : pastilles en étoile numérotées de 1 à 24 et conversion propre
   vers V. Détail dans « Base de données et multi-utilisateur (en cours) ».
+  Testé par Raphaël : un vrai bloc placé sur le Comp Wall avec son compte d'ouvreur.
+- **Fin de session.** Les deux modifications demandées pour RB1 et RB2 (échelle 1-15, Comp
+  Wall) sont faites, ainsi que l'écran Administration. Pourquoi de ces choix : `DECISIONS.md`,
+  « Les échelles maison et les centres Rose Bloc ». **Prochain chantier annoncé par Raphaël :
+  une nouvelle nomenclature des styles de bloc**, qui remplacera Dalle, Coordo, Dévers et
+  Joker (liste pas encore donnée). Restent aussi l'étape 5 (essai dans un vrai centre) et les
+  limites connues : glisser un bloc au doigt, nommer un ouvreur sans SQL.

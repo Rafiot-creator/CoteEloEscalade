@@ -159,6 +159,46 @@ blocs de chacun n'y compteront pas pour les blocs.
 en cours de route ni tricheurs : un nouveau est juste plus vite, et dix faux envois ne
 déplacent plus aucun bloc. Glicko y était bien plus vulnérable que l'Elo.
 
+### Les échelles maison et les centres Rose Bloc (30-31 octobre 2026)
+
+**Le calcul ne connaît que la cote V, et c'est voulu.** Les salles Rose Bloc cotent de 1 à 15 ;
+leur Comp Wall (RB2) numérote ses 24 blocs de 1 à 24. Plutôt que d'apprendre ces échelles au
+modèle, la base garde toujours une cote V (à deux décimales au plus) et l'échelle maison n'est
+qu'une traduction à l'affichage et à la saisie (`src/core/echelles.ts`). Le modèle travaille de
+toute façon sur un index continu (1 cote V = 1000 points) : une cote fractionnaire comme V5,31
+ne lui coûte rien, et un seul jeu de formules sert tous les centres. Raphaël a confirmé que les
+écrans d'analyse restent en V ; seules la Carte et la colonne « Affichée » de Blocs montrent la
+cote du centre, plus la colonne « Calculée » en « 1-15 / V ».
+
+**Les conversions sont des choix de Raphaël, pas des mesures.**
+- Rose Bloc : 1 = V0, puis le facteur à deux décimales qui met 10 au plus près de V8, soit
+  V = (cote − 1) ÷ 1,13. Deux premières propositions écartées en route : un simple décalage
+  (+2) et un facteur 1,2, incompatible avec 1 = V0 et 10 = V8 à la fois.
+- Comp Wall : 1 = cote 1 du gym, 24 = cote 15, en progression régulière, puis la conversion
+  Rose Bloc (14 → V7, 24 → V12,39). Risques signalés et acceptés : si le 24 est en réalité bien
+  plus facile qu'un 15, ou si les écarts entre numéros ne sont pas réguliers, l'amorce est
+  fausse. Ce n'est qu'une amorce : la cote calculée s'en écarte avec les ascensions.
+
+**Un bloc du Comp Wall se reconnaît à sa couleur, choisie par l'ouvreur, pas à sa position.**
+Un même chiffre vaut près de 4 cotes V d'écart selon le système (★12 = V5,92, 12 du gym =
+V9,73) : une bascule involontaire d'un bloc posé en bordure du mur coûterait cher, pour un gain
+nul (24 blocs, un clic chacun). La couleur spéciale `comp-wall` évite une colonne de plus ; elle
+n'a pas d'autre usage pour ces blocs. Pastille en étoile pour qu'on ne puisse pas la confondre
+avec une pastille ronde. Un numéro en double avertit sans refuser : pendant un remontage,
+l'ancien et le nouveau bloc coexistent.
+
+**RB1 et RB2 partagent une seule cote** (un « groupe de calcul », `GROUPES_CALCUL`) : mêmes
+grimpeurs, même échelle, mêmes ouvreurs, et deux fois plus de duels pour chaque cote. La période
+d'essai de 10 blocs se compte par groupe. **Pour les centres suivants, Raphaël ne veut pas
+empiler des groupes** mais appliquer les pistes du 18 septembre (§ 7, « Uniformiser les cotes
+entre centres »).
+
+**Corriger les données passe par des fonctions réservées à l'admin général**, comme toute
+écriture depuis l'étape 2 : l'écran Administration ne touche jamais les tables directement, et
+chaque fonction revérifie le droit (`verifier_admin`). Né d'un cas réel : un bloc test démonté
+gardait son flash dans la fiche de Raphaël, et « Démonter » garde volontairement l'historique
+d'un bloc grimpé.
+
 ---
 
 ## 3. Détecter les blocs mal cotés
@@ -290,9 +330,12 @@ est un changement dans `src/core/sources/` et nulle part ailleurs.
   2026** avec Supabase (voir README, § « Base de données et multi-utilisateur (en cours) »). Il
   faut une base *et* un serveur (ou un service qui fournit les deux) — une base seule, exposée
   au navigateur, ne peut appliquer aucune règle d'accès. Étapes 1 (lecture) et 2 (comptes,
-  pseudonymes, envois) faites ; outils de l'ouvreur et temps réel à suivre.
+  pseudonymes, envois), 3 (outils de l'ouvreur) et 4 (temps réel) faites les 29 et 30 octobre ;
+  reste l'essai dans un vrai centre (étape 5).
 - **Uniformiser les cotes entre centres** une fois qu'il y en aura plusieurs avec de vraies
-  données, discuté le 18 septembre 2026. Deux pistes complémentaires, aucune codée :
+  données, discuté le 18 septembre 2026. Deux pistes complémentaires, aucune codée. **Raphaël
+  veut les appliquer aux prochains centres** (30 octobre 2026), plutôt que d'ajouter des
+  groupes de calcul comme RB1 + RB2 (§ 2, « Les échelles maison ») :
   - *Grimpeurs-ponts avec cote figée à l'exterieur* : un grimpeur qui visite un centre autre que
     le sien voit ses duels là-bas influencer les blocs visités, sans que ses propres duels
     ailleurs ne fassent bouger sa cote d'origine (evite qu'un petit echantillon hors de son
