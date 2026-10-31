@@ -251,6 +251,12 @@ comme la Carte, pour rester cohérent avec le choix de pouvoir changer d'avis da
 Le grimpeur est **le même que sur la Carte** (compte connecté, sinon nom choisi sur la Carte),
 plutôt qu'un second sélecteur de nom sur l'écran Blocs.
 
+**Sur la Carte, un bloc envoyé garde sa couleur** (choix de Raphaël, 2026-10-31) : la couleur
+de la pastille est celle des prises au mur, l'information dont on a besoin pour retrouver le
+bloc ; la ternir pour marquer l'envoi la rendait moins reconnaissable. L'envoi n'est plus
+signalé que par l'anneau vert, d'où son épaisseur doublée (toujours proportionnelle à la
+pastille, pour ne pas rouvrir les problèmes de contour sur téléphone du 16 septembre).
+
 **Le centre principal demandé à l'inscription va dans `grimpeurs.gym_principal`**, champ qui
 existait déjà et que la colonne « Salle » des classements affiche : pas de nouvelle colonne,
 mais une donnée publique, ce que le formulaire et la politique de confidentialité annoncent. Il

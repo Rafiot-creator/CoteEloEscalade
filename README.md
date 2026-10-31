@@ -2146,4 +2146,12 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   `--critique` (`styles.css`), lisibles dans les deux thèmes. Un bloc tenté sans assez de duels
   n'est pas dans le tableau, donc pas surligné. Vérifié dans Chrome sans interface sur la Démo
   (Victor Bergeron : 1 flash, 10 réussis, 13 échecs sur les 25 premiers ; thèmes clair et sombre,
-  390 px sans débordement) ; pas encore essayé avec un compte connecté sur RB1/RB2.
+  390 px sans débordement) ; confirmé ensuite par Raphaël avec Rafiot connecté sur RB1/RB2.
+- **Carte : un bloc envoyé garde sa couleur**, demandé par Raphaël. L'atténuation des pastilles
+  envoyées (`grayscale(0.4) saturate(0.7)` + `opacity: 0.85`, en place depuis le 16 septembre)
+  est retirée ; seul l'anneau vert signale désormais l'envoi, rendu deux fois plus épais pour se
+  voir d'un coup d'œil : `EPAISSEUR_ENVOYE` (`Math.max(2, Math.round(RAYON * 0.2))`,
+  `VueCarte.tsx`), soit 4 px sur bureau et 2 px au plancher sur téléphone, au lieu
+  d'`EPAISSEUR_CONTOUR` (2 px et 1 px). Le contour de sélection (accès complet) garde
+  `EPAISSEUR_CONTOUR`. Étoiles du Comp Wall comprises. Vérifié dans Chrome sans interface sur la
+  Démo (bureau) ; pas encore vu sur téléphone.

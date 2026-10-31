@@ -734,6 +734,11 @@ au-dessus du tableau Blocs qui teinte les blocs tentés par le grimpeur (vert fl
 réussi, rouge échec, plus ⚡/✓/✗), même grimpeur que la Carte. Vérifié sur la Démo dans Chrome
 sans interface, puis confirmé par Raphaël sur le site en ligne avec Rafiot connecté sur RB1/RB2.
 
+**Carte, bloc envoyé, 2026-10-31** (commit `035e7fb`, déploiement vérifié vert) : la pastille
+garde sa couleur (plus de grisé ni de transparence) et l'anneau vert est deux fois plus épais
+(`EPAISSEUR_ENVOYE`, `VueCarte.tsx` : 4 px bureau, 2 px téléphone). Vérifié sur bureau
+seulement ; **reste à voir sur téléphone**.
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
