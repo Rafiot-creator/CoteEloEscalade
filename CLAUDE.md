@@ -739,6 +739,29 @@ garde sa couleur (plus de grisé ni de transparence) et l'anneau vert est deux f
 (`EPAISSEUR_ENVOYE`, `VueCarte.tsx` : 4 px bureau, 2 px téléphone). Vérifié sur bureau
 seulement ; **reste à voir sur téléphone**.
 
+## État au 2026-11-01
+
+Session courte, tout poussé et déploiement vérifié vert (dernier commit de code `08f7061`),
+migrations appliquées jusqu'à `20261031000500_admin_ouvreurs.sql`. Pourquoi des choix :
+`DECISIONS.md`, « Les outils de l'ouvreur au quotidien » ; détail : README, journal du
+2026-11-01.
+
+- **Ouvreurs dans Administration** : carte « Ouvreurs » (liste) et, pour un grimpeur choisi,
+  une case par centre (`admin_lister_ouvreurs`, `admin_definir_ouvreur`, `admin_a_compte`).
+  Testé dans la base (transaction annulée). Raphaël a nommé sa fille **Liv** ouvreuse avec,
+  et confirmé que ça marche.
+- **Carte, tap à côté d'un rectangle ouvert** : le referme sans placer de bloc
+  (`popupAuDebutDuGeste`, `VueCarte.tsx`). Vérifié à la souris seulement ; **à confirmer sur le
+  téléphone de Liv**.
+- **Noms de blocs automatiques** Style-Cote-Couleur-Secteur (`src/core/cartes/nomAuto.ts`,
+  6 tests) ; les trois blocs déjà posés à RB1/RB2 renommés dans la base. Vérifié sur la Démo,
+  **pas encore vu sur Rose Bloc** avec un vrai compte d'ouvreur (secteur choisi par étiquette la
+  plus proche : à surveiller près des limites).
+- **Données, onglet Grimpeurs** limité aux grimpeurs qui ont grimpé dans le centre choisi.
+- Le `db push` reste bloqué par le garde-fou du mode auto même avec l'accord de Raphaël : lui
+  faire lancer `! npx supabase db push --linked`. Une écriture ponctuelle de données par
+  `npx supabase db query --linked` (renommage des trois blocs), elle, est passée.
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
@@ -746,6 +769,10 @@ ordinateur, n'existe que quand le serveur de dev tourne) et le site publié : à
 pour présenter les prochains aperçus.
 
 ## Prochaine étape
+
+**À la reprise (après le 2026-11-01)** : demander à Raphaël comment s'est passée la saisie des
+blocs de RB1/RB2, si le tap à côté d'un rectangle fonctionne sur le téléphone de Liv, si les
+noms automatiques tombent dans le bon secteur, et ce qu'il y a dans les Commentaires.
 
 **Styles de bloc, 2026-10-31 : Physique, Technique, Coordo** (une seule liste pour tous les
 centres, `STYLES_BLOC`), remplacent Dalle, Coordo, Dévers, Joker. Fait et poussé : Démo

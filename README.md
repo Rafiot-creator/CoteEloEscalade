@@ -2196,3 +2196,8 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   centres choisi (`VueDonnees.tsx`, affichage seulement : ni la base ni le calcul ne changent).
   Vérifié dans Chrome sans interface : RB1 n'affiche plus que Liv, la Démo ses 55 grimpeurs plus
   un compte réel.
+- **Fin de session.** Tout est poussé, déploiement vérifié vert, migrations appliquées jusqu'à
+  `20261031000500_admin_ouvreurs.sql`. Liv, fille de Raphaël, est la première ouvreuse nommée
+  depuis l'écran Administration. Pourquoi des choix du jour : `DECISIONS.md`, « Les outils de
+  l'ouvreur au quotidien ». Restent à confirmer en salle : la fermeture du rectangle au doigt
+  (téléphone de Liv) et le secteur des noms automatiques sur Rose Bloc.

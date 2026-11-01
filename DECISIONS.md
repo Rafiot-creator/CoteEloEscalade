@@ -271,6 +271,47 @@ haut de l'échelle, sans quoi un flash 14 ou 15 de Rose Bloc (V11,5, V12,39) sor
 l'échelle. Les deux tombent alors au même départ, 12 000 : un écart négligeable pour une
 poignée de grimpeurs, que le calcul corrige de toute façon.
 
+### Les outils de l'ouvreur au quotidien (1er novembre 2026)
+
+**Les ouvreurs se nomment dans l'écran Administration**, une case par centre, plutôt qu'en
+SQL : Raphaël venait de nommer sa fille Liv (« Liv », ouvreuse) et le ferait de nouveau à chaque
+ouvreur de Rose Bloc. Seul l'admin général s'en sert, et **la ligne d'admin général (centre nul)
+ne passe jamais par ces cases** : la donner par erreur ouvrirait l'écran Administration à
+quelqu'un, la retirer couperait l'accès de Raphaël lui-même. Un grimpeur sans compte (Démo) ne
+peut pas être nommé : il n'y a personne derrière pour ouvrir.
+
+**Taper à côté d'un rectangle ouvert le referme sans placer de bloc** (signalé sur le téléphone
+de Liv). En édition, un tap sur le fond pose un bloc ; c'était aussi le seul moyen de fermer le
+rectangle au doigt, d'où un bloc parasite à chaque fermeture. L'état « rectangle ouvert » est lu
+au début du geste (`pointerdown`), pas au clic : un téléphone qui se déclare capable de survoler
+(ce qui ouvre le rectangle au tap en édition) envoie entre le tap et le clic un `mouseleave` qui
+l'a déjà refermé, et le clic croyait alors qu'il n'y avait rien à fermer. Le téléphone simulé ne
+reproduit pas ce geste : vérifié à la souris, à confirmer sur le vrai téléphone.
+
+**Le nom d'un bloc se donne d'office : Style-Cote-Couleur-Secteur** (« Coordo-10-Rouge-Le-Rose »),
+demandé par Raphaël, plutôt que l'identifiant technique. Trois choix, faits par lui :
+
+- *Le secteur est l'étiquette la plus proche de la pastille.* Les plans n'ont que les noms des
+  secteurs, pas leurs limites ; dessiner ces limites demanderait un travail de traçage (cf. les
+  essais de carte du 18 septembre et du 19 octobre) pour un gain faible. Près d'une limite, le nom
+  peut tomber du mauvais côté : l'ouvreur le corrige à la main. Les étiquettes sont lues dans le
+  SVG du fond (texte gras `#333`), donc une future carte dessinée selon la même convention en
+  profite sans code ; les zones qui ne sont pas des murs (Accueil, Vestiaires) sont en gris clair
+  et ne comptent pas.
+- *Le nom suit le bloc tant que personne ne l'a tapé.* Un bloc posé reçoit d'abord des réglages
+  par défaut (V4 ou son équivalent, bleu, sans style) : figer le nom à la pose l'aurait laissé
+  faux une fois le bloc réglé. Pas de colonne « nom manuel » dans la base : un nom est jugé
+  automatique s'il est vide, égal à l'identifiant technique, ou égal au nom calculé pour l'état
+  précédent du bloc (avec ou sans numéro de doublon, avec ou sans secteur, au cas où le fond
+  n'était pas encore lu). Un nom tapé à la main ne tombe dans aucun de ces cas. Vider le champ
+  rend la main au nom automatique.
+- *Les blocs déjà posés sous leur identifiant ont été renommés* (trois à ce moment-là).
+
+**L'onglet Grimpeurs de Données ne montre que ceux qui ont grimpé dans le centre choisi.** La table
+des grimpeurs reste commune à tous les centres (un compte grimpe partout) ; c'est l'affichage qui
+filtre, sur les ascensions du groupe de calcul. Sans ça, RB1 et RB2 montraient les 55 grimpeurs
+fictifs de la Démo, qui n'y ont jamais grimpé et n'entraient déjà dans aucun calcul.
+
 ---
 
 ## 3. Détecter les blocs mal cotés
