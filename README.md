@@ -2169,3 +2169,12 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
 - **Nommer et retirer les ouvreurs depuis l'écran Administration**, demandé par Raphaël (le SQL à
   la main n'était pas pratique) : une case par centre sur la fiche d'un grimpeur, et la liste des
   ouvreurs actuels. Détail dans « Base de données et multi-utilisateur (en cours) ».
+- **Carte, fermer le rectangle d'un bloc au doigt en édition** : signalé par Raphaël sur le
+  téléphone de Liv (ouvreuse) : taper à côté pour refermer le rectangle (cote, flash, réussi,
+  échec) plaçait aussi un nouveau bloc. Désormais, si un rectangle était ouvert au début du
+  geste (`pointerdown`, `popupAuDebutDuGeste` dans `VueCarte.tsx`), le clic le referme
+  seulement ; le tap suivant place un bloc comme avant. Lu au `pointerdown` plutôt qu'au clic :
+  un téléphone qui se déclare capable de survoler (c'est ce qui ouvre le rectangle au tap en
+  édition) envoie entre-temps un `mouseleave` qui l'a déjà refermé. Vérifié à la souris dans
+  Chrome sans interface (bug reproduit sans le correctif, corrigé avec) ; le téléphone simulé
+  ne génère pas le clic comme un vrai, donc à confirmer sur le téléphone de Liv.

@@ -214,6 +214,8 @@ export function VueCarte({
   const zoneRef = useRef<HTMLDivElement>(null)
   const editionRef = useRef<HTMLDivElement>(null)
   const glisse = useRef<{ id: string; deplace: boolean } | null>(null)
+  /** Un popup etait ouvert au moment d'appuyer sur la carte (cf. `ajouter`). */
+  const popupAuDebutDuGeste = useRef(false)
   /** Bloc debloque par un appui long, en train de suivre le doigt. */
   const [glisseTactile, setGlisseTactile] = useState<string | null>(null)
   const nomAuFocus = useRef('')
@@ -439,7 +441,18 @@ export function VueCarte({
       return
     }
     if (glisse.current) return
-    setSurvole(null)
+    // Un popup ouvert au debut du geste : ce clic sert a le refermer, pas a
+    // placer un bloc. Au doigt, taper a cote est le seul moyen de le fermer
+    // (signale par Raphael : un nouveau bloc apparaissait a chaque fermeture).
+    // Lu au `pointerdown` et pas ici : un telephone qui se declare capable de
+    // survoler emet, entre le tap et le clic, un `mouseleave` sur la pastille
+    // qui a deja remis `survole` a null. A la souris, le popup est deja ferme
+    // en quittant la pastille, avant d'appuyer : rien ne change.
+    if (popupAuDebutDuGeste.current || survole !== null) {
+      popupAuDebutDuGeste.current = false
+      setSurvole(null)
+      return
+    }
     const { x, y } = relatif(e.clientX, e.clientY)
     // Cote par defaut : V4, ou son equivalent dans l'echelle du centre.
     const cotation = versCotationV(depuisCotationV('V4', echelleCotes), echelleCotes)
@@ -709,6 +722,9 @@ export function VueCarte({
       >
         <div
           ref={zoneRef}
+          onPointerDown={() => {
+            popupAuDebutDuGeste.current = survole !== null
+          }}
           onClick={ajouter}
           style={{
             position: 'relative',
