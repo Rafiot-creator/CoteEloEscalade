@@ -760,9 +760,10 @@ migrations appliquées jusqu'à `20261031000500_admin_ouvreurs.sql`. Pourquoi de
 - **Données, onglet Grimpeurs** limité aux grimpeurs qui ont grimpé dans le centre choisi.
 - **Application installable (PWA)** : `public/manifest.webmanifest`, `public/icones/`,
   `public/sw.js` (fichiers du site seulement, jamais Supabase/Google ; enregistré en production
-  seulement). Raphaël a écarté les magasins (Capacitor) et le natif pour l'instant. Vérifié dans
-  Chrome sans interface (installable, hors ligne) ; **à tester sur son téléphone**. Détail :
-  README § « L'application installable (PWA) ».
+  seulement). Raphaël a écarté les magasins (Capacitor) et le natif pour l'instant. Installée et
+  confirmée par Raphaël sur son téléphone. Onglet **Télécharger** (`VueApplication.tsx`) :
+  bouton d'installation si le navigateur le permet, sinon instructions (iPhone) ; caché dans
+  l'application installée. Détail : README § « L'application installable (PWA) ».
 - Le `db push` reste bloqué par le garde-fou du mode auto même avec l'accord de Raphaël : lui
   faire lancer `! npx supabase db push --linked`. Une écriture ponctuelle de données par
   `npx supabase db query --linked` (renommage des trois blocs), elle, est passée.

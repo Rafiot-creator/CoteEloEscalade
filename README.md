@@ -1364,6 +1364,11 @@ Supabase, même temps réel. Une mise en ligne met l'application à jour au lanc
   copie tout de suite, rafraîchie en arrière-plan. **Rien de ce qui vient de Supabase ou de
   Google n'est intercepté** : cotes, envois, blocs et connexion passent toujours par le réseau.
   Changer `VERSION` dans `sw.js` efface toutes les copies.
+- **Onglet « Télécharger »** (`VueApplication.tsx`, `src/ui/installation.ts`), visible par
+  tous, caché une fois le site ouvert depuis l'application installée. Chrome, Edge et Android :
+  un vrai bouton « Installer l'application », qui ouvre l'invite du navigateur (événement
+  `beforeinstallprompt`, retenu dès le chargement de la page). Safari (iPhone, Mac) n'a pas
+  d'invite : instructions de l'appareil détecté, celles des autres appareils repliées dessous.
 - Hors ligne, l'application s'ouvre mais n'affiche pas de données et un envoi ne passe pas,
   comme le site. Garder les envois sur le téléphone jusqu'au retour du réseau serait l'étape
   suivante (pas faite).
@@ -2233,3 +2238,7 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   aucune erreur d'installabilité, page contrôlée par le service worker, seuls des fichiers du
   site en mémoire (rien de Supabase), application qui s'ouvre hors ligne avec tous ses onglets.
   À tester par Raphaël sur son téléphone (installation, connexion Google dans l'application).
+  Confirmé par Raphaël (« Ça fonctionne ! »), qui a ensuite demandé un onglet pour l'installer :
+  **onglet « Télécharger »**, voir la même section. Vérifié dans Chrome sans interface : bouton
+  d'installation (invite simulée) puis « C'est fait ! » ; instructions Safari sur iPhone simulé
+  (sans débordement à 390 px) ; onglet caché en mode application installée.

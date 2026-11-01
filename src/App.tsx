@@ -12,6 +12,8 @@ import { VueGrimpeurs } from './ui/views/VueGrimpeurs'
 import { VueAdministration } from './ui/views/VueAdministration'
 import { VueCommentaires } from './ui/views/VueCommentaires'
 import { VueBlocs } from './ui/views/VueBlocs'
+import { VueApplication } from './ui/views/VueApplication'
+import { estDansApplication } from './ui/installation'
 import { lireGrimpeurChoisi } from './ui/suivi'
 
 const ONGLETS = [
@@ -22,6 +24,8 @@ const ONGLETS = [
   { id: 'donnees', fr: 'Données', en: 'Data', reserve: true },
   { id: 'fichiers', fr: 'Fichiers', en: 'Files', reserve: true },
   { id: 'commentaires', fr: 'Commentaires', en: 'Feedback', reserve: false },
+  // Cache une fois ouvert depuis l'application installee (`estDansApplication`).
+  { id: 'application', fr: 'Télécharger', en: 'Get the app', reserve: false },
   // Compte admin general seulement (`compte.estAdmin`), independant de l'acces complet.
   { id: 'administration', fr: 'Administration', en: 'Admin', reserve: 'admin' },
 ] as const
@@ -118,14 +122,18 @@ function Contenu() {
   const [apercuVisiteur, setApercuVisiteur] = useState(false)
   const vueComplete = accesComplet && !apercuVisiteur
   const ongletVisible = (o: (typeof ONGLETS)[number]) =>
-    o.reserve === 'admin' ? compte.estAdmin && !apercuVisiteur : vueComplete || !o.reserve
+    o.id === 'application'
+      ? !estDansApplication()
+      : o.reserve === 'admin'
+        ? compte.estAdmin && !apercuVisiteur
+        : vueComplete || !o.reserve
   const onglets = ONGLETS.filter(ongletVisible)
   const [onglet, setOnglet] = useState<OngletId>(() =>
     lireMemoire(CLE_ONGLET, ONGLETS.map((o) => o.id), 'blocs')
   )
   useEffect(() => ecrireMemoire(CLE_ONGLET, onglet), [onglet])
   // Onglets qui ne montrent pas le calcul du centre choisi.
-  const horsCalcul = onglet === 'carte' || onglet === 'administration' || onglet === 'commentaires'
+  const horsCalcul = onglet === 'carte' || onglet === 'administration' || onglet === 'commentaires' || onglet === 'application'
   const [theme, setTheme] = useState<'auto' | 'clair' | 'sombre'>('auto')
   const centre = CENTRES.find((c) => c.id === centreId) ?? CENTRES[0]
   const [blocCible, setBlocCible] = useState<string | null>(null)
@@ -234,6 +242,8 @@ function Contenu() {
         {onglet === 'administration' && compte.estAdmin && <VueAdministration apresModification={atelier.recharger} />}
 
         {onglet === 'commentaires' && <VueCommentaires centre={centre.fr} pseudo={compte.grimpeur?.nom ?? null} />}
+
+        {onglet === 'application' && <VueApplication />}
 
         {onglet === 'carte' && (
           <VueCarte
