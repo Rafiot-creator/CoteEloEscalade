@@ -2254,13 +2254,8 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   dans la base (transaction annulée, ne touche que son propre compte), test vitest (lecture de
   la colonne, calcul inchangé), écran dans Chrome sans interface avec un grimpeur de la Démo
   masqué temporairement dans la base et un compte simulé, puis base remise à l'identique.
-- **Une seule cote affichée, « Cote calculée »**, demandé par Raphaël : les tableaux Blocs et
-  Grimpeurs montraient en accès complet une colonne par formule (Elo, Glicko, Mélange). Partout
-  désormais, dans toutes les vues, une seule colonne : la cote Mélange, appelée « Cote
-  calculée ». Sur Grimpeurs, elle fusionne avec l'ancienne colonne « Cote par style », qui
-  répétait le même chiffre quand aucun style n'était choisi : l'en-tête est le menu (« Cote
-  calculée » ou un style). L'export CSV de Blocs n'a plus qu'une colonne `cote_calculee`.
-  L'écran Formules (accès complet) garde la comparaison des formules ; le Verdict (accord des
-  formules contre l'ouvreur) et l'Incertitude (Glicko) restent, ce ne sont pas des cotes.
-  Vérifié dans Chrome sans interface, accès complet et visiteur : aucune mention d'Elo, Glicko
-  ou Mélange dans les deux écrans.
+- **Colonnes Elo/Glicko : rien à changer.** Raphaël a demandé de ne garder que la cote Mélange,
+  appelée « Cote calculée », partout ; fait et poussé (`c1ca212`), puis annulé à sa demande
+  (revert) : il ne voyait les colonnes par formule qu'en accès complet, et la vue visiteur avait
+  déjà une seule colonne « Cote » depuis le 2026-09-14. **Voulu ainsi : toute l'information en
+  accès complet, une seule cote en vue visiteur.**

@@ -769,9 +769,10 @@ migrations appliquées jusqu'à `20261031000500_admin_ouvreurs.sql`. Pourquoi de
   `20261101000000_masque_classement.sql`, appliquée). Retiré de l'affichage public, ligne à
   part pour soi, toujours dans le calcul. Testé par Raphaël avec Rafiot (« Ça fonctionne ! »),
   pas besoin de le retirer d'autres écrans (Données, Administration).
-- **Une seule cote affichée, « Cote calculée »** (la cote Mélange) dans Blocs et Grimpeurs,
-  toutes vues confondues ; plus de colonnes Elo/Glicko. Comparer les formules : écran Formules
-  seulement. Sur Grimpeurs, fusionnée avec le menu de style.
+- **Accès complet = toute l'information** (colonnes Elo, Glicko, Mélange côte à côte) ; vue
+  visiteur = une seule colonne « Cote ». Un passage à une seule « Cote calculée » partout a
+  été fait puis annulé à la demande de Raphaël le 2026-11-01 : en cas de remarque sur des
+  colonnes en trop, vérifier d'abord dans quelle vue il regarde.
 - Le `db push` reste bloqué par le garde-fou du mode auto même avec l'accord de Raphaël : lui
   faire lancer `! npx supabase db push --linked`. Une écriture ponctuelle de données par
   `npx supabase db query --linked` (renommage des trois blocs), elle, est passée.
