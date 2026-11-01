@@ -9,7 +9,7 @@ import { Nuage } from '../charts/Nuage'
 import { Carte, LegendeCote, PastilleCote, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { nombre, pourcent, signe, telecharger } from '../format'
-import { bilingue, useLangue } from '../langue'
+import { useLangue } from '../langue'
 import type { StatutEnvoi } from '../etat'
 import { useChoixMemorise } from '../memoire'
 
@@ -51,7 +51,7 @@ export function VueBlocs({
   /** Grimpeur dont on peut montrer les resultats : compte connecte, ou nom choisi sur la Carte. */
   grimpeurNom?: string
 }) {
-  const { langue, t } = useLangue()
+  const { t } = useLangue()
   const maison = echelle !== 'v'
   const [gymChoisi, setGym] = useState(salleParDefaut ?? 'tous')
   const [seulsDesaccords, setSeulsDesaccords] = useState(false)
@@ -86,8 +86,10 @@ export function VueBlocs({
     })).filter((c) => c.parBloc.size > 0)
   }, [resultats])
 
-  // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
-  const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
+  // Une seule colonne de cote, celle du melange, appelee « Cote calculee », dans
+  // toutes les vues (choix de Raphael, 2026-11-01) : comparer les formules
+  // entre elles reste possible dans l'ecran Formules.
+  const colonnesFormules = cotesParFormule.filter((c) => c.formule.id === 'melange')
 
   /**
    * Combien de formules signalent ce bloc ?
@@ -236,30 +238,17 @@ export function VueBlocs({
     },
     ...colonnesFormules.map((c) => ({
       cle: `cote-${c.formule.id}`,
-      titre: simplifie ? t('Cote', 'Rating') : bilingue(c.formule.labelCourt ?? c.formule.label, c.formule.labelCourtEn ?? c.formule.labelEn, langue),
+      titre: t('Cote calculée', 'Calculated rating'),
       num: true,
-      aide: simplifie
-        ? t(
-            'Cote du bloc. Divisez par 1000 pour la lire en cotes V : 4500 = V4,5.',
-            'The boulder\'s rating. Divide by 1000 to read it in V grades: 4500 = V4.5.'
-          )
-        : t(
-            `Cote du bloc selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en cotes V : 4500 = V4,5. ` +
-              (c.formule.id === resultat.formuleId
-                ? "C'est la formule active : c'est elle qui donne la cotation calculée et l'écart."
-                : "Quand deux formules s'écartent nettement sur un bloc, c'est que ce bloc est mal connu."),
-            `The boulder's rating according to the "${bilingue(c.formule.label, c.formule.labelEn, langue)}" formula. Divide by 1000 to read it in V grades: 4500 = V4.5. ` +
-              (c.formule.id === resultat.formuleId
-                ? "It's the active formula: it's the one driving the calculated grade and the gap."
-                : "When two formulas disagree sharply on a boulder, that boulder is poorly documented.")
-          ),
+      aide: t(
+        'Cote du bloc, calculée à partir des réussites et des échecs. Divisez par 1000 pour la lire en cotes V : 4500 = V4,5.',
+        "The boulder's rating, calculated from sends and failed attempts. Divide by 1000 to read it in V grades: 4500 = V4.5."
+      ),
       valeur: (b: LigneBloc) => c.parBloc.get(b.id)?.rating ?? Number.NaN,
       rendu: (b: LigneBloc) => {
         const ligne = c.parBloc.get(b.id)
         if (!ligne || !Number.isFinite(ligne.rating)) return <span className="discret">—</span>
-        // La formule courante est celle qui pilote l'ecart : on la souligne.
-        const courante = c.formule.id === resultat.formuleId
-        return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
+        return <span>{nombre(ligne.rating)}</span>
       },
     })),
     {
@@ -409,7 +398,7 @@ export function VueBlocs({
                     cotation_calculee: b.cotationCalculee,
                     ...Object.fromEntries(
                       colonnesFormules.map((c) => [
-                        simplifie ? 'cote' : `cote_${c.formule.id.replace(/-/g, '_')}`,
+                        'cote_calculee',
                         Math.round(c.parBloc.get(b.id)?.rating ?? Number.NaN),
                       ])
                     ),

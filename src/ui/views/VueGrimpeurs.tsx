@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { ratingVersIndex } from '../../core/calibrage'
-import { FORMULES } from '../../core/formulas/registry'
 import { DUELS_PROVISOIRES } from '../../core/formulas/lib'
 import { formaterIndex } from '../../core/cotations'
 import type { LigneGrimpeur, Resultat } from '../../core/pipeline'
@@ -11,7 +10,7 @@ import { Histogramme } from '../charts/Histogramme'
 import { Carte, LegendeCote, Tuile } from '../components/base'
 import { Tableau, type Colonne } from '../components/Tableau'
 import { dateCourte, nombre, pourcent } from '../format'
-import { bilingue, useLangue } from '../langue'
+import { useLangue } from '../langue'
 import { echantillonner } from '../etat'
 import { useChoixMemorise, useTriMemorise } from '../memoire'
 
@@ -58,13 +57,6 @@ export function VueGrimpeurs({
     if (erreur) setErreurMasque(erreur)
   }
 
-  const cotesParFormule = useMemo(() => {
-    return FORMULES.map((f) => ({
-      formule: f,
-      parGrimpeur: new Map((resultats.get(f.id)?.grimpeurs ?? []).map((g) => [g.id, g])),
-    })).filter((c) => c.parGrimpeur.size > 0)
-  }, [resultats])
-
   // La ventilation par style vient toujours d'Elo bloc (cf. `elo-bloc.ts`),
   // quelle que soit la formule active a l'ecran : Glicko ne la calcule pas
   // (mise a jour bayesienne par periode, pas mouvement par mouvement, rien a
@@ -96,9 +88,6 @@ export function VueGrimpeurs({
    */
   const enStyle = (g: LigneGrimpeur) =>
     styleSelectionne ? eloParGrimpeur.get(g.id)?.stylesGrimpeur?.[styleSelectionne] : undefined
-
-  // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
-  const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
 
   // Les grimpeurs en periode d'essai (moins de dix blocs tentes, cf.
   // `LigneGrimpeur.provisoire`) n'apparaissent nulle part dans le classement
@@ -210,32 +199,15 @@ export function VueGrimpeurs({
       tri: (g) => g.indexNiveau,
       rendu: (g) => formaterIndex(g.indexNiveau, langue),
     },
-    ...colonnesFormules.map((c) => ({
-      cle: `cote-${c.formule.id}`,
-      titre: simplifie ? t('Cote', 'Rating') : bilingue(c.formule.labelCourt ?? c.formule.label, c.formule.labelCourtEn ?? c.formule.labelEn, langue),
-      num: true,
-      aide: simplifie
-        ? t(
-            "Cote du grimpeur. Divisez par 1000 pour la lire en cotes V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.",
-            "The climber's rating. Divide by 1000 to read it in V grades: 5300 = V5.3. A climber rated 1000 points above a boulder sends it nine times out of ten."
-          )
-        : t(
-            `Cote du grimpeur selon la formule "${c.formule.label}". Divisez par 1000 pour la lire en cotes V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix.`,
-            `The climber's rating according to the "${bilingue(c.formule.label, c.formule.labelEn, langue)}" formula. Divide by 1000 to read it in V grades: 5300 = V5.3. A climber rated 1000 points above a boulder sends it nine times out of ten.`
-          ),
-      valeur: (g: LigneGrimpeur) => c.parGrimpeur.get(g.id)?.rating ?? Number.NaN,
-      rendu: (g: LigneGrimpeur) => {
-        const ligne = c.parGrimpeur.get(g.id)
-        if (!ligne || !Number.isFinite(ligne.rating)) return <span className="discret">—</span>
-        const courante = c.formule.id === resultat.formuleId
-        return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
-      },
-    })),
+    // Seule colonne de cote, dans toutes les vues (choix de Raphael,
+    // 2026-11-01) : la cote Melange, appelee « Cote calculee », ou celle d'un
+    // style choisi dans le menu de l'en-tete. Comparer les formules entre
+    // elles reste possible dans l'ecran Formules.
     ...(eloBloc && melangeBloc
       ? [
           {
             cle: 'cote-style',
-            titre: t('Cote par style', 'Rating by style'),
+            titre: t('Cote calculée', 'Calculated rating'),
             titreRendu: () => (
               <select
                 value={styleSelectionne}
@@ -254,7 +226,7 @@ export function VueGrimpeurs({
                 // plutot que d'ecraser ce select.
                 style={{ font: 'inherit', fontWeight: 400, minWidth: 160 }}
               >
-                <option value="">{t('Cote globale (Mélange)', 'Overall rating (Blend)')}</option>
+                <option value="">{t('Cote calculée', 'Calculated rating')}</option>
                 {STYLES_BLOC.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -264,8 +236,8 @@ export function VueGrimpeurs({
             ),
             num: true,
             aide: t(
-              "Cote Mélange (toujours cette formule, la référence utilisée partout ailleurs dans cet écran) pour le style choisi dans le menu déroulant. Le calcul par style n'existe que pour Elo bloc (Glicko ne s'y prête pas) : chaque style affiché ici est donc la cote Mélange globale du grimpeur, décalée du même écart qu'Elo a mesuré pour ce style-là — pas une cote Mélange indépendante, mais cohérente avec la cote affichée ailleurs. Tiret si le grimpeur n'a jamais affronté ce style.",
-              "Blend rating (always this formula, the reference used everywhere else on this screen) for the style chosen in the dropdown. The per-style breakdown only exists for Elo boulder (Glicko doesn't lend itself to it): each style shown here is therefore the climber's overall Blend rating, shifted by the same gap Elo measured for that style — not an independent Blend rating, but consistent with the rating shown elsewhere. Dash if the climber never faced that style."
+              "Cote du grimpeur, calculée à partir de ses réussites et de ses échecs. Divisez par 1000 pour la lire en cotes V : 5300 = V5,3. Un grimpeur coté 1000 points au-dessus d'un bloc l'envoie neuf fois sur dix. Choisir un style dans le menu montre sa cote dans ce style seulement (tiret s'il ne l'a jamais affronté).",
+              "The climber's rating, calculated from their sends and failed attempts. Divide by 1000 to read it in V grades: 5300 = V5.3. A climber rated 1000 points above a boulder sends it nine times out of ten. Picking a style in the menu shows their rating in that style only (dash if they never faced it)."
             ),
             valeur: (g: LigneGrimpeur) => {
               const ligneMelange = melangeParGrimpeur.get(g.id)
@@ -419,8 +391,8 @@ export function VueGrimpeurs({
       <Carte
         titre={t('Classement', 'Leaderboard')}
         sousTitre={t(
-          "Le niveau calculé est la cotation V que le grimpeur envoie une fois sur deux. Les cotes des deux formules sont affichées côte à côte ; celle en gras est la formule active.",
-          "The calculated level is the V grade the climber sends half the time. Both formulas' ratings are shown side by side; the one in bold is the active formula."
+          'Le niveau calculé est la cotation V que le grimpeur envoie une fois sur deux.',
+          'The calculated level is the V grade the climber sends half the time.'
         )}
       >
         {definirMasque && (
@@ -450,7 +422,7 @@ export function VueGrimpeurs({
                   // Le menu de style reste dans l'en-tete du classement : il
                   // pilote aussi cette ligne, inutile de l'y doubler.
                   colonnes={colonnes.map(({ titreRendu, ...c }) =>
-                    titreRendu ? { ...c, titre: styleSelectionne || t('Cote globale', 'Overall rating') } : c
+                    titreRendu ? { ...c, titre: styleSelectionne || t('Cote calculée', 'Calculated rating') } : c
                   )}
                   cleLigne={(g) => g.id}
                   enEvidence={moiHorsClassement.id}

@@ -767,8 +767,11 @@ migrations appliquées jusqu'à `20261031000500_admin_ouvreurs.sql`. Pourquoi de
 - **Case « Je ne souhaite pas apparaître dans le classement »** (Grimpeurs, compte connecté) :
   `grimpeurs.masque_classement`, `definir_masque_classement` (migration
   `20261101000000_masque_classement.sql`, appliquée). Retiré de l'affichage public, ligne à
-  part pour soi, toujours dans le calcul. Vérifié avec un compte simulé ; **pas encore testé
-  par Raphaël avec Rafiot**.
+  part pour soi, toujours dans le calcul. Testé par Raphaël avec Rafiot (« Ça fonctionne ! »),
+  pas besoin de le retirer d'autres écrans (Données, Administration).
+- **Une seule cote affichée, « Cote calculée »** (la cote Mélange) dans Blocs et Grimpeurs,
+  toutes vues confondues ; plus de colonnes Elo/Glicko. Comparer les formules : écran Formules
+  seulement. Sur Grimpeurs, fusionnée avec le menu de style.
 - Le `db push` reste bloqué par le garde-fou du mode auto même avec l'accord de Raphaël : lui
   faire lancer `! npx supabase db push --linked`. Une écriture ponctuelle de données par
   `npx supabase db query --linked` (renommage des trois blocs), elle, est passée.
