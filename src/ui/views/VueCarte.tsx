@@ -11,6 +11,7 @@ import {
 } from '../../core/echelles'
 import { DUELS_STABILISATION_SPECIAL } from '../../core/formulas/lib'
 import { chargerCarte, demonterBloc, modifierBloc, placerBloc } from '../../core/cartes/sources'
+import { estNomAuto, lireSecteurs, nomDeBase, nomUnique, secteurProche, type SecteursCarte } from '../../core/cartes/nomAuto'
 import type { BlocCarte, Carte as DonneesCarte } from '../../core/cartes/types'
 import { STYLES_BLOC } from '../../core/stylesBloc'
 import { supabase } from '../../core/supabase'
@@ -284,6 +285,46 @@ export function VueCarte({
   const RAYON = Math.round(Math.max(5 * FACTEUR, Math.min(20 * FACTEUR, largeurCarte * 0.018 * FACTEUR)))
   // Echelle affichee (src/core/echelles.ts) ; la base et le calcul restent en V.
   const echelleCotes = carte?.echelle ?? 'v'
+
+  // Etiquettes de secteurs du fond de carte, pour le nom donne d'office aux
+  // blocs (src/core/cartes/nomAuto.ts). Pas de fond SVG : pas de secteur.
+  const [secteurs, setSecteurs] = useState<SecteursCarte | null>(null)
+  const fondCarte = carte?.fond
+  useEffect(() => {
+    setSecteurs(null)
+    if (!fondCarte?.endsWith('.svg')) return
+    let vivant = true
+    fetch(fondCarte)
+      .then((r) => (r.ok ? r.text() : ''))
+      .then((svg) => vivant && setSecteurs(lireSecteurs(svg)))
+      .catch(() => {})
+    return () => {
+      vivant = false
+    }
+  }, [fondCarte])
+
+  /** Style-Cote-Couleur-Secteur du bloc, sans numero de doublon. */
+  const baseNom = (b: Omit<BlocCarte, 'id'>, avecSecteur = true) =>
+    nomDeBase({
+      style: b.style,
+      cote: libelleCote(b.cotation, b.couleur, echelleCotes, b.special).replace('★', ''),
+      couleur: b.couleur === COULEUR_COMP_WALL ? '' : infoCouleur(b.couleur).fr,
+      secteur: avecSecteur ? secteurProche(secteurs, b.x, b.y) : null,
+    })
+  const nomLibre = (b: Omit<BlocCarte, 'id'>, id: string | null) =>
+    nomUnique(
+      baseNom(b),
+      (carte?.blocs ?? []).filter((x) => x.id !== id).map((x) => x.nom ?? x.id)
+    )
+  /**
+   * Etat suivant d'un bloc, avec son nom mis a jour s'il etait encore un nom
+   * donne d'office (jamais un nom tape a la main). Le nom sans secteur compte
+   * aussi : un bloc pose avant la lecture du fond de carte n'en a pas.
+   */
+  const avecNomAuto = (avant: BlocCarte, apres: BlocCarte): BlocCarte =>
+    estNomAuto(avant.nom, avant.id, [baseNom(avant), baseNom(avant, false)])
+      ? { ...apres, nom: nomLibre(apres, apres.id) }
+      : apres
   // Le contour de la pastille (boxShadow plus bas) etait fixe a 2px depuis
   // toujours, jamais retouche pendant les correctifs precedents de l'anneau
   // "envoye" — la cause reelle du "debordement" signale par Raphael sur
@@ -456,7 +497,8 @@ export function VueCarte({
     const { x, y } = relatif(e.clientX, e.clientY)
     // Cote par defaut : V4, ou son equivalent dans l'echelle du centre.
     const cotation = versCotationV(depuisCotationV('V4', echelleCotes), echelleCotes)
-    const nouveau: Omit<BlocCarte, 'id'> = { x, y, cotation, couleur: 'bleu', style: '' }
+    const sansNom: Omit<BlocCarte, 'id'> = { x, y, cotation, couleur: 'bleu', style: '' }
+    const nouveau: Omit<BlocCarte, 'id'> = { ...sansNom, nom: nomLibre(sansNom, null) }
     if (!ouvreur) {
       const bloc: BlocCarte = { id: nouvelId(), ...nouveau }
       setCarte({ ...carte, blocs: [...carte.blocs, bloc] })
@@ -471,7 +513,7 @@ export function VueCarte({
         setErreurEdition(r.erreur)
         return
       }
-      setCarte((c) => (c ? { ...c, blocs: [...c.blocs, { id: r.id, ...nouveau, nom: r.id }] } : c))
+      setCarte((c) => (c ? { ...c, blocs: [...c.blocs, { id: r.id, ...nouveau, nom: nouveau.nom || r.id }] } : c))
       setSelection(r.id)
       apresModification?.()
     })
@@ -496,8 +538,21 @@ export function VueCarte({
   }
 
   const modifierEtSauver = (bloc: BlocCarte, patch: Partial<BlocCarte>) => {
-    modifier(bloc.id, patch)
-    sauver({ ...bloc, ...patch })
+    const suivant = avecNomAuto(bloc, { ...bloc, ...patch })
+    modifier(bloc.id, suivant)
+    sauver(suivant)
+  }
+
+  /**
+   * Fin d'un glisser : enregistre la position finale, et le nom si le bloc a
+   * change de secteur. Une position ne touche aucun calcul (`false`).
+   */
+  const poserApresGlisse = (depart: BlocCarte, position: { x: number; y: number }) => {
+    const suivant = avecNomAuto(depart, { ...depart, ...position })
+    const renomme = suivant.nom !== depart.nom
+    if (renomme) modifier(depart.id, { nom: suivant.nom })
+    // Un nouveau nom se voit dans Blocs : relire alors, comme un autre changement.
+    sauver(suivant, renomme)
   }
 
   const supprimer = (id: string) => {
@@ -568,7 +623,7 @@ export function VueCarte({
       if (fut && !fut.deplace) setSelection(id)
       // Enregistre la position finale seulement, pas chaque etape du glisser.
       const depart = carte.blocs.find((b) => b.id === id)
-      if (fut?.deplace && position && depart) sauver({ ...depart, ...position }, false)
+      if (fut?.deplace && position && depart) poserApresGlisse(depart, position)
     }
     window.addEventListener('mousemove', bouger)
     window.addEventListener('mouseup', relacher)
@@ -611,7 +666,7 @@ export function VueCarte({
       glisse.current = null
       setGlisseTactile(null)
       const depart = carte.blocs.find((b) => b.id === id)
-      if (position && depart) sauver({ ...depart, ...position }, false)
+      if (position && depart) poserApresGlisse(depart, position)
       // Comme a la souris : un bloc deplace n'est pas selectionne (l'editeur
       // ferait defiler la page), un appui long sans bouger le selectionne.
       else setSelection(id)
@@ -977,14 +1032,19 @@ export function VueCarte({
             <input
               type="text"
               value={blocSelectionne.nom ?? ''}
-              placeholder={t('ex. DA-0002', 'e.g. DA-0002')}
+              placeholder={t('vide = nom automatique', 'empty = automatic name')}
               maxLength={40}
               onChange={(e) => modifier(blocSelectionne.id, { nom: e.currentTarget.value })}
               // Enregistre a la sortie du champ, pas a chaque lettre, et
-              // seulement si le nom a change.
+              // seulement si le nom a change. Un nom efface redevient le nom
+              // automatique (src/core/cartes/nomAuto.ts), qui suit ensuite le bloc.
               onFocus={() => (nomAuFocus.current = blocSelectionne.nom ?? '')}
               onBlur={() => {
-                if ((blocSelectionne.nom ?? '') !== nomAuFocus.current) sauver(blocSelectionne)
+                if (!(blocSelectionne.nom ?? '').trim()) {
+                  const auto = { ...blocSelectionne, nom: nomLibre(blocSelectionne, blocSelectionne.id) }
+                  modifier(auto.id, { nom: auto.nom })
+                  if (auto.nom !== nomAuFocus.current) sauver(auto)
+                } else if ((blocSelectionne.nom ?? '') !== nomAuFocus.current) sauver(blocSelectionne)
               }}
               style={{ width: '100%' }}
             />
