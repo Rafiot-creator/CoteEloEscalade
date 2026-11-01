@@ -2178,3 +2178,15 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   édition) envoie entre-temps un `mouseleave` qui l'a déjà refermé. Vérifié à la souris dans
   Chrome sans interface (bug reproduit sans le correctif, corrigé avec) ; le téléphone simulé
   ne génère pas le clic comme un vrai, donc à confirmer sur le téléphone de Liv.
+- **Noms de blocs lisibles**, demandé par Raphaël : un bloc posé sur la Carte s'appelle
+  d'office Style-Cote-Couleur-Secteur (ex. « Coordo-10-Rouge-Le-Rose ») au lieu de son
+  identifiant technique (`src/core/cartes/nomAuto.ts`, tests dans `nomAuto.test.ts`). Parties
+  vides sautées ; cote dans l'échelle du centre (numéro seul au Comp Wall, sans couleur ; « S »
+  pour un bloc spécial) ; « -2 », « -3 » pour les doublons ; 40 caractères au plus. Secteur =
+  étiquette la plus proche de la pastille, lue dans le SVG du fond (textes en gras `#333` ; les
+  zones en gris clair comme Accueil ou Vestiaires ne comptent pas ; « MUR DE » / « VITESSE »
+  recollés) : les limites entre secteurs n'étant pas dessinées, un bloc près d'une limite peut
+  tomber du mauvais côté, l'ouvreur corrige alors à la main (choix de Raphaël). Le nom suit le
+  bloc (style, cote, couleur, déplacement) tant qu'il n'a pas été tapé à la main ; un champ Nom
+  vidé redevient automatique. Les trois blocs déjà posés à RB1/RB2, encore sous leur nom
+  technique, ont été renommés dans la base. Vérifié dans Chrome sans interface sur la Démo.

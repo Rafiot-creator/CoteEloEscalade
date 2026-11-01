@@ -39,7 +39,7 @@ rejetées). Ne pas ré-expliquer ce qui y est déjà écrit.**
 ```bash
 npm install
 npm run dev            # http://localhost:5173
-npm test                # 74 tests sur le cœur de calcul
+npm test                # 80 tests sur le cœur de calcul
 npm run build           # site statique dans dist/
 npm run data:generate   # régénère le jeu de données de démonstration
 ```
