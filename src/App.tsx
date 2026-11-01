@@ -257,7 +257,7 @@ function Contenu() {
             // tant que leur cote n'est pas stable (cf. `LigneGrimpeur.provisoire`).
             grimpeurs={
               donneesBranchees
-                ? atelier.resultats.get('melange')?.grimpeurs.filter((g) => !g.provisoire).map((g) => g.nom)
+                ? atelier.resultats.get('melange')?.grimpeurs.filter((g) => !g.provisoire && !g.masqueClassement).map((g) => g.nom)
                 : undefined
             }
             enregistrerAscension={donneesBranchees ? atelier.enregistrerAscension : undefined}
@@ -318,6 +318,16 @@ function Contenu() {
                 resultats={atelier.resultats}
                 simplifie={!vueComplete}
                 moi={compte.grimpeur?.id}
+                masque={compte.grimpeur?.masqueClassement}
+                definirMasque={
+                  compte.grimpeur
+                    ? async (m) => {
+                        const erreur = await compte.definirMasque(m)
+                        if (!erreur) atelier.recharger()
+                        return erreur
+                      }
+                    : undefined
+                }
               />
             )}
             {onglet === 'formules' && <VueFormules atelier={atelier} onVoirBlocSurCarte={voirBlocSurCarte} />}

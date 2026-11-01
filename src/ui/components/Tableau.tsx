@@ -59,6 +59,8 @@ interface Props<T> {
    * une ligne de points de suspension : on se trouve sans tout derouler.
    */
   enEvidence?: string
+  /** Sans le pied « n sur m lignes » (ex. un tableau d'une seule ligne). */
+  sansPied?: boolean
 }
 
 /**
@@ -80,6 +82,7 @@ export function Tableau<T>({
   pageTaille = 50,
   videMessage,
   enEvidence,
+  sansPied = false,
 }: Props<T>) {
   const triDefaut = triInitial ?? { cle: colonnes[0].cle, sens: 1 as 1 | -1 }
   const [triInterne, setTriInterne] = useTriMemorise(memoire, triDefaut)
@@ -165,7 +168,7 @@ export function Tableau<T>({
         </table>
       </div>
       {noeud}
-      <div className="pagination">
+      {!sansPied && <div className="pagination">
         <span>
           {t(`${nombre(visibles.length)} sur ${nombre(lignes.length)} lignes`, `${nombre(visibles.length)} of ${nombre(lignes.length)} rows`)}
         </span>
@@ -179,7 +182,7 @@ export function Tableau<T>({
             {t('Replier', 'Collapse')}
           </button>
         )}
-      </div>
+      </div>}
     </>
   )
 }

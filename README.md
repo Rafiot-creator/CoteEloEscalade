@@ -2242,3 +2242,15 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   **onglet « Télécharger »**, voir la même section. Vérifié dans Chrome sans interface : bouton
   d'installation (invite simulée) puis « C'est fait ! » ; instructions Safari sur iPhone simulé
   (sans débordement à 390 px) ; onglet caché en mode application installée.
+- **« Je ne souhaite pas apparaître dans le classement »**, demandé par Raphaël : case à cocher
+  au-dessus du tableau Classement (écran Grimpeurs), pour un compte connecté. Cochée, le
+  grimpeur disparaît pour tout le monde du classement, de l'histogramme, des tuiles et de la
+  liste de noms de la Carte. Il voit ses propres cotes sur une ligne à part, au-dessus du
+  tableau, sans rang. Il reste dans le calcul : ses envois déplacent toujours la cote des blocs.
+  Colonne `grimpeurs.masque_classement` et fonction `definir_masque_classement` (migration
+  `20261101000000_masque_classement.sql`, appliquée par Raphaël). Comme le reste de
+  `grimpeurs`, la colonne est en lecture publique : on retire le pseudonyme de l'affichage, on
+  ne protège pas les données (le calcul se fait dans le navigateur). Vérifié : fonction testée
+  dans la base (transaction annulée, ne touche que son propre compte), test vitest (lecture de
+  la colonne, calcul inchangé), écran dans Chrome sans interface avec un grimpeur de la Démo
+  masqué temporairement dans la base et un compte simulé, puis base remise à l'identique.

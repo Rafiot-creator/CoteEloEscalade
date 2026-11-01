@@ -324,6 +324,16 @@ que les fichiers du site, jamais les données : une copie périmée des cotes ou
 pire que pas de copie. Le vrai plus d'une application, garder les envois faits sans réseau
 jusqu'à son retour, reste à faire si le réseau en salle le demande.
 
+**Se retirer du classement retire l'affichage, pas le calcul.** Un grimpeur qui coche « Je ne
+souhaite pas apparaître dans le classement » (écran Grimpeurs) continue de compter : l'exclure
+du calcul fausserait la cote de chaque bloc qu'il a essayé, pour tout le monde. Le choix est
+rangé dans la base (`grimpeurs.masque_classement`) et non dans le navigateur : il doit valoir
+chez tous ceux qui regardent le classement, pas seulement chez lui. Retiré partout où un
+pseudonyme se lit à côté d'une cote (classement, histogramme, tuiles, liste de noms de la
+Carte) ; l'écran Données (accès complet) et Administration le montrent toujours. Limite
+assumée : la table reste lisible par l'API (le calcul se fait dans le navigateur), le
+pseudonyme reste donc le vrai rempart.
+
 ---
 
 ## 3. Détecter les blocs mal cotés

@@ -764,6 +764,11 @@ migrations appliquées jusqu'à `20261031000500_admin_ouvreurs.sql`. Pourquoi de
   confirmée par Raphaël sur son téléphone. Onglet **Télécharger** (`VueApplication.tsx`) :
   bouton d'installation si le navigateur le permet, sinon instructions (iPhone) ; caché dans
   l'application installée. Détail : README § « L'application installable (PWA) ».
+- **Case « Je ne souhaite pas apparaître dans le classement »** (Grimpeurs, compte connecté) :
+  `grimpeurs.masque_classement`, `definir_masque_classement` (migration
+  `20261101000000_masque_classement.sql`, appliquée). Retiré de l'affichage public, ligne à
+  part pour soi, toujours dans le calcul. Vérifié avec un compte simulé ; **pas encore testé
+  par Raphaël avec Rafiot**.
 - Le `db push` reste bloqué par le garde-fou du mode auto même avec l'accord de Raphaël : lui
   faire lancer `! npx supabase db push --linked`. Une écriture ponctuelle de données par
   `npx supabase db query --linked` (renommage des trois blocs), elle, est passée.

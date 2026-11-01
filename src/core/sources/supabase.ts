@@ -15,7 +15,7 @@ import { lireTable } from '../supabase'
  * sur ses seules ascensions.
  */
 const tables = (centres: string[]) => [
-  { nom: 'grimpeurs.csv', table: 'grimpeurs', ordre: 'id', colonnes: ['id', 'nom', 'sexe', 'gym_principal', 'premiere_saison', 'niveau_declare'] },
+  { nom: 'grimpeurs.csv', table: 'grimpeurs', ordre: 'id', colonnes: ['id', 'nom', 'sexe', 'gym_principal', 'premiere_saison', 'niveau_declare', 'masque_classement'] },
   {
     nom: 'blocs.csv',
     table: 'blocs',

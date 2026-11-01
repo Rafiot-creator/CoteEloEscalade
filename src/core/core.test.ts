@@ -852,3 +852,26 @@ describe('blocs speciaux (non cotes)', () => {
     }
   })
 })
+
+describe('grimpeur hors classement', () => {
+  it('lit masque_classement et le reporte sur la ligne du grimpeur, sans toucher au calcul', async () => {
+    const { schemaGrimpeur } = await import('./loaders/schemas')
+    const base = { id: 'g', nom: 'G', sexe: 'X', gym_principal: '', premiere_saison: '2026', niveau_declare: '' }
+    expect(schemaGrimpeur.parse({ ...base, masque_classement: 'true' }).masqueClassement).toBe(true)
+    expect(schemaGrimpeur.parse({ ...base, masque_classement: 'false' }).masqueClassement).toBeUndefined()
+    expect(schemaGrimpeur.parse(base).masqueClassement).toBeUndefined()
+
+    const ds = await dataset()
+    const cible = ds.grimpeurs[0].id
+    const masque: Dataset = {
+      ...ds,
+      grimpeurs: ds.grimpeurs.map((g) => (g.id === cible ? { ...g, masqueClassement: true } : g)),
+    }
+    const f = FORMULES.find((x) => x.id === 'elo-bloc')!
+    const avant = executer(ds, f, paramsParDefaut(f.params), {})
+    const apres = executer(masque, f, paramsParDefaut(f.params), {})
+    expect(apres.grimpeurs.find((g) => g.id === cible)?.masqueClassement).toBe(true)
+    expect(apres.grimpeurs.filter((g) => g.masqueClassement)).toHaveLength(1)
+    expect(apres.grimpeurs.map((g) => g.rating)).toEqual(avant.grimpeurs.map((g) => g.rating))
+  })
+})

@@ -23,11 +23,19 @@ export function VueGrimpeurs({
   resultats,
   simplifie = false,
   moi,
+  masque = false,
+  definirMasque,
 }: {
   resultat: Resultat
   resultats: Map<string, Resultat>
   /** Id du grimpeur du compte connecte : sa ligne est mise en evidence. */
   moi?: string | null
+  /**
+   * « Je ne souhaite pas apparaitre dans le classement », pour le compte
+   * connecte (absent sans compte). Renvoie un message d'erreur, ou null.
+   */
+  masque?: boolean
+  definirMasque?: (masque: boolean) => Promise<string | null>
   /** Vue visiteur : une seule colonne de cote (le melange), appelee simplement "Cote". */
   simplifie?: boolean
 }) {
@@ -37,6 +45,18 @@ export function VueGrimpeurs({
   const plusieursSalles = resultat.resume.gyms.length > 1
   const [selection, setSelection] = useState<string[]>([])
   const [tableau, setTableau] = useState(false)
+  // Case cochee/decochee en attente de la base : affichee tout de suite.
+  const [masqueEnCours, setMasqueEnCours] = useState<boolean | null>(null)
+  const [erreurMasque, setErreurMasque] = useState<string | null>(null)
+  const masqueAffiche = masqueEnCours ?? masque
+  const basculerMasque = async (m: boolean) => {
+    if (!definirMasque) return
+    setMasqueEnCours(m)
+    setErreurMasque(null)
+    const erreur = await definirMasque(m)
+    setMasqueEnCours(null)
+    if (erreur) setErreurMasque(erreur)
+  }
 
   const cotesParFormule = useMemo(() => {
     return FORMULES.map((f) => ({
@@ -84,10 +104,18 @@ export function VueGrimpeurs({
   // `LigneGrimpeur.provisoire`) n'apparaissent nulle part dans le classement
   // ni dans les graphiques : leur cote n'est pas encore stable. Seul le
   // compte concerne voit sa position, marquee provisoire (tuile plus bas).
+  // Ceux qui ont demande a ne pas y apparaitre (`masqueClassement`) non plus :
+  // le compte concerne voit ses cotes sur une ligne a part, au-dessus du tableau.
   const classement = useMemo(
-    () => [...resultat.grimpeurs].filter((g) => g.matchs > 0 && !g.provisoire).sort((a, b) => b.rating - a.rating),
+    () =>
+      [...resultat.grimpeurs]
+        .filter((g) => g.matchs > 0 && !g.provisoire && !g.masqueClassement)
+        .sort((a, b) => b.rating - a.rating),
     [resultat]
   )
+  const moiHorsClassement = moi
+    ? resultat.grimpeurs.find((g) => g.id === moi && g.masqueClassement && g.matchs > 0 && !g.provisoire)
+    : undefined
   const enEssai = useMemo(() => resultat.grimpeurs.filter((g) => g.matchs > 0 && g.provisoire).length, [resultat])
   const moiProvisoire = moi ? resultat.grimpeurs.find((g) => g.id === moi && g.provisoire) : undefined
 
@@ -136,6 +164,8 @@ export function VueGrimpeurs({
       aide: t('Rang au classement, par cote décroissante.', 'Rank in the leaderboard, by decreasing rating.'),
       valeur: (g) => classement.indexOf(g) + 1,
       tri: (g) => classement.indexOf(g),
+      // Ligne a part du compte hors classement : pas de rang.
+      rendu: (g) => (classement.includes(g) ? classement.indexOf(g) + 1 : <span className="discret">—</span>),
     },
     {
       cle: 'nom',
@@ -393,6 +423,43 @@ export function VueGrimpeurs({
           "The calculated level is the V grade the climber sends half the time. Both formulas' ratings are shown side by side; the one in bold is the active formula."
         )}
       >
+        {definirMasque && (
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={masqueAffiche}
+                disabled={masqueEnCours !== null}
+                onChange={(e) => void basculerMasque(e.currentTarget.checked)}
+              />
+              {t('Je ne souhaite pas apparaître dans le classement', "I don't want to appear in the leaderboard")}
+            </label>
+            {erreurMasque && <p style={{ color: 'var(--critique)', margin: '4px 0 0' }}>{erreurMasque}</p>}
+            {masqueAffiche && (
+              <p className="sous-titre" style={{ margin: '4px 0 0' }}>
+                {t(
+                  'Votre pseudonyme est retiré du classement pour tout le monde. Vos envois comptent toujours dans le calcul des cotes des blocs, et vous seul voyez vos cotes ci-dessous.',
+                  'Your username is removed from the leaderboard for everyone. Your sends still count toward boulder ratings, and only you see your ratings below.'
+                )}
+              </p>
+            )}
+            {masqueAffiche && moiHorsClassement && (
+              <div style={{ marginTop: 8 }}>
+                <Tableau
+                  lignes={[moiHorsClassement]}
+                  // Le menu de style reste dans l'en-tete du classement : il
+                  // pilote aussi cette ligne, inutile de l'y doubler.
+                  colonnes={colonnes.map(({ titreRendu, ...c }) =>
+                    titreRendu ? { ...c, titre: styleSelectionne || t('Cote globale', 'Overall rating') } : c
+                  )}
+                  cleLigne={(g) => g.id}
+                  enEvidence={moiHorsClassement.id}
+                  sansPied
+                />
+              </div>
+            )}
+          </div>
+        )}
         <Tableau
           lignes={classement}
           colonnes={colonnes}

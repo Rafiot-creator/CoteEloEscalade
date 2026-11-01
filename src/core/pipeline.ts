@@ -65,6 +65,8 @@ export interface LigneGrimpeur {
    * la duree par defaut qui decide de l'affichage.
    */
   provisoire: boolean
+  /** A demande a ne pas apparaitre dans le classement (cf. `Grimpeur.masqueClassement`). */
+  masqueClassement: boolean
   nom: string
   gymPrincipal: string
   sexe: string
@@ -239,6 +241,7 @@ export function executer(
       id: g.id,
       blocsTentes: nTentes,
       provisoire: nTentes < DUELS_PROVISOIRES,
+      masqueClassement: !!g.masqueClassement,
       nom: g.nom,
       gymPrincipal: g.gymPrincipal,
       sexe: g.sexe,

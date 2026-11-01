@@ -23,6 +23,7 @@ export const schemaGrimpeur = z
     premiere_saison: z.coerce.number().int().min(1900).max(2100),
     // Facultatif : beaucoup de salles ne demandent rien a l'inscription.
     niveau_declare: z.union([z.string().trim(), z.number()]).optional().default(''),
+    masque_classement: z.enum(['true', 'false', '']).optional().default(''),
   })
   .transform((r) => ({
     id: r.id,
@@ -31,6 +32,7 @@ export const schemaGrimpeur = z
     gymPrincipal: r.gym_principal,
     premiereSaison: r.premiere_saison,
     niveauDeclare: r.niveau_declare === '' ? null : indexDeCotation(String(r.niveau_declare)),
+    ...(r.masque_classement === 'true' ? { masqueClassement: true } : {}),
   }))
 
 export const schemaBloc = z

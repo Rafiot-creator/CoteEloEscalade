@@ -28,7 +28,8 @@ export interface Compte {
   /** Grimpeur du compte, une fois le pseudonyme choisi. */
   /** `niveauDeclare` : cote de depart declaree (flash + 1, cf. supabase/migrations/), null si aucune. */
   /** `gymPrincipal` : nom du centre ou il grimpe le plus souvent ('' : aucun ou autre). */
-  grimpeur: { id: string; nom: string; niveauDeclare: string | null; gymPrincipal: string } | null
+  /** `masqueClassement` : a demande a ne pas apparaitre dans le classement. */
+  grimpeur: { id: string; nom: string; niveauDeclare: string | null; gymPrincipal: string; masqueClassement: boolean } | null
   /**
    * Le compte peut-il placer, modifier et demonter les blocs de ce centre ?
    * Table `ouvreurs` (cf. supabase/migrations/) ; la base le reverifie de
@@ -59,6 +60,8 @@ export interface Compte {
   creerProfil: (pseudo: string, flash: string | null, centre: string | null) => Promise<string | null>
   /** Change le centre principal (id, ou null pour aucun). */
   definirCentre: (centre: string | null) => Promise<string | null>
+  /** « Je ne souhaite pas apparaitre dans le classement » (ecran Grimpeurs). */
+  definirMasque: (masque: boolean) => Promise<string | null>
   /** Pour un compte sans niveau declare (cree avant la question), une seule fois. */
   declarerFlash: (flash: string) => Promise<string | null>
   deconnecter: () => Promise<void>
@@ -119,11 +122,11 @@ export function useCompte(): Compte {
     const [{ data }, { data: droits }] = await Promise.all([
       supabase
         .from('profils')
-        .select('grimpeur_id, grimpeurs(nom, niveau_declare, gym_principal)')
+        .select('grimpeur_id, grimpeurs(nom, niveau_declare, gym_principal, masque_classement)')
         .eq('user_id', userId)
         .maybeSingle<{
           grimpeur_id: string
-          grimpeurs: { nom: string; niveau_declare: string | null; gym_principal: string } | null
+          grimpeurs: { nom: string; niveau_declare: string | null; gym_principal: string; masque_classement: boolean } | null
         }>(),
       supabase.from('ouvreurs').select('centre_id').eq('user_id', userId).returns<{ centre_id: string | null }[]>(),
     ])
@@ -134,6 +137,7 @@ export function useCompte(): Compte {
             nom: data.grimpeurs?.nom ?? '',
             niveauDeclare: data.grimpeurs?.niveau_declare ?? null,
             gymPrincipal: data.grimpeurs?.gym_principal ?? '',
+            masqueClassement: data.grimpeurs?.masque_classement ?? false,
           }
         : null
     )
@@ -215,6 +219,16 @@ export function useCompte(): Compte {
     [lireProfil]
   )
 
+  const definirMasque = useCallback(
+    async (masque: boolean) => {
+      const { error } = await supabase.rpc('definir_masque_classement', { masque })
+      if (error) return error.message
+      await lireProfil()
+      return null
+    },
+    [lireProfil]
+  )
+
   const deconnecter = useCallback(async () => {
     await supabase.auth.signOut()
   }, [])
@@ -226,5 +240,5 @@ export function useCompte(): Compte {
 
   const estAdmin = centresOuvreur.includes(null)
   return { pret: sessionLue && profilLuPour === userId, courriel, grimpeur, peutOuvrir, estAdmin, recuperation,
-    connecterGoogle, connecterJetonGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, definirCentre, declarerFlash, deconnecter }
+    connecterGoogle, connecterJetonGoogle, connecter, inscrire, oublie, changerMotDePasse, creerProfil, definirCentre, definirMasque, declarerFlash, deconnecter }
 }

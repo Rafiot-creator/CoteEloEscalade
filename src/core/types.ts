@@ -18,6 +18,11 @@ export interface Grimpeur {
    * pas prononce — le classement l'estime alors depuis ses premiers blocs.
    */
   niveauDeclare: number | null
+  /**
+   * « Je ne souhaite pas apparaitre dans le classement » (ecran Grimpeurs) :
+   * absent des classements publics, mais toujours dans le calcul.
+   */
+  masqueClassement?: boolean
 }
 
 export interface Bloc {
