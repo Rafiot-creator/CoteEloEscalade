@@ -613,7 +613,7 @@ en temps réel. Plan, choix et sécurité dans le README, § « Base de données
 - **Étape 3 faite le 2026-10-29** (outils de l'ouvreur : table `ouvreurs`, fonctions
   `placer_bloc`/`modifier_bloc`/`demonter_bloc`, édition de la Carte enregistrée dans la base).
   « Rafiot » est admin général. Testé par Raphaël sur Rose Bloc 1. Glisser un bloc : souris,
-  ou au doigt après un appui d'une seconde (depuis le 2026-10-31). Nommer un ouvreur : SQL donné dans le README.
+  ou au doigt après un appui d'une seconde (depuis le 2026-10-31). Nommer ou retirer un ouvreur : écran Administration (cases par centre, depuis le 2026-11-01).
 - **Connexion Google + mot de passe faite le 2026-10-29** (lien par courriel retiré). Bouton
   officiel de Google (`BoutonGoogle.tsx`) pour que Google affiche « Cote Elo Escalade » et non
   le domaine Supabase. Détail, réglages Google Cloud et procédure de suppression de compte dans
@@ -701,7 +701,7 @@ choisie dans le menu (filtre de salle existant). **Pour les futurs centres, Raph
 appliquer les pistes du 18 septembre** (README, « uniformiser les cotes entre centres ») plutôt
 que d'empiler des groupes. Les autres centres du menu n'ont que leur carte. Un bloc sans assez de duels n'apparaît pas dans
 l'écran Blocs (`fiable`), comme sur la Démo. Limites connues restantes :
-pas d'écran pour nommer un ouvreur ni pour
+pas d'écran pour
 supprimer un compte (SQL dans le README), et au lancement tout le monde sera en période
 d'essai en même temps (coût mesuré dans `DECISIONS.md`).
 

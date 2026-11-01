@@ -1198,8 +1198,8 @@ refusées.
    de la base affiché, puis carte relue. Sur la Démo, Blocs et Grimpeurs se rechargent après un
    changement qui touche au calcul. Ces deux écrans ne lisent que les blocs du centre `demo`.
    Testé dans la base (deux comptes fictifs, transaction annulée) et par Raphaël sur Rose Bloc 1.
-   **Limites** : pas d'écran pour nommer
-   un ouvreur, à faire en SQL :
+   Nommer ou retirer un ouvreur : écran Administration depuis le 1er novembre 2026 (voir plus
+   bas). Équivalent SQL, pour mémoire :
    `insert into public.ouvreurs (user_id, centre_id) select p.user_id, '<centre>' from public.profils p join public.grimpeurs g on g.id = p.grimpeur_id where g.nom = '<pseudo>';`
 4. **Temps réel** — *fait le 30 octobre 2026.* `ascensions` et `blocs` ajoutées à la
    publication `supabase_realtime` (`supabase/migrations/20261030000000_temps_reel.sql`) ; la
@@ -1227,6 +1227,14 @@ effacer une ascension, supprimer un bloc pour de bon avec ses ascensions (à la 
 inconnu refusé, les trois actions font ce qu'elles disent. Après un changement, la page de
 l'admin recalcule ; les autres le voient à leur prochain chargement (les suppressions ne sont
 pas diffusées en temps réel).
+
+**Ouvreurs dans l'écran Administration** — *fait le 1er novembre 2026.* Carte « Ouvreurs » (liste
+des comptes et de leurs centres, un nom ouvre sa fiche) et, pour un grimpeur choisi, carte
+« Statut d'ouvreur » : une case par centre, cocher nomme, décocher retire (confirmation chaque
+fois). Un grimpeur sans compte (Démo) ne peut pas être nommé. La ligne d'admin général (centre
+nul) ne se donne ni ne se retire par là. Fonctions `admin_lister_ouvreurs`,
+`admin_definir_ouvreur`, `admin_a_compte`
+(`supabase/migrations/20261031000500_admin_ouvreurs.sql`), réservées à l'admin général.
 
 **Comp Wall de Rose Bloc 2** — *fait le 31 octobre 2026.* Ce mur numérote ses 24 blocs de 1 (le
 plus facile) à 24 (le plus dur), sans autre cote. Conversion choisie par Raphaël : 1 = cote 1
@@ -2155,3 +2163,9 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   d'`EPAISSEUR_CONTOUR` (2 px et 1 px). Le contour de sélection (accès complet) garde
   `EPAISSEUR_CONTOUR`. Étoiles du Comp Wall comprises. Vérifié dans Chrome sans interface sur la
   Démo (bureau) ; pas encore vu sur téléphone.
+
+### 2026-11-01
+
+- **Nommer et retirer les ouvreurs depuis l'écran Administration**, demandé par Raphaël (le SQL à
+  la main n'était pas pratique) : une case par centre sur la fiche d'un grimpeur, et la liste des
+  ouvreurs actuels. Détail dans « Base de données et multi-utilisateur (en cours) ».
