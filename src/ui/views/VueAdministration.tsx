@@ -270,6 +270,7 @@ export function VueAdministration({ apresModification }: { apresModification?: (
   return (
     <div className="large">
       <SectionCommentaires />
+      <SectionOuvreurs centres={centres} generation={generation} choisir={(id, nom) => setSelection({ genre: 'grimpeur', id, nom })} />
 
       <div className="barre-outils">
         <input
@@ -306,6 +307,15 @@ export function VueAdministration({ apresModification }: { apresModification?: (
           <p className="param-aide">{t('Blocs (y compris démontés)', 'Boulders (including taken down)')}</p>
           <Tableau lignes={blocs} colonnes={colonnesBlocs} cleLigne={(b) => b.id} pageTaille={10} videMessage={t('Aucun.', 'None.')} />
         </Carte>
+      )}
+
+      {selection?.genre === 'grimpeur' && (
+        <StatutOuvreur
+          grimpeur={selection}
+          centres={centres}
+          generation={generation}
+          definir={(centre, ouvreur) => void ecrire('admin_definir_ouvreur', { grimpeur: selection.id, centre, ouvreur })}
+        />
       )}
 
       {selection && (
@@ -347,6 +357,143 @@ export function VueAdministration({ apresModification }: { apresModification?: (
         </Carte>
       )}
     </div>
+  )
+}
+
+interface DroitOuvreur {
+  grimpeur_id: string
+  nom: string
+  centre_id: string
+}
+
+/** Droits d'ouvreur par centre, tous comptes confondus (admin general exclu). */
+function useOuvreurs(generation: number) {
+  const [ouvreurs, setOuvreurs] = useState<DroitOuvreur[] | null>(null)
+  const [erreur, setErreur] = useState<string | null>(null)
+  useEffect(() => {
+    let vivant = true
+    void supabase.rpc('admin_lister_ouvreurs').then(({ data, error }) => {
+      if (!vivant) return
+      setErreur(error?.message ?? null)
+      setOuvreurs((data as DroitOuvreur[] | null) ?? [])
+    })
+    return () => {
+      vivant = false
+    }
+  }, [generation])
+  return { ouvreurs, erreur }
+}
+
+/** Liste des ouvreurs actuels ; un nom ouvre la fiche du grimpeur pour changer ses droits. */
+function SectionOuvreurs({
+  centres,
+  generation,
+  choisir,
+}: {
+  centres: Map<string, Centre>
+  generation: number
+  choisir: (id: string, nom: string) => void
+}) {
+  const { t } = useLangue()
+  const { ouvreurs, erreur } = useOuvreurs(generation)
+  const parGrimpeur = new Map<string, { nom: string; centres: string[] }>()
+  for (const o of ouvreurs ?? []) {
+    const g = parGrimpeur.get(o.grimpeur_id) ?? { nom: o.nom, centres: [] }
+    g.centres.push(centres.get(o.centre_id)?.nom ?? o.centre_id)
+    parGrimpeur.set(o.grimpeur_id, g)
+  }
+  return (
+    <Carte
+      titre={t('Ouvreurs', 'Route setters')}
+      sousTitre={t(
+        'Pour nommer un ouvreur, cherchez son pseudonyme ci-dessous et cochez ses centres.',
+        'To name a setter, search for their username below and tick their gyms.'
+      )}
+    >
+      {erreur && <p style={{ color: 'var(--critique)' }}>{erreur}</p>}
+      {ouvreurs === null ? (
+        <p className="vide">{t('Chargement…', 'Loading…')}</p>
+      ) : parGrimpeur.size === 0 ? (
+        <p className="vide">{t('Aucun ouvreur pour l’instant.', 'No setters yet.')}</p>
+      ) : (
+        <ul style={{ margin: 0, paddingLeft: 18 }}>
+          {[...parGrimpeur].map(([id, g]) => (
+            <li key={id}>
+              <button className="lien-bloc" onClick={() => choisir(id, g.nom)}>
+                {g.nom}
+              </button>{' '}
+              — {g.centres.join(', ')}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Carte>
+  )
+}
+
+/** Une case par centre : cochee = ouvreur de ce centre. */
+function StatutOuvreur({
+  grimpeur,
+  centres,
+  generation,
+  definir,
+}: {
+  grimpeur: { id: string; nom: string }
+  centres: Map<string, Centre>
+  generation: number
+  definir: (centre: string, ouvreur: boolean) => void
+}) {
+  const { t } = useLangue()
+  const { ouvreurs, erreur } = useOuvreurs(generation)
+  const [aCompte, setACompte] = useState<boolean | null>(null)
+  useEffect(() => {
+    let vivant = true
+    setACompte(null)
+    void supabase.rpc('admin_a_compte', { grimpeur: grimpeur.id }).then(({ data }) => {
+      if (vivant) setACompte(data === true)
+    })
+    return () => {
+      vivant = false
+    }
+  }, [grimpeur.id])
+  const siens = new Set((ouvreurs ?? []).filter((o) => o.grimpeur_id === grimpeur.id).map((o) => o.centre_id))
+
+  return (
+    <Carte
+      titre={t(`Statut d'ouvreur de ${grimpeur.nom}`, `${grimpeur.nom}'s setter status`)}
+      sousTitre={t(
+        'Un ouvreur place, modifie et démonte les blocs du centre sur la Carte.',
+        'A setter places, edits and takes down the gym’s boulders on the Map.'
+      )}
+    >
+      {erreur && <p style={{ color: 'var(--critique)' }}>{erreur}</p>}
+      {aCompte === null || ouvreurs === null ? (
+        <p className="vide">{t('Chargement…', 'Loading…')}</p>
+      ) : !aCompte ? (
+        <p className="vide">
+          {t("Ce grimpeur n'a pas de compte : il ne peut pas être ouvreur.", 'This climber has no account and cannot be a setter.')}
+        </p>
+      ) : (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 18px' }}>
+          {[...centres].map(([id, c]) => (
+            <label key={id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <input
+                type="checkbox"
+                checked={siens.has(id)}
+                onChange={(e) => {
+                  const coche = e.currentTarget.checked
+                  const question = coche
+                    ? t(`Nommer ${grimpeur.nom} ouvreur de ${c.nom} ?`, `Make ${grimpeur.nom} a setter at ${c.nom}?`)
+                    : t(`Retirer à ${grimpeur.nom} le statut d'ouvreur de ${c.nom} ?`, `Remove ${grimpeur.nom}'s setter status at ${c.nom}?`)
+                  if (window.confirm(question)) definir(id, coche)
+                }}
+              />
+              {c.nom}
+            </label>
+          ))}
+        </div>
+      )}
+    </Carte>
   )
 }
 
