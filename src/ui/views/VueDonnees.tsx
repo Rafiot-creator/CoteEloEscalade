@@ -31,10 +31,13 @@ export function VueDonnees({
   const correspond = (...champs: (string | number | null)[]) =>
     !q || champs.some((c) => String(c ?? '').toLowerCase().includes(q))
 
-  const grimpeurs = useMemo(
-    () => dataset.grimpeurs.filter((g) => correspond(g.nom, g.gymPrincipal, g.id)),
-    [dataset, q]
-  )
+  // Seulement les grimpeurs qui ont grimpe dans le groupe de centres choisi :
+  // la table des grimpeurs est commune a tous les centres (src/core/sources/supabase.ts),
+  // elle montrait sinon les 55 grimpeurs fictifs de la Demo sur Rose Bloc.
+  const grimpeurs = useMemo(() => {
+    const actifs = new Set(dataset.ascensions.map((a) => a.grimpeurId))
+    return dataset.grimpeurs.filter((g) => actifs.has(g.id) && correspond(g.nom, g.gymPrincipal, g.id))
+  }, [dataset, q])
   const blocs = useMemo(
     () => dataset.blocs.filter((b) => correspond(b.nom, b.gym, b.secteur, b.couleur, b.cotationOfficielle, b.id)),
     [dataset, q]

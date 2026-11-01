@@ -2190,3 +2190,9 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   bloc (style, cote, couleur, déplacement) tant qu'il n'a pas été tapé à la main ; un champ Nom
   vidé redevient automatique. Les trois blocs déjà posés à RB1/RB2, encore sous leur nom
   technique, ont été renommés dans la base. Vérifié dans Chrome sans interface sur la Démo.
+- **Données, onglet Grimpeurs filtré par centre** : la table des grimpeurs étant commune à tous
+  les centres, RB1/RB2 montraient les 55 grimpeurs fictifs de la Démo (remarqué par Raphaël).
+  L'onglet ne montre plus que les grimpeurs qui ont au moins une ascension dans le groupe de
+  centres choisi (`VueDonnees.tsx`, affichage seulement : ni la base ni le calcul ne changent).
+  Vérifié dans Chrome sans interface : RB1 n'affiche plus que Liv, la Démo ses 55 grimpeurs plus
+  un compte réel.
