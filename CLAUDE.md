@@ -758,6 +758,11 @@ migrations appliquées jusqu'à `20261031000500_admin_ouvreurs.sql`. Pourquoi de
   **pas encore vu sur Rose Bloc** avec un vrai compte d'ouvreur (secteur choisi par étiquette la
   plus proche : à surveiller près des limites).
 - **Données, onglet Grimpeurs** limité aux grimpeurs qui ont grimpé dans le centre choisi.
+- **Application installable (PWA)** : `public/manifest.webmanifest`, `public/icones/`,
+  `public/sw.js` (fichiers du site seulement, jamais Supabase/Google ; enregistré en production
+  seulement). Raphaël a écarté les magasins (Capacitor) et le natif pour l'instant. Vérifié dans
+  Chrome sans interface (installable, hors ligne) ; **à tester sur son téléphone**. Détail :
+  README § « L'application installable (PWA) ».
 - Le `db push` reste bloqué par le garde-fou du mode auto même avec l'accord de Raphaël : lui
   faire lancer `! npx supabase db push --linked`. Une écriture ponctuelle de données par
   `npx supabase db query --linked` (renommage des trois blocs), elle, est passée.

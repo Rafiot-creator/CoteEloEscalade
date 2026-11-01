@@ -312,6 +312,18 @@ des grimpeurs reste commune à tous les centres (un compte grimpe partout) ; c'e
 filtre, sur les ascensions du groupe de calcul. Sans ça, RB1 et RB2 montraient les 55 grimpeurs
 fictifs de la Démo, qui n'y ont jamais grimpé et n'entraient déjà dans aucun calcul.
 
+**Une application installable (PWA), pas une application des magasins.** Trois options
+comparées : la PWA (le site s'installe sur l'écran d'accueil ; quelques heures), le même site
+emballé pour l'App Store et Google Play (Capacitor : comptes payants, connexion Google à refaire
+en natif, suppression de compte obligatoire dans l'application chez Apple, risque de refus d'un
+« site emballé », examen à chaque version) et une réécriture native (des semaines, toute
+l'interface à refaire). Raphaël s'en tient à la PWA : même code, même base, même temps réel,
+aucun frais. Service worker écrit à la main (`public/sw.js`, une centaine de lignes) plutôt que
+`vite-plugin-pwa`, qui tire Workbox et ses dépendances pour un besoin aussi simple. Il ne garde
+que les fichiers du site, jamais les données : une copie périmée des cotes ou des envois serait
+pire que pas de copie. Le vrai plus d'une application, garder les envois faits sans réseau
+jusqu'à son retour, reste à faire si le réseau en salle le demande.
+
 ---
 
 ## 3. Détecter les blocs mal cotés

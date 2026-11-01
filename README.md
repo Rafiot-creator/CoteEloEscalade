@@ -1346,6 +1346,31 @@ Chaque poussée sur `main` déclenche alors le déploiement ; l'avancement se su
 Ensuite, publier une correction ou de nouvelles données revient à `git push` : le site se
 reconstruit tout seul.
 
+### L'application installable (PWA)
+
+Depuis le 1er novembre 2026, le site s'installe comme une application : sur téléphone,
+« Ajouter à l'écran d'accueil » (Safari sur iPhone, menu ⋮ de Chrome sur Android, ou la
+proposition d'installation de Chrome) donne une icône et une ouverture en plein écran, sans
+barre de navigateur. **C'est le même site, pas une seconde version** : même code, même base
+Supabase, même temps réel. Une mise en ligne met l'application à jour au lancement suivant.
+
+- `public/manifest.webmanifest` : nom (« Cote Elo » sous l'icône), couleurs, icônes
+  (`public/icones/`, rendues depuis `favicon.svg` ; les « masquables » ont une marge pour les
+  icônes rondes ou carrées d'Android). Chemins relatifs, comme `base: './'`.
+- `public/sw.js` (service worker, enregistré dans `src/main.tsx` **en production seulement**) :
+  garde une copie des fichiers du site pour s'ouvrir vite et même sans réseau. Pages : réseau
+  d'abord, copie si le réseau est coupé ou traîne plus de 4 s (réseau faible en salle). Code
+  construit (`assets/`, nom à empreinte) : copie d'abord. Le reste (icônes, fonds de carte) :
+  copie tout de suite, rafraîchie en arrière-plan. **Rien de ce qui vient de Supabase ou de
+  Google n'est intercepté** : cotes, envois, blocs et connexion passent toujours par le réseau.
+  Changer `VERSION` dans `sw.js` efface toutes les copies.
+- Hors ligne, l'application s'ouvre mais n'affiche pas de données et un envoi ne passe pas,
+  comme le site. Garder les envois sur le téléphone jusqu'au retour du réseau serait l'étape
+  suivante (pas faite).
+- Sur iPhone, l'application installée a **son propre stockage**, séparé de Safari : il faut s'y
+  reconnecter une fois, et le centre, l'onglet et le tri retenus repartent à zéro. Un lien reçu
+  par courriel (mot de passe oublié) s'ouvre dans Safari, pas dans l'application.
+
 ### Ce à quoi penser avant de rendre public
 
 - **Le dépôt public expose les données.** Ici ce sont des données factices, aucun problème.
@@ -2201,3 +2226,10 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   depuis l'écran Administration. Pourquoi des choix du jour : `DECISIONS.md`, « Les outils de
   l'ouvreur au quotidien ». Restent à confirmer en salle : la fermeture du rectangle au doigt
   (téléphone de Liv) et le secteur des noms automatiques sur Rose Bloc.
+- **Application installable (PWA)**, après discussion des options (PWA, emballage Capacitor pour
+  les magasins, réécriture native) : Raphaël s'en tient à la PWA pour l'instant. Manifeste,
+  icônes et service worker, voir § « L'application installable (PWA) ». Vérifié dans Chrome sans
+  interface, site servi sous `/CoteEloEscalade/` comme sur GitHub Pages : manifeste sans erreur,
+  aucune erreur d'installabilité, page contrôlée par le service worker, seuls des fichiers du
+  site en mémoire (rien de Supabase), application qui s'ouvre hors ligne avec tous ses onglets.
+  À tester par Raphaël sur son téléphone (installation, connexion Google dans l'application).

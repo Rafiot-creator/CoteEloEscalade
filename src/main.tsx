@@ -8,3 +8,11 @@ createRoot(document.getElementById('root') as HTMLElement).render(
     <App />
   </StrictMode>
 )
+
+// Application installable (PWA) : voir public/sw.js. Pas en developpement, ou
+// une copie en memoire masquerait les modifications en cours.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {})
+  })
+}
