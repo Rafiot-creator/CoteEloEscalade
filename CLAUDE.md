@@ -777,6 +777,14 @@ migrations appliquées jusqu'à `20261031000500_admin_ouvreurs.sql`. Pourquoi de
   faire lancer `! npx supabase db push --linked`. Une écriture ponctuelle de données par
   `npx supabase db query --linked` (renommage des trois blocs), elle, est passée.
 
+## État au 2026-11-02
+
+Liv a commencé la saisie des blocs de RB1 ; Raphaël : « tout se passe bien ». Correctif
+(commit `b025d68`, déploiement vérifié vert) : au doigt, un tap d'ouvreur sur une pastille
+ouvrait seulement la fiche (le rectangle flash/réussi/échec demandait Majuscule+clic). Il ouvre
+désormais les deux, sans défiler vers la fiche (bouton « Modifier le bloc ↓ » dans le
+rectangle). Vérifié en émulation iPhone (Chrome sans interface), pas sur un vrai téléphone.
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
