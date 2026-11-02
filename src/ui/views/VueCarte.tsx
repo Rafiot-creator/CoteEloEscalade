@@ -442,8 +442,13 @@ export function VueCarte({
 
   // Sur une grande carte, le panneau d'edition serait hors ecran sans ca :
   // rien ne dirait qu'un clic sur une pastille a fonctionne.
+  // Sauf apres un tap d'ouvreur au doigt (cf. le clic sur une pastille) : le
+  // rectangle flash/reussi/echec s'ouvre alors en meme temps sur la carte, le
+  // defilement l'emporterait hors de l'ecran. Son bouton « Modifier » y mene.
+  const sansDefilement = useRef(false)
   useEffect(() => {
-    if (selection) editionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (selection && !sansDefilement.current) editionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    sansDefilement.current = false
   }, [selection])
 
   // Arrivee depuis un nom de bloc cliquable ailleurs sur le site : ouvre son
@@ -828,7 +833,15 @@ export function VueCarte({
                       e.stopPropagation()
                       if (edition) {
                         if (e.shiftKey) ouvrirPopup(b.id)
-                        else setSelection(b.id)
+                        else if (!survolPossible) {
+                          // Au doigt, pas de Majuscule+clic ni de survol : un
+                          // tap ouvre la fiche ET le rectangle, pour qu'un
+                          // ouvreur puisse aussi noter son propre envoi
+                          // (signale par Raphael pour Liv, 2026-11-02).
+                          if (selection !== b.id) sansDefilement.current = true
+                          setSelection(b.id)
+                          ouvrirPopup(b.id)
+                        } else setSelection(b.id)
                       } else if (enregistrerAscension) {
                         ouvrirPopup(b.id)
                       } else {
@@ -924,7 +937,10 @@ export function VueCarte({
                     const by = b.y * hauteurZone
                     const aGauche = bx + RAYON - 2 + POPUP_LARGEUR > largeurZone
                     const gauche = aGauche ? -(RAYON - 2 + POPUP_LARGEUR) : RAYON - 2
-                    const hautMax = Math.max(4, hauteurZone - POPUP_HAUTEUR - 4)
+                    // Bouton « Modifier » et raison des boutons inactifs en plus
+                    // (mesure : 235 px avec les deux, sur telephone).
+                    const hauteurPopup = POPUP_HAUTEUR + (edition ? 50 : 0) + (actionsActives ? 0 : 45)
+                    const hautMax = Math.max(4, hauteurZone - hauteurPopup - 4)
                     const hautVoulu = by - RAYON
                     const haut = Math.min(Math.max(4, hautVoulu), hautMax) - by
                     const echelle = Math.max(1, echelleZoom)
@@ -1003,6 +1019,19 @@ export function VueCarte({
                         // tactile) : sans ce texte visible, les boutons desactives
                         // semblent juste ne pas repondre au tap.
                         <p className="carte-popup-raison">{raisonInactif}</p>
+                      )}
+                      {edition && (
+                        <button
+                          className="bouton carte-popup-modifier"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSurvole(null)
+                            if (selection !== b.id) setSelection(b.id)
+                            else editionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                          }}
+                        >
+                          {t('Modifier le bloc ↓', 'Edit boulder ↓')}
+                        </button>
                       )}
                     </div>
                     )

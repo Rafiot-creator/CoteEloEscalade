@@ -436,6 +436,7 @@ table.donnees tbody tr.saut:hover { background: none; }
 .carte-popup-actions button:not(:disabled):hover { filter: brightness(1.1); }
 .carte-popup-actions button:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(50%); }
 .carte-popup-raison { margin: 6px 0 0; font-size: 11px; color: var(--encre-3); }
+.carte-popup-modifier { width: 100%; margin-top: 8px; justify-content: center; }
 
 svg text { font-family: var(--sans); }
 .axe-texte { fill: var(--encre-3); font-size: 10.5px; }
