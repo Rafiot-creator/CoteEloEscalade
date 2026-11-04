@@ -2253,3 +2253,40 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   (revert) : il ne voyait les colonnes par formule qu'en accès complet, et la vue visiteur avait
   déjà une seule colonne « Cote » depuis le 2026-09-14. **Voulu ainsi : toute l'information en
   accès complet, une seule cote en vue visiteur.**
+
+### 2026-11-02
+
+- Liv a commencé la saisie des blocs de RB1 au téléphone. **Carte, tap d'ouvreur sur une
+  pastille** : au doigt, il n'ouvrait que la fiche d'édition (le rectangle flash/réussi/échec
+  demandait Majuscule+clic, impossible au doigt), si bien qu'un ouvreur ne pouvait pas noter son
+  propre envoi. Il ouvre désormais les deux, sans faire défiler la page vers la fiche (le
+  rectangle resterait hors écran) : un bouton « Modifier le bloc ↓ » dans le rectangle y mène.
+  Vérifié en émulation iPhone dans Chrome sans interface.
+
+### 2026-11-03
+
+- **Carte, glisser un bloc à la souris** : signalé par Raphaël, la page défilait jusqu'à la
+  fiche du bloc à chaque déplacement. Le navigateur émet un clic après le relâchement (la
+  pastille, qui a suivi le curseur, est encore dessous) ; ce clic sélectionnait le bloc. Il est
+  désormais ignoré (`clicApresGlisse`, `VueCarte.tsx`), y compris quand il tombe sur le fond de
+  carte (relâché au bord), où il aurait placé un nouveau bloc. Un simple clic ouvre toujours la
+  fiche. Vérifié dans Chrome sans interface en comptant les appels à `scrollIntoView` : 1 après
+  un glisser sans le correctif, 0 avec. Confirmé par Raphaël.
+- **Carte, anneau rouge autour des blocs échoués**, demandé par Raphaël : même épaisseur que
+  l'anneau vert des blocs envoyés (`var(--critique)`) ; un envoi l'emporte sur un échec. Peu
+  visible sur une pastille rouge ou rose ; Raphaël le trouve assez clair, on le laisse ainsi.
+- **Cote par style recalée** (écran Grimpeurs) : Raphaël s'étonnait que ses trois cotes par
+  style soient toutes au-dessus de sa cote globale. Pas un bug de données ni de Glicko (vérifié
+  dans la base et par un calcul à part sur les vraies données de RB1) : le décalage affiché
+  était `style − global` en Elo, alors que le global cumule les mouvements de tous les styles.
+  Désormais `cote Mélange + (style − départ)`, voir § « La cote par style » et `DECISIONS.md`.
+- **Une colonne par style** dans le classement de Grimpeurs, à la place du menu déroulant
+  (Raphaël : « beaucoup plus clair en tableau »), avec l'écart à la cote globale entre
+  parenthèses. Plus dur envoyé, Duels utiles et Duels gagnés reviennent aux totaux. Vérifié dans
+  Chrome sans interface en accès complet, en vue visiteur et à 390 px.
+- **Histogramme** (`Histogramme.tsx`) : avec deux grimpeurs, l'axe vertical de Distribution des
+  grimpeurs affichait 0, 0, 1, 1, 1 (graduations à 0,25 arrondies) et l'axe horizontal
+  « +7 +7 +8 +8 » (signe pensé pour les écarts de l'écran Blocs, demi-cotes arrondies).
+  Graduations entières seulement pour les effectifs, une décimale pour les demi-cotes, et prop
+  `formatX` : l'écran Grimpeurs affiche « V6,5 V7 V7,5… ». L'écran Blocs garde ses écarts
+  signés. Vérifié dans Chrome sans interface sur Grimpeurs (RB1, Démo) et Blocs (Démo).

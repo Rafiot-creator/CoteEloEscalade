@@ -785,32 +785,29 @@ ouvrait seulement la fiche (le rectangle flash/réussi/échec demandait Majuscul
 désormais les deux, sans défiler vers la fiche (bouton « Modifier le bloc ↓ » dans le
 rectangle). Vérifié en émulation iPhone (Chrome sans interface), pas sur un vrai téléphone.
 
-2026-11-03 (commit `99ac3b5`, déploiement vérifié vert) : à la souris, glisser un bloc faisait
-défiler la page jusqu'à sa fiche — le clic émis par le navigateur après le relâchement
-sélectionnait le bloc déplacé. Ignoré désormais (`clicApresGlisse`, `VueCarte.tsx`), aussi sur
-le fond de carte. Vérifié dans Chrome sans interface (bug reproduit sans le correctif, absent
-avec ; un simple clic ouvre toujours la fiche).
+## État au 2026-11-03
 
-2026-11-03 (commit `896a876`, déploiement vérifié vert) : anneau rouge (`var(--critique)`,
-même épaisseur que le vert) autour des blocs échoués sur la Carte ; un envoi l'emporte. Peu
-visible sur une pastille rouge ou rose, mais Raphaël le trouve assez clair : on n'y touche pas.
+Liv et Raphaël ont entré leurs premiers résultats à RB1 (73 ascensions, blocs avec style :
+76 Physique, 30 Technique, 18 Coordo). Tout poussé, déploiement vérifié vert après chaque
+commit, aucune migration. Détail : README, journal du 2026-11-03 ; pourquoi du recalage par
+style : `DECISIONS.md`, « La cote par style ».
 
-2026-11-03 : **cote par style recalée** (écran Grimpeurs). Raphaël s'étonnait que ses trois
-styles soient tous au-dessus de son global. Cause : le décalage était `style Elo − global Elo`,
-or le global cumule les mouvements de tous les styles. Désormais `Mélange + (style Elo − départ)`
-(`LigneGrimpeur.departStyles`, exposé par `elo-bloc.ts`). Détail : README, § « La cote par
-style ». Vérifié sur les vraies données de RB1 (Rafiot : 6 775 / 6 372 / 6 261 pour un global
-de 6 583).
-
-Puis, sur demande de Raphaël, **une colonne par style** (Physique, Technique, Coordo) dans le
-classement de Grimpeurs, à la place du menu déroulant : « 6 775 (+192) », écart avec la cote
-globale entre parenthèses. Plus dur envoyé, Duels utiles et Duels gagnés reviennent aux totaux.
-Vérifié dans Chrome (accès complet, visiteur, 390 px : le tableau défile horizontalement).
-
-Histogramme (`Histogramme.tsx`) : axe vertical en graduations entières seulement (avec deux
-grimpeurs, il affichait 0, 0, 1, 1, 1) ; demi-cotes avec une décimale sur l'axe horizontal ;
-prop `formatX` pour que Distribution des grimpeurs affiche « V7 » au lieu de « +7 ». Vérifié
-dans Chrome sur Grimpeurs (RB1, Démo) et Blocs (Démo).
+- **Glisser un bloc à la souris** (`99ac3b5`) ne fait plus défiler jusqu'à sa fiche : le clic
+  émis après le relâchement est ignoré (`clicApresGlisse`, `VueCarte.tsx`). Confirmé par Raphaël.
+- **Anneau rouge autour des blocs échoués** sur la Carte (`896a876`, `var(--critique)`, même
+  épaisseur que le vert ; un envoi l'emporte). Peu visible sur une pastille rouge ou rose, mais
+  Raphaël le trouve assez clair : **on n'y touche pas**.
+- **Cote par style recalée** (`9ea5943`) : `Mélange + (style Elo − départ)`
+  (`LigneGrimpeur.departStyles`) au lieu de `Mélange + (style Elo − global Elo)`, qui mettait
+  tous les styles de Rafiot au-dessus de son global.
+- **Une colonne par style** dans le classement de Grimpeurs (`1f67b0a`), à la place du menu
+  déroulant : « 6 775 (+192) ». Plus dur envoyé, Duels utiles et Duels gagnés reviennent aux
+  totaux.
+- **Histogramme** (`4b7b2ba`) : graduations entières sur l'axe vertical, demi-cotes avec une
+  décimale, « V7 » au lieu de « +7 » sur Distribution des grimpeurs (prop `formatX`).
+- Méthode : `npx supabase db query` exige désormais `--read-only` pour une simple lecture
+  (sinon refus en mode agent). Le calcul sur les vraies données se vérifie par un test vitest
+  temporaire (`sourceSupabase.charger` + `construireDataset` + `executer`), supprimé ensuite.
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
@@ -820,9 +817,11 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**À la reprise (après le 2026-11-01)** : demander à Raphaël comment s'est passée la saisie des
-blocs de RB1/RB2, si le tap à côté d'un rectangle fonctionne sur le téléphone de Liv, si les
-noms automatiques tombent dans le bon secteur, et ce qu'il y a dans les Commentaires.
+**À la reprise (après le 2026-11-03)** : la saisie de RB1 avance (Liv et Raphaël y entrent
+déjà des résultats). Demander si la saisie de RB2 a commencé, si le tap à côté d'un rectangle
+fonctionne sur le téléphone de Liv, si les noms automatiques tombent dans le bon secteur, et ce
+qu'il y a dans les Commentaires. Les cotes par style reposent encore sur très peu de duels
+(Technique : un seul pour Rafiot) : normal qu'elles bougent beaucoup au début.
 
 **Styles de bloc, 2026-10-31 : Physique, Technique, Coordo** (une seule liste pour tous les
 centres, `STYLES_BLOC`), remplacent Dalle, Coordo, Dévers, Joker. Fait et poussé : Démo

@@ -334,6 +334,25 @@ Carte) ; l'écran Données (accès complet) et Administration le montrent toujou
 assumée : la table reste lisible par l'API (le calcul se fait dans le navigateur), le
 pseudonyme reste donc le vrai rempart.
 
+### La cote par style (recalée le 3 novembre 2026)
+
+Le calcul ne change pas : chaque style part du même point que la cote globale Elo (le départ),
+et n'encaisse que les mouvements causés par les blocs de ce style. C'est la **lecture** qui a
+changé. Une cote de style s'affiche comme **la cote Mélange globale plus le mouvement propre au
+style depuis le départ** (`style − départ`), et non plus plus l'écart `style − global`.
+
+Le global cumule les mouvements de tous les styles ; chaque style seulement le sien. L'écart
+`style − global` revenait donc à ajouter à chaque style les mouvements *des autres*, changés de
+signe. Sur les premières vraies données de RB1, Rafiot (départ 7 000) avait +191 en Physique,
+−212 en Technique, −323 en Coordo, soit −343 au global : ses trois styles s'affichaient
+au-dessus de son global, ce qui ne veut rien dire. L'effet inverse frappait un grimpeur qui
+progresse, et grandissait avec le temps. Avec `style − départ`, un style est au-dessus du global
+seulement si le grimpeur y réussit mieux que prévu.
+
+Les styles s'affichent **côte à côte, une colonne chacun**, plutôt que par un menu déroulant
+qui n'en montrait qu'un à la fois : la comparaison entre styles est justement ce qu'on cherche
+(choix de Raphaël, « beaucoup plus clair en tableau »).
+
 ---
 
 ## 3. Détecter les blocs mal cotés
@@ -420,6 +439,12 @@ posées qu'une fois.
 **Régler l'échelle par convention plutôt que par mesure.** L'échelle Elo usuelle (400) donnait
 1,36 cran d'erreur : les cotes n'avaient pas le budget de correction pour s'écarter autant. Un
 paramètre repris d'un autre domaine mérite d'être mesuré avant d'être adopté.
+
+**Comparer une partie à un total qui la contient.** La cote par style s'affichait décalée de
+`style − global`, alors que le global est la somme des mouvements de tous les styles. Sur le jeu
+de démonstration, des centaines de duels par grimpeur noyaient l'effet ; il a sauté aux yeux
+avec les premiers grimpeurs réels, peu de duels et une cote de départ déclarée trop haute. Une
+ventilation se compare à son point de départ, pas au total (§ 2, « La cote par style »).
 
 ---
 
