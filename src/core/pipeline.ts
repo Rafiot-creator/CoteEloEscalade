@@ -94,6 +94,8 @@ export interface LigneGrimpeur {
    * absente si la formule active ne la produit pas (seule Elo bloc le fait).
    */
   stylesGrimpeur?: Record<string, EtatRating>
+  /** Point de depart commun de `stylesGrimpeur` (cf. `SortieFormule.departStyles`). */
+  departStyles?: number
 }
 
 /**
@@ -258,6 +260,7 @@ export function executer(
       ),
       gyms: [...(gymsParGrimpeur.get(g.id) ?? [])].sort((x, y) => x.localeCompare(y, 'fr')),
       stylesGrimpeur: sortie.parStyle?.has(g.id) ? Object.fromEntries(sortie.parStyle.get(g.id)!) : undefined,
+      departStyles: sortie.departStyles?.get(g.id),
     }
   })
 

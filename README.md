@@ -1015,8 +1015,15 @@ chiffre.
 Le calcul par style lui-même n'existe que pour Elo bloc (voir plus bas), mais l'affichage est
 calé sur **Mélange** — la cote de référence utilisée partout ailleurs sur cet écran — plutôt que
 d'afficher Elo brut : « Cote globale » montre la cote Mélange habituelle du grimpeur, et chaque
-style affiché est cette même cote Mélange, **décalée du même écart relatif qu'Elo a mesuré pour
-ce style** (`cote_mélange + (cote_style_elo − cote_globale_elo)`). Ce n'est pas une cote Mélange
+style affiché est cette même cote Mélange, **plus le mouvement Elo propre à ce style depuis le
+point de départ commun** (`cote_mélange + (cote_style_elo − départ)`, `LigneGrimpeur.departStyles`).
+Jusqu'au 2026-11-03, le décalage était `cote_style_elo − cote_globale_elo` : or la cote globale
+cumule les mouvements de *tous* les styles, chaque style seulement le sien. Un grimpeur dont la
+cote avait baissé depuis son départ voyait donc tous ses styles au-dessus de son global
+(Rafiot : départ 7 000, Physique +191, Technique −212, Coordo −323, global −343 — trois styles
+au-dessus du global), et l'effet inverse pour un grimpeur qui progresse, de plus en plus marqué
+avec le temps. Désormais un style est au-dessus du global seulement s'il y réussit mieux que
+prévu. Signalé par Raphaël. Ce n'est pas une cote Mélange
 par style indépendante — Glicko ne contribue à aucun des deux termes du décalage — mais elle
 reste cohérente avec le nombre affiché ailleurs sur l'écran, plutôt que de faire cohabiter deux
 échelles différentes dans le même tableau. Demande de Raphaël : la première version affichait

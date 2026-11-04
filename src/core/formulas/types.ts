@@ -94,6 +94,11 @@ export interface SortieFormule {
    * exactement le mouvement de sa cote globale, sans jamais l'influencer.
    */
   parStyle?: Map<string, Map<string, EtatRating>>
+  /**
+   * Point de depart commun des styles de chaque grimpeur (grimpeurId -> cote),
+   * pour en tirer le mouvement propre a un style (`rating - depart`).
+   */
+  departStyles?: Map<string, number>
 }
 
 export interface Formule<P extends Params = Params> {

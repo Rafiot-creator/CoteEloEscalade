@@ -97,6 +97,23 @@ export function VueGrimpeurs({
   const enStyle = (g: LigneGrimpeur) =>
     styleSelectionne ? eloParGrimpeur.get(g.id)?.stylesGrimpeur?.[styleSelectionne] : undefined
 
+  /**
+   * Colonne "Cote par style" : Melange global, plus le mouvement Elo propre au
+   * style depuis le point de depart commun. Pas `style - global Elo` (version
+   * jusqu'au 2026-11-03) : le global cumule les mouvements de tous les styles,
+   * si bien qu'un grimpeur dont la cote avait baisse depuis son depart voyait
+   * tous ses styles au-dessus de son global (signale par Raphael).
+   */
+  const coteStyle = (g: LigneGrimpeur): number | null => {
+    const ligneMelange = melangeParGrimpeur.get(g.id)
+    if (!ligneMelange) return null
+    if (!styleSelectionne) return ligneMelange.rating
+    const ligneElo = eloParGrimpeur.get(g.id)
+    const e = ligneElo?.stylesGrimpeur?.[styleSelectionne]
+    if (!ligneElo || !e || e.matchs === 0 || ligneElo.departStyles === undefined) return null
+    return ligneMelange.rating + (e.rating - ligneElo.departStyles)
+  }
+
   // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
   const colonnesFormules = simplifie ? cotesParFormule.filter((c) => c.formule.id === 'melange') : cotesParFormule
 
@@ -264,26 +281,13 @@ export function VueGrimpeurs({
             ),
             num: true,
             aide: t(
-              "Cote Mélange (toujours cette formule, la référence utilisée partout ailleurs dans cet écran) pour le style choisi dans le menu déroulant. Le calcul par style n'existe que pour Elo bloc (Glicko ne s'y prête pas) : chaque style affiché ici est donc la cote Mélange globale du grimpeur, décalée du même écart qu'Elo a mesuré pour ce style-là — pas une cote Mélange indépendante, mais cohérente avec la cote affichée ailleurs. Tiret si le grimpeur n'a jamais affronté ce style.",
-              "Blend rating (always this formula, the reference used everywhere else on this screen) for the style chosen in the dropdown. The per-style breakdown only exists for Elo boulder (Glicko doesn't lend itself to it): each style shown here is therefore the climber's overall Blend rating, shifted by the same gap Elo measured for that style — not an independent Blend rating, but consistent with the rating shown elsewhere. Dash if the climber never faced that style."
+              "Cote Mélange (la référence utilisée partout ailleurs dans cet écran) pour le style choisi dans le menu déroulant : la cote Mélange globale du grimpeur, plus ce qu'il a gagné ou perdu en Elo sur les blocs de ce style depuis son point de départ. Au-dessus de la cote globale s'il réussit ce style mieux que prévu, en dessous sinon. Le calcul par style n'existe que pour Elo bloc (Glicko ne s'y prête pas). Tiret si le grimpeur n'a jamais affronté ce style.",
+              "Blend rating (the reference used everywhere else on this screen) for the style chosen in the dropdown: the climber's overall Blend rating, plus what they gained or lost in Elo on boulders of that style since their starting point. Above the overall rating if they do better than expected in that style, below otherwise. The per-style breakdown only exists for Elo boulder (Glicko doesn't lend itself to it). Dash if the climber never faced that style."
             ),
-            valeur: (g: LigneGrimpeur) => {
-              const ligneMelange = melangeParGrimpeur.get(g.id)
-              if (!ligneMelange) return null
-              if (!styleSelectionne) return ligneMelange.rating
-              const ligneElo = eloParGrimpeur.get(g.id)
-              const e = ligneElo?.stylesGrimpeur?.[styleSelectionne]
-              if (!ligneElo || !e || e.matchs === 0) return null
-              return ligneMelange.rating + (e.rating - ligneElo.rating)
-            },
+            valeur: (g: LigneGrimpeur) => coteStyle(g),
             rendu: (g: LigneGrimpeur) => {
-              const ligneMelange = melangeParGrimpeur.get(g.id)
-              if (!ligneMelange) return <span className="discret">—</span>
-              if (!styleSelectionne) return <span>{nombre(ligneMelange.rating)}</span>
-              const ligneElo = eloParGrimpeur.get(g.id)
-              const e = ligneElo?.stylesGrimpeur?.[styleSelectionne]
-              if (!ligneElo || !e || e.matchs === 0) return <span className="discret">—</span>
-              return <span>{nombre(ligneMelange.rating + (e.rating - ligneElo.rating))}</span>
+              const v = coteStyle(g)
+              return v === null ? <span className="discret">—</span> : <span>{nombre(v)}</span>
             },
           },
         ]

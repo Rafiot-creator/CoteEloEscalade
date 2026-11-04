@@ -795,6 +795,13 @@ avec ; un simple clic ouvre toujours la fiche).
 même épaisseur que le vert) autour des blocs échoués sur la Carte ; un envoi l'emporte. Peu
 visible sur une pastille rouge ou rose, mais Raphaël le trouve assez clair : on n'y touche pas.
 
+2026-11-03 : **cote par style recalée** (écran Grimpeurs). Raphaël s'étonnait que ses trois
+styles soient tous au-dessus de son global. Cause : le décalage était `style Elo − global Elo`,
+or le global cumule les mouvements de tous les styles. Désormais `Mélange + (style Elo − départ)`
+(`LigneGrimpeur.departStyles`, exposé par `elo-bloc.ts`). Détail : README, § « La cote par
+style ». Vérifié sur les vraies données de RB1 (Rafiot : 6 775 / 6 372 / 6 261 pour un global
+de 6 583).
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son

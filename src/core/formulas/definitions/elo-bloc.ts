@@ -297,8 +297,10 @@ const formule: Formule = {
     // ci-dessous et le commentaire sur `SortieFormule.parStyle`.
     const blocStyle = new Map(dataset.blocs.map((b) => [b.id, b.secteur]))
     const parStyle = new Map<string, Map<string, EtatRating>>()
+    const departStyles = new Map<string, number>()
     for (const g of dataset.grimpeurs) {
       const depart = amorces.get(g.id) ?? (p.ratingInitial as number)
+      departStyles.set(g.id, depart)
       parStyle.set(g.id, new Map(STYLES_BLOC.map((s) => [s, etatVide(depart)])))
     }
     const observateurGrimpeur: ObservateurGrimpeur = {
@@ -336,6 +338,7 @@ const formule: Formule = {
     })
 
     sortie.parStyle = parStyle
+    sortie.departStyles = departStyles
     sortie.diagnostics.push(diagnosticDuels(affrontements))
     return sortie
   },
