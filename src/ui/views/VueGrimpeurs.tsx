@@ -13,7 +13,7 @@ import { Tableau, type Colonne } from '../components/Tableau'
 import { dateCourte, nombre, pourcent } from '../format'
 import { bilingue, useLangue } from '../langue'
 import { echantillonner } from '../etat'
-import { useChoixMemorise, useTriMemorise } from '../memoire'
+import { useTriMemorise } from '../memoire'
 
 /** Au-dela, les teintes ne se distinguent plus de facon fiable. */
 const MAX_SERIES = 4
@@ -78,40 +78,27 @@ export function VueGrimpeurs({
   const melangeBloc = resultats.get('melange')
   const eloParGrimpeur = useMemo(() => new Map((eloBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [eloBloc])
   const melangeParGrimpeur = useMemo(() => new Map((melangeBloc?.grimpeurs ?? []).map((g) => [g.id, g])), [melangeBloc])
-  // Style choisi et tri retenus dans ce navigateur (voir `memoire.ts`).
-  const [styleSelectionne, setStyleSelectionne] = useChoixMemorise<string>('cee-style-grimpeurs', ['', ...STYLES_BLOC], '')
-  // Tri du tableau Classement, pilote depuis ici pour que choisir un style
-  // dans le menu deroulant de la colonne "Cote par style" retrie aussitot le
-  // classement sur cette colonne, sans empecher un clic manuel sur un autre
-  // en-tete (cf. `onTri` sur `Tableau`).
+  // Tri du tableau Classement, retenu dans ce navigateur (voir `memoire.ts`).
   const [triClassement, setTriClassement] = useTriMemorise('grimpeurs', { cle: 'rang', sens: 1 })
 
   /**
-   * Duels/reussites d'un grimpeur pour le style choisi, pour les colonnes a
-   * droite de "Cote par style" (Plus dur envoye, Duels utiles, Duels gagnes) :
-   * les faire suivre le style choisi plutot que de toujours montrer les
-   * totaux tous styles confondus, incoherent une fois qu'on regarde une seule
-   * colonne "par style". Meme source qu'Elo bloc pour la colonne de cote
-   * elle-meme (`stylesGrimpeur`), absente si aucun style n'est choisi.
+   * Mouvement Elo propre a un style depuis le point de depart commun des
+   * styles, null si le grimpeur ne l'a jamais affronte. La cote d'un style est
+   * la cote Melange globale plus ce mouvement. Pas `style - global Elo`
+   * (version jusqu'au 2026-11-03) : le global cumule les mouvements de tous
+   * les styles, si bien qu'un grimpeur dont la cote avait baisse depuis son
+   * depart voyait tous ses styles au-dessus de son global (signale par Raphael).
    */
-  const enStyle = (g: LigneGrimpeur) =>
-    styleSelectionne ? eloParGrimpeur.get(g.id)?.stylesGrimpeur?.[styleSelectionne] : undefined
-
-  /**
-   * Colonne "Cote par style" : Melange global, plus le mouvement Elo propre au
-   * style depuis le point de depart commun. Pas `style - global Elo` (version
-   * jusqu'au 2026-11-03) : le global cumule les mouvements de tous les styles,
-   * si bien qu'un grimpeur dont la cote avait baisse depuis son depart voyait
-   * tous ses styles au-dessus de son global (signale par Raphael).
-   */
-  const coteStyle = (g: LigneGrimpeur): number | null => {
-    const ligneMelange = melangeParGrimpeur.get(g.id)
-    if (!ligneMelange) return null
-    if (!styleSelectionne) return ligneMelange.rating
+  const mouvementStyle = (g: LigneGrimpeur, style: string): number | null => {
     const ligneElo = eloParGrimpeur.get(g.id)
-    const e = ligneElo?.stylesGrimpeur?.[styleSelectionne]
+    const e = ligneElo?.stylesGrimpeur?.[style]
     if (!ligneElo || !e || e.matchs === 0 || ligneElo.departStyles === undefined) return null
-    return ligneMelange.rating + (e.rating - ligneElo.departStyles)
+    return e.rating - ligneElo.departStyles
+  }
+  const coteStyle = (g: LigneGrimpeur, style: string): number | null => {
+    const ligneMelange = melangeParGrimpeur.get(g.id)
+    const m = mouvementStyle(g, style)
+    return ligneMelange && m !== null ? ligneMelange.rating + m : null
   }
 
   // Vue visiteur : une seule colonne, celle du melange, appelee simplement "Cote".
@@ -248,105 +235,71 @@ export function VueGrimpeurs({
         return <span style={{ fontWeight: courante ? 600 : undefined }}>{nombre(ligne.rating)}</span>
       },
     })),
+    // Une colonne par style, toujours visibles (demande de Raphael, 2026-11-03 :
+    // plus clair qu'un menu deroulant qui n'en montrait qu'un a la fois).
+    // Le mouvement propre au style est rappele entre parentheses.
     ...(eloBloc && melangeBloc
-      ? [
-          {
-            cle: 'cote-style',
-            titre: t('Cote par style', 'Rating by style'),
-            titreRendu: () => (
-              <select
-                value={styleSelectionne}
-                onChange={(e) => {
-                  setStyleSelectionne(e.currentTarget.value)
-                  setTriClassement({ cle: 'cote-style', sens: -1 })
-                }}
-                onClick={(e) => e.stopPropagation()}
-                // La table a `width: 100%` (styles.css) : sans min-width, le
-                // moteur de mise en page auto des tableaux comprime cette
-                // colonne pour faire tenir toutes les autres dans cette
-                // largeur, au lieu de laisser le tableau deborder et
-                // defiler horizontalement (`.table-enveloppe`) comme prevu —
-                // illisible sur un ecran etroit (retour de Raphael sur
-                // telephone). Un min-width force le tableau a deborder
-                // plutot que d'ecraser ce select.
-                style={{ font: 'inherit', fontWeight: 400, minWidth: 160 }}
-              >
-                <option value="">{t('Cote globale (Mélange)', 'Overall rating (Blend)')}</option>
-                {STYLES_BLOC.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            ),
-            num: true,
-            aide: t(
-              "Cote Mélange (la référence utilisée partout ailleurs dans cet écran) pour le style choisi dans le menu déroulant : la cote Mélange globale du grimpeur, plus ce qu'il a gagné ou perdu en Elo sur les blocs de ce style depuis son point de départ. Au-dessus de la cote globale s'il réussit ce style mieux que prévu, en dessous sinon. Le calcul par style n'existe que pour Elo bloc (Glicko ne s'y prête pas). Tiret si le grimpeur n'a jamais affronté ce style.",
-              "Blend rating (the reference used everywhere else on this screen) for the style chosen in the dropdown: the climber's overall Blend rating, plus what they gained or lost in Elo on boulders of that style since their starting point. Above the overall rating if they do better than expected in that style, below otherwise. The per-style breakdown only exists for Elo boulder (Glicko doesn't lend itself to it). Dash if the climber never faced that style."
-            ),
-            valeur: (g: LigneGrimpeur) => coteStyle(g),
-            rendu: (g: LigneGrimpeur) => {
-              const v = coteStyle(g)
-              return v === null ? <span className="discret">—</span> : <span>{nombre(v)}</span>
-            },
+      ? STYLES_BLOC.map((s) => ({
+          cle: `style-${s}`,
+          titre: s,
+          num: true,
+          aide: t(
+            `Cote du grimpeur en ${s} : sa cote Mélange globale, plus ce qu'il a gagné ou perdu (entre parenthèses) sur les blocs ${s} depuis son point de départ. Au-dessus de la cote globale s'il réussit ce style mieux que prévu, en dessous sinon. Calcul tiré d'Elo bloc (Glicko ne se prête pas à la ventilation par style). Tiret s'il n'a jamais affronté ce style.`,
+            `The climber's ${s} rating: their overall Blend rating, plus what they gained or lost (in brackets) on ${s} boulders since their starting point. Above the overall rating if they do better than expected in that style, below otherwise. Derived from Elo boulder (Glicko doesn't lend itself to a per-style breakdown). Dash if they never faced that style.`
+          ),
+          valeur: (g: LigneGrimpeur) => coteStyle(g, s),
+          rendu: (g: LigneGrimpeur) => {
+            const v = coteStyle(g, s)
+            const global = melangeParGrimpeur.get(g.id)?.rating
+            if (v === null || global === undefined) return <span className="discret">—</span>
+            // Ecart entre les deux nombres *affiches* (arrondis), pour que
+            // l'addition tombe juste a l'oeil.
+            const m = Math.round(v) - Math.round(global)
+            return (
+              <span style={{ whiteSpace: 'nowrap' }}>
+                {nombre(v)}{' '}
+                <span className="discret">
+                  ({m >= 0 ? '+' : '−'}
+                  {nombre(Math.abs(m))})
+                </span>
+              </span>
+            )
           },
-        ]
+        }))
       : []),
     {
       cle: 'meilleure',
-      titre: styleSelectionne ? t(`Plus dur envoyé (${styleSelectionne})`, `Hardest sent (${styleSelectionne})`) : t('Plus dur envoyé', 'Hardest sent'),
-      aide: styleSelectionne
-        ? t(
-            `La cotation *affichée* la plus dure qu'il ait réellement envoyée dans le style "${styleSelectionne}" — tiret s'il ne l'a jamais affronté. Choisir "Cote globale" dans le menu déroulant de la colonne "Cote par style" revient aux tous styles confondus.`,
-            `The hardest *displayed* grade they actually sent in the "${styleSelectionne}" style — dash if they never faced it. Pick "Overall rating" in the "Cote par style" column's dropdown to go back to all styles combined.`
-          )
-        : t(
-            "La cotation *affichée* la plus dure qu'il ait réellement envoyée. Elle dépasse souvent le niveau calculé, qui vise la cotation réussie une fois sur deux et non le record.",
-            "The hardest *displayed* grade they actually sent. It often exceeds the calculated level, which targets the grade sent half the time, not their personal record."
-          ),
-      valeur: (g) => (styleSelectionne ? (g.meilleureCotationParStyle[styleSelectionne] ?? null) : g.meilleureCotation),
+      titre: t('Plus dur envoyé', 'Hardest sent'),
+      aide: t(
+        "La cotation *affichée* la plus dure qu'il ait réellement envoyée. Elle dépasse souvent le niveau calculé, qui vise la cotation réussie une fois sur deux et non le record.",
+        "The hardest *displayed* grade they actually sent. It often exceeds the calculated level, which targets the grade sent half the time, not their personal record."
+      ),
+      valeur: (g) => g.meilleureCotation,
     },
     ...(simplifie
       ? []
       : [
           {
             cle: 'matchs',
-            titre: styleSelectionne ? t(`Duels utiles (${styleSelectionne})`, `Useful duels (${styleSelectionne})`) : t('Duels utiles', 'Useful duels'),
+            titre: t('Duels utiles', 'Useful duels'),
             num: true,
-            aide: styleSelectionne
-              ? t(
-                  `Nombre de blocs de style "${styleSelectionne}" qu'il a affrontés et dont l'issue a compté.`,
-                  `Number of "${styleSelectionne}"-style boulders they faced whose outcome counted.`
-                )
-              : t(
-                  "Nombre de blocs qu'il a affrontés et dont l'issue a compté. Les blocs largement hors de sa portée, dans un sens comme dans l'autre, n'y figurent pas.",
-                  "Number of boulders they faced whose outcome counted. Boulders far out of their reach either way are excluded."
-                ),
-            valeur: (g: LigneGrimpeur) => (styleSelectionne ? (enStyle(g)?.matchs ?? 0) : g.matchs),
+            aide: t(
+              "Nombre de blocs qu'il a affrontés et dont l'issue a compté. Les blocs largement hors de sa portée, dans un sens comme dans l'autre, n'y figurent pas.",
+              "Number of boulders they faced whose outcome counted. Boulders far out of their reach either way are excluded."
+            ),
+            valeur: (g: LigneGrimpeur) => g.matchs,
           },
         ]),
     {
       cle: 'taux',
-      titre: styleSelectionne ? t(`Duels gagnés (${styleSelectionne})`, `Duels won (${styleSelectionne})`) : t('Duels gagnés', 'Duels won'),
+      titre: t('Duels gagnés', 'Duels won'),
       num: true,
-      aide: styleSelectionne
-        ? t(
-            `Part des blocs de style "${styleSelectionne}" qu'il a fini par envoyer — tiret s'il ne l'a jamais affronté.`,
-            `Share of "${styleSelectionne}"-style boulders they eventually sent — dash if they never faced it.`
-          )
-        : t(
-            "Part de ces blocs qu'il a fini par envoyer. Un taux élevé signale surtout quelqu'un qui choisit des blocs à sa portée, pas nécessairement un bon grimpeur.",
-            "Share of those boulders they eventually sent. A high rate mostly signals someone who picks boulders within reach, not necessarily a strong climber."
-          ),
-      valeur: (g) => {
-        const e = enStyle(g)
-        return styleSelectionne ? (e && e.matchs ? e.reussites / e.matchs : 0) : g.tauxReussite
-      },
-      rendu: (g) => {
-        const e = enStyle(g)
-        if (!styleSelectionne) return pourcent(g.tauxReussite)
-        return e && e.matchs ? pourcent(e.reussites / e.matchs) : <span className="discret">—</span>
-      },
+      aide: t(
+        "Part de ces blocs qu'il a fini par envoyer. Un taux élevé signale surtout quelqu'un qui choisit des blocs à sa portée, pas nécessairement un bon grimpeur.",
+        "Share of those boulders they eventually sent. A high rate mostly signals someone who picks boulders within reach, not necessarily a strong climber."
+      ),
+      valeur: (g) => g.tauxReussite,
+      rendu: (g) => pourcent(g.tauxReussite),
     },
     {
       cle: 'suivi',
@@ -451,11 +404,7 @@ export function VueGrimpeurs({
               <div style={{ marginTop: 8 }}>
                 <Tableau
                   lignes={[moiHorsClassement]}
-                  // Le menu de style reste dans l'en-tete du classement : il
-                  // pilote aussi cette ligne, inutile de l'y doubler.
-                  colonnes={colonnes.map(({ titreRendu, ...c }) =>
-                    titreRendu ? { ...c, titre: styleSelectionne || t('Cote globale', 'Overall rating') } : c
-                  )}
+                  colonnes={colonnes}
                   cleLigne={(g) => g.id}
                   enEvidence={moiHorsClassement.id}
                   sansPied

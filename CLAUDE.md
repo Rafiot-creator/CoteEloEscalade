@@ -802,6 +802,11 @@ or le global cumule les mouvements de tous les styles. Désormais `Mélange + (s
 style ». Vérifié sur les vraies données de RB1 (Rafiot : 6 775 / 6 372 / 6 261 pour un global
 de 6 583).
 
+Puis, sur demande de Raphaël, **une colonne par style** (Physique, Technique, Coordo) dans le
+classement de Grimpeurs, à la place du menu déroulant : « 6 775 (+192) », écart avec la cote
+globale entre parenthèses. Plus dur envoyé, Duels utiles et Duels gagnés reviennent aux totaux.
+Vérifié dans Chrome (accès complet, visiteur, 390 px : le tableau défile horizontalement).
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
