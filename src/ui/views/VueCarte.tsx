@@ -826,7 +826,11 @@ export function VueCarte({
               const couleur = infoCouleur(b.couleur)
               const cote = coteParId.get(b.id)
               const etoile = b.couleur === COULEUR_COMP_WALL
-              const contour = selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : null
+              // Anneau rouge d'un bloc echoue, meme epaisseur que le vert
+              // (demande de Raphael, 2026-11-03). Un envoi l'emporte toujours.
+              const echoue = !fait && statut === 'echec'
+              const contour =
+                selection === b.id ? 'var(--encre)' : fait ? 'var(--bon)' : echoue ? 'var(--critique)' : null
               const epaisseur = selection === b.id ? EPAISSEUR_CONTOUR : EPAISSEUR_ENVOYE
               return (
                 <div
