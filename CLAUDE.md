@@ -807,6 +807,11 @@ classement de Grimpeurs, à la place du menu déroulant : « 6 775 (+192) », é
 globale entre parenthèses. Plus dur envoyé, Duels utiles et Duels gagnés reviennent aux totaux.
 Vérifié dans Chrome (accès complet, visiteur, 390 px : le tableau défile horizontalement).
 
+Histogramme (`Histogramme.tsx`) : axe vertical en graduations entières seulement (avec deux
+grimpeurs, il affichait 0, 0, 1, 1, 1) ; demi-cotes avec une décimale sur l'axe horizontal ;
+prop `formatX` pour que Distribution des grimpeurs affiche « V7 » au lieu de « +7 ». Vérifié
+dans Chrome sur Grimpeurs (RB1, Démo) et Blocs (Démo).
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son

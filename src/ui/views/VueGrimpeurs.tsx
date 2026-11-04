@@ -433,7 +433,9 @@ export function VueGrimpeurs({
       >
         <Histogramme
           valeurs={classement.map((g) => g.indexNiveau)}
-          uniteX={t('cote V', 'V grade')}
+          // Des niveaux, pas des ecarts : « V7 », sans signe +.
+          uniteX=""
+          formatX={(v, decimales) => `V${nombre(v, decimales)}`}
           uniteY={t('grimpeurs', 'climbers')}
         />
       </Carte>

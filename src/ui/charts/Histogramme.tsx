@@ -17,6 +17,7 @@ export function Histogramme({
   uniteX,
   uniteY,
   couleur = 'var(--serie-1)',
+  formatX = (v, decimales) => signe(v, decimales),
 }: {
   valeurs: number[]
   largeurClasse?: number
@@ -24,6 +25,11 @@ export function Histogramme({
   uniteX?: string
   uniteY?: string
   couleur?: string
+  /**
+   * Etiquette d'une valeur de l'axe X (graduations et infobulle). Par defaut un
+   * ecart signe (+0,5) ; l'ecran Grimpeurs, qui trace des niveaux, met « V7 ».
+   */
+  formatX?: (v: number, decimales: number) => string
 }) {
   const { montrer, cacher, noeud } = useInfobulle()
   const { t } = useLangue()
@@ -55,12 +61,17 @@ export function Histogramme({
               <Cadre
                 largeur={largeur}
                 hauteur={hauteur}
-                ticksY={graduations(0, maxEffectif, 4)}
+                // Des effectifs : graduations entieres seulement. Avec peu de
+                // valeurs (2 grimpeurs), le pas tombait a 0,25 et les
+                // etiquettes arrondies se repetaient (0, 0, 1, 1, 1).
+                ticksY={graduations(0, maxEffectif, Math.min(4, maxEffectif)).filter(Number.isInteger)}
                 y={y}
                 ticksX={graduations(min, max, 6)}
                 x={x}
                 formatY={(v) => nombre(v)}
-                formatX={(v) => signe(v, Math.abs(v) < 1 ? 1 : 0)}
+                // Une decimale seulement pour les demi-cotes : sans ca, 7,5
+                // s'affichait arrondi a 8, a cote du vrai 8.
+                formatX={(v) => formatX(v, Number.isInteger(v) ? 0 : 1)}
                 titreY={uniteEffectif}
               />
 
@@ -84,8 +95,8 @@ export function Histogramme({
                       onMouseMove={(e) =>
                         montrer(e, {
                           titre: t(
-                            `${signe(min + i * largeurClasse, 1)} à ${signe(min + (i + 1) * largeurClasse, 1)} ${unite}`,
-                            `${signe(min + i * largeurClasse, 1)} to ${signe(min + (i + 1) * largeurClasse, 1)} ${unite}`
+                            `${formatX(min + i * largeurClasse, 1)} à ${formatX(min + (i + 1) * largeurClasse, 1)} ${unite}`.trim(),
+                            `${formatX(min + i * largeurClasse, 1)} to ${formatX(min + (i + 1) * largeurClasse, 1)} ${unite}`.trim()
                           ),
                           lignes: [[uniteEffectif[0].toUpperCase() + uniteEffectif.slice(1), nombre(n)]],
                         })
