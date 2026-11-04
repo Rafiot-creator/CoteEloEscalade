@@ -446,6 +446,8 @@ export function VueCarte({
   // rectangle flash/reussi/echec s'ouvre alors en meme temps sur la carte, le
   // defilement l'emporterait hors de l'ecran. Son bouton « Modifier » y mene.
   const sansDefilement = useRef(false)
+  // Vrai le temps du clic que le navigateur emet juste apres un glisser.
+  const clicApresGlisse = useRef(false)
   useEffect(() => {
     if (selection && !sansDefilement.current) editionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     sansDefilement.current = false
@@ -486,7 +488,8 @@ export function VueCarte({
       setSurvole(null)
       return
     }
-    if (glisse.current) return
+    // Relache a cote de la pastille (bord de carte) : le clic tombe sur le fond.
+    if (glisse.current || clicApresGlisse.current) return
     // Un popup ouvert au debut du geste : ce clic sert a le refermer, pas a
     // placer un bloc. Au doigt, taper a cote est le seul moyen de le fermer
     // (signale par Raphael : un nouveau bloc apparaissait a chaque fermeture).
@@ -626,6 +629,14 @@ export function VueCarte({
       const fut = glisse.current
       glisse.current = null
       if (fut && !fut.deplace) setSelection(id)
+      // Le navigateur envoie quand meme un clic apres le relachement (la
+      // pastille a suivi le curseur, elle est encore dessous) : sans ce
+      // drapeau, il selectionnait le bloc deplace et faisait defiler la page
+      // jusqu'a sa fiche (signale par Raphael, 2026-11-03).
+      if (fut?.deplace) {
+        clicApresGlisse.current = true
+        window.setTimeout(() => (clicApresGlisse.current = false), 0)
+      }
       // Enregistre la position finale seulement, pas chaque etape du glisser.
       const depart = carte.blocs.find((b) => b.id === id)
       if (fut?.deplace && position && depart) poserApresGlisse(depart, position)
@@ -831,6 +842,7 @@ export function VueCarte({
                     onContextMenu={edition ? (e) => e.preventDefault() : undefined}
                     onClick={(e) => {
                       e.stopPropagation()
+                      if (clicApresGlisse.current) return
                       if (edition) {
                         if (e.shiftKey) ouvrirPopup(b.id)
                         else if (!survolPossible) {
