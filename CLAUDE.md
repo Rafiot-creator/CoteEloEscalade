@@ -785,6 +785,12 @@ ouvrait seulement la fiche (le rectangle flash/réussi/échec demandait Majuscul
 désormais les deux, sans défiler vers la fiche (bouton « Modifier le bloc ↓ » dans le
 rectangle). Vérifié en émulation iPhone (Chrome sans interface), pas sur un vrai téléphone.
 
+2026-11-03 (commit `99ac3b5`, déploiement vérifié vert) : à la souris, glisser un bloc faisait
+défiler la page jusqu'à sa fiche — le clic émis par le navigateur après le relâchement
+sélectionnait le bloc déplacé. Ignoré désormais (`clicApresGlisse`, `VueCarte.tsx`), aussi sur
+le fond de carte. Vérifié dans Chrome sans interface (bug reproduit sans le correctif, absent
+avec ; un simple clic ouvre toujours la fiche).
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
