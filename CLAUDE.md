@@ -793,7 +793,7 @@ avec ; un simple clic ouvre toujours la fiche).
 
 2026-11-03 (commit `896a876`, déploiement vérifié vert) : anneau rouge (`var(--critique)`,
 même épaisseur que le vert) autour des blocs échoués sur la Carte ; un envoi l'emporte. Peu
-visible sur une pastille rouge ou rose : question posée à Raphaël.
+visible sur une pastille rouge ou rose, mais Raphaël le trouve assez clair : on n'y touche pas.
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
