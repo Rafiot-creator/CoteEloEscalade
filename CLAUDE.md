@@ -809,6 +809,26 @@ style : `DECISIONS.md`, « La cote par style ».
   (sinon refus en mode agent). Le calcul sur les vraies données se vérifie par un test vitest
   temporaire (`sourceSupabase.charger` + `construireDataset` + `executer`), supprimé ensuite.
 
+## État au 2026-11-05 : API pour Praxis Climbing (contrat rédigé, rien codé)
+
+L'entraîneur de l'équipe de Liv (Praxis Climbing, https://praxisclimbing.com/testing/, son
+propre site avec base, connexion Google, construit lui aussi avec une IA) veut un bouton vers
+notre site et récupérer les résultats de ses athlètes. Contrat d'API bilingue rédigé et validé
+par Raphaël, qui l'envoie à l'entraîneur : https://claude.ai/artifact/PrA3kCz6G4Epg7feufTCjo
+(doc Claude). Choix : courriel Google vérifié comme clé commune, consentement coché chez nous
+(parent pour les moins de 14 ans, Loi 25), retrait signalé 30 jours dans `revoked`, Praxis
+interroge une Edge Function `praxis-v1` avec une clé secrète (60 appels/h max), cotes calculées
+côté serveur. Attente des réponses de l'entraîneur aux 5 questions ouvertes avant de coder.
+
+Vérifié le 2026-11-05 (prototype dans le scratchpad, rien dans le dépôt) : le cœur de calcul
+tourne sous Deno (moteur des Edge Functions) une fois regroupé en un fichier par `vite build` en
+mode bibliothèque — étape obligatoire, `import.meta.glob` de `formulas/registry.ts` n'existe que
+sous Vite. Résultats identiques à Node. Mesures : groupe RB (178 ascensions) lecture 188 ms +
+calcul 16 ms ; Démo (18 889 ascensions) lecture 624 ms + calcul des trois formules 158 ms, loin
+de la limite de 2 s de CPU d'une Edge Function. À refaire côté API (vit dans l'UI aujourd'hui) :
+la cote par style recalée (`VueGrimpeurs.tsx`, `rating − departStyles` ajouté au Mélange) et la
+position au classement. Pas encore testé : un vrai déploiement sur Supabase.
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
