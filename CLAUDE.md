@@ -838,7 +838,13 @@ Ils sont désormais ignorés pendant 2,5 s après un `touchstart` (`dernierTouch
 bien la séquence réelle (touchstart, touchend, mousedown, mouseup, click), contrairement à
 `Input.synthesizeTapGesture` (pas de clic en sans interface) ; le défilement se lit sur
 `main.scrollTop`, pas `window.scrollY`. Bug reproduit (532 px de défilement) puis corrigé (0),
-bouton « Modifier le bloc ↓ » et clic souris inchangés. **À confirmer sur un vrai téléphone.**
+bouton « Modifier le bloc ↓ » et clic souris inchangés. Commit `d94cc98`, déploiement vérifié
+vert, **confirmé par Raphaël sur téléphone** (« le problème semble réglé »).
+
+**Fin de session du 2026-11-05.** Tout poussé. README (§ « En préparation : partager les
+résultats avec Praxis Climbing (API) » et journal du 2026-11-05) et `DECISIONS.md` (« Le
+partage avec Praxis Climbing », et la leçon sur les événements souris simulés dans « Les
+outils de l'ouvreur au quotidien ») à jour.
 
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
@@ -848,10 +854,11 @@ pour présenter les prochains aperçus.
 
 ## Prochaine étape
 
-**À la reprise (après le 2026-11-03)** : la saisie de RB1 avance (Liv et Raphaël y entrent
-déjà des résultats). Demander si la saisie de RB2 a commencé, si le tap à côté d'un rectangle
-fonctionne sur le téléphone de Liv, si les noms automatiques tombent dans le bon secteur, et ce
-qu'il y a dans les Commentaires. Les cotes par style reposent encore sur très peu de duels
+**À la reprise (après le 2026-11-05)** : les blocs de RB1 et RB2 sont saisis. Demander si
+l'entraîneur de Praxis a répondu aux 5 questions du contrat d'API (si oui : commencer par un
+vrai déploiement d'Edge Function, puis consentement, table, fonction `praxis-v1`), si le tap à
+côté d'un rectangle fonctionne sur le téléphone de Liv, si les noms automatiques tombent dans
+le bon secteur, et ce qu'il y a dans les Commentaires. Les cotes par style reposent encore sur très peu de duels
 (Technique : un seul pour Rafiot) : normal qu'elles bougent beaucoup au début.
 
 **Styles de bloc, 2026-10-31 : Physique, Technique, Coordo** (une seule liste pour tous les

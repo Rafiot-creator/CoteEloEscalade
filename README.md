@@ -1279,6 +1279,51 @@ automatique ne marche pas depuis Claude Code, et `npx.ps1` est bloqué par la po
 d'exécution de Windows), et le dépôt est relié au projet (`supabase link`, dans
 `supabase/.temp/`, ignoré par Git).
 
+## En préparation : partager les résultats avec Praxis Climbing (API)
+
+Demandé par Raphaël le 5 novembre 2026. L'entraîneur du club de Liv (équipe Canada) suit les
+tests physiques de ses athlètes sur [Praxis Climbing](https://praxisclimbing.com/testing/) (son
+propre site, avec base de données et connexion Google). Il veut un bouton qui amène ses
+athlètes ici, puis récupérer leurs résultats chez lui. **Contrat d'API bilingue rédigé et envoyé
+à l'entraîneur** ([document](https://claude.ai/artifact/PrA3kCz6G4Epg7feufTCjo), brouillon
+v0.1). **Rien n'est codé** : on attend ses réponses aux cinq questions ouvertes du contrat (sa
+technique, temps réel ou non, consentement parental, comptes Google, champs prioritaires).
+
+Ce que prévoit le contrat (le pourquoi est dans `DECISIONS.md`, « Le partage avec Praxis
+Climbing ») :
+
+- **Le bouton** pointe simplement vers le site (`?from=praxis`) ; il ne crée aucun compte.
+- **La clé commune est le courriel vérifié** de l'athlète (même compte Google des deux côtés).
+- **Le consentement se coche ici** (« Partager mes résultats avec Praxis Climbing »), avec
+  celui d'un parent pour les moins de 14 ans (Loi 25). Retrait possible à tout moment ; un
+  courriel retiré figure 30 jours dans `revoked` pour que Praxis efface ses données.
+- **Praxis vient chercher les données** : une Edge Function Supabase `praxis-v1`, appelée depuis
+  son serveur avec une clé secrète (60 appels par heure au plus). Elle renvoie, pour les seuls
+  athlètes consentants : profil, cotes (Mélange, Elo, Glicko, cote par style, niveau, position
+  au classement), statistiques, toutes les ascensions et les blocs concernés.
+- **Les cotes sont calculées par la fonction**, puisque la cote d'un athlète dépend de tous les
+  grimpeurs de son groupe de centres, que Praxis ne reçoit pas.
+
+**Vérifié le 5 novembre (prototype hors dépôt)** : le cœur de calcul tourne sous Deno, le
+moteur des Edge Functions, une fois regroupé en un seul fichier par `vite build` en mode
+bibliothèque. Ce regroupement est obligatoire : `import.meta.glob` (`formulas/registry.ts`)
+n'existe que sous Vite. Résultats identiques à ceux de Node. Mesures sur les vraies données :
+
+| Groupe | Ascensions | Lecture de la base | Calcul (3 formules) |
+| --- | --- | --- | --- |
+| Rose Bloc 1 + 2 | 178 | 188 ms | 16 ms |
+| Démo | 18 889 | 624 ms | 158 ms |
+
+Une Edge Function a droit à 2 s de calcul par appel. À refaire dans la fonction, parce que c'est
+aujourd'hui l'interface qui le calcule : la cote par style recalée (`VueGrimpeurs.tsx`) et la
+position au classement. Pas encore fait : un vrai déploiement sur Supabase.
+
+**Un athlète qui aurait deux comptes** (par exemple un compte Google scolaire chez Praxis et un
+compte personnel ici) n'est pas reconnu, et rien ne permet aujourd'hui de fusionner deux
+comptes. Prévu : afficher clairement le compte connecté sur l'écran de consentement. En réserve
+si le cas devient fréquent : rattacher une seconde identité Google à un compte (Supabase le
+permet). Fusion de deux comptes existants : à la main dans la base, au cas par cas.
+
 ## Piste envisagée, pas commencée : uniformiser les cotes entre centres
 
 Discuté avec Raphaël le 18 septembre 2026, en prévision du jour où plusieurs centres auront de
@@ -2290,3 +2335,21 @@ un fichier énorme — dans l'onglet de qui le charge. Toutes corrigées, `npm a
   Graduations entières seulement pour les effectifs, une décimale pour les demi-cotes, et prop
   `formatX` : l'écran Grimpeurs affiche « V6,5 V7 V7,5… ». L'écran Blocs garde ses écarts
   signés. Vérifié dans Chrome sans interface sur Grimpeurs (RB1, Démo) et Blocs (Démo).
+
+### 2026-11-05
+
+- **Partage avec Praxis Climbing** : contrat d'API bilingue rédigé à la demande de Raphaël et
+  envoyé à l'entraîneur du club de Liv ; calcul des cotes vérifié sous Deno, le moteur des
+  fonctions Supabase. Rien de codé dans le site. Voir § « En préparation : partager les
+  résultats avec Praxis Climbing (API) ».
+- Raphaël et Liv ont entré les blocs de RB2. **Carte, tap d'ouvreur au téléphone** : la page
+  défilait encore vers la fiche du bloc, malgré le correctif du 2 novembre, qui n'avait en fait
+  jamais marché sur un vrai téléphone. Au doigt, le navigateur émet aussi `mousedown` et
+  `mouseup` simulés après le toucher. Ils passaient par le glisser à la souris
+  (`debuterGlisse`), qui sélectionnait le bloc sans bloquer le défilement, avant même le clic.
+  Ils sont désormais ignorés pendant 2,5 s après un `touchstart` (`dernierToucher`,
+  `DELAI_SOURIS_SIMULEE`, `VueCarte.tsx`). Le bug a d'abord été reproduit : `page.touchscreen.tap`
+  de puppeteer émet la vraie séquence (touchstart, touchend, mousedown, mouseup, click), et le
+  défilement se lit sur `main.scrollTop`, pas sur `window.scrollY`. Avant le correctif : 532 px
+  de défilement ; après : 0. Le bouton « Modifier le bloc ↓ » et le clic souris sont inchangés.
+  Confirmé par Raphaël sur téléphone.

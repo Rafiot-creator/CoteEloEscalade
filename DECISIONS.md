@@ -334,6 +334,49 @@ Carte) ; l'écran Données (accès complet) et Administration le montrent toujou
 assumée : la table reste lisible par l'API (le calcul se fait dans le navigateur), le
 pseudonyme reste donc le vrai rempart.
 
+**Au doigt, les événements de souris simulés sont ignorés** (5 novembre 2026). Un téléphone
+émet `mousedown`, `mouseup` et `click` après chaque tap, par compatibilité. Le glisser à la
+souris les prenait pour un vrai clic et faisait défiler la page vers la fiche du bloc, ce qui
+a fait échouer en salle le correctif du 2 novembre. Plutôt que de passer aux événements
+`pointer` (réécriture des deux chemins, souris et doigt, qui marchent par ailleurs), un simple
+délai : toute souris dans les 2,5 s qui suivent un toucher sur une pastille est une simulation.
+Le délai part du début du toucher et couvre un tap tenu jusqu'à l'appui long (1 s) ; une vraie
+souris utilisée moins de 2,5 s après un toucher, sur un appareil hybride, est un cas
+négligeable. **Leçon de méthode** : le correctif du 2 novembre avait été « vérifié » avec un
+tap simulé qui n'émettait pas ces événements. Un test au doigt doit d'abord reproduire le bug
+(ici `page.touchscreen.tap` de puppeteer, qui émet la vraie séquence) avant de valider le
+correctif.
+
+### Le partage avec Praxis Climbing (5 novembre 2026, contrat seulement)
+
+L'entraîneur du club de Liv veut récupérer sur son site ([Praxis
+Climbing](https://praxisclimbing.com/testing/)) les résultats de ses athlètes. Rien n'est
+codé ; le contrat d'API est écrit et envoyé (README, § « En préparation : partager les
+résultats avec Praxis Climbing »). Les choix et leur raison :
+
+- **Le courriel vérifié comme clé commune, plutôt qu'un code de liaison.** Un code à usage
+  unique passé par le bouton était la première idée, parce que mettre l'identifiant Praxis
+  dans l'adresse permettrait à n'importe qui de se lier au compte d'un autre. Les deux sites
+  utilisant la connexion Google, le courriel vérifié suffit, sans code à générer chez Praxis.
+- **Le consentement donné ici est le seul verrou.** Se connecter ne vaut pas accord. C'est la
+  case cochée chez nous qui garantit que Praxis ne reçoit que des athlètes qui l'ont voulu.
+  Sans elle, son API pourrait demander les résultats de n'importe quelle adresse. Praxis filtre
+  ensuite sur sa propre liste d'athlètes. Moins de 14 ans : consentement d'un parent (Loi 25).
+- **Praxis vient chercher les données (pull), on ne les lui pousse pas.** Pas de point
+  d'entrée à construire et sécuriser chez lui ; on garde le contrôle (nouvelle clé = accès
+  coupé ; un retrait s'applique à l'appel suivant). Un webhook reste possible s'il lui faut du
+  temps réel.
+- **Les cotes sont calculées côté serveur.** La cote d'un athlète dépend de tous les grimpeurs
+  de son groupe de centres ; Praxis, qui ne reçoit que ses athlètes, ne peut pas la recalculer.
+  Vérifié faisable : le cœur de calcul tourne sous Deno, avec une large marge sur la limite de
+  2 s de calcul d'une Edge Function.
+- **Ce que l'API rend privé n'est pas les résultats** (pseudonymes et ascensions sont déjà
+  publics sur le site) **mais le lien entre un courriel et un pseudonyme.**
+- **Noms de champs en anglais dans les deux versions du contrat**, pour que l'IA de
+  l'entraîneur et la nôtre travaillent sur exactement la même structure.
+- Valeurs fixées par Claude et acceptées par Raphaël : 60 appels par heure au plus ; un
+  retrait de consentement signalé 30 jours dans `revoked`.
+
 ### La cote par style (recalée le 3 novembre 2026)
 
 Le calcul ne change pas : chaque style part du même point que la cote globale Elo (le départ),
@@ -492,6 +535,8 @@ est un changement dans `src/core/sources/` et nulle part ailleurs.
   au navigateur, ne peut appliquer aucune règle d'accès. Étapes 1 (lecture) et 2 (comptes,
   pseudonymes, envois), 3 (outils de l'ouvreur) et 4 (temps réel) faites les 29 et 30 octobre ;
   reste l'essai dans un vrai centre (étape 5).
+- **L'API pour Praxis Climbing** (5 novembre 2026) : contrat écrit et envoyé, en attente des
+  réponses de l'entraîneur avant de coder (§ 2, « Le partage avec Praxis Climbing »).
 - **Uniformiser les cotes entre centres** une fois qu'il y en aura plusieurs avec de vraies
   données, discuté le 18 septembre 2026. Deux pistes complémentaires, aucune codée. **Raphaël
   veut les appliquer aux prochains centres** (30 octobre 2026), plutôt que d'ajouter des
