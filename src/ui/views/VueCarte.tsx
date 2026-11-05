@@ -128,6 +128,12 @@ function fondMetal(id: string): string {
 const DELAI_APPUI_LONG = 1000
 /** Au-dela de ce deplacement (px) avant le delai, c'est un defilement, pas un appui. */
 const TOLERANCE_APPUI_LONG = 10
+/**
+ * Apres un toucher, les evenements souris recus pendant ce delai (ms) sont les
+ * simulations du navigateur, pas une vraie souris. Compte depuis le debut du
+ * toucher : couvre un tap tenu jusqu'a l'appui long (1 s) avec de la marge.
+ */
+const DELAI_SOURIS_SIMULEE = 2500
 
 function nouvelId(): string {
   return `b${Date.now().toString(36)}${Math.round(Math.random() * 1000)}`
@@ -448,6 +454,8 @@ export function VueCarte({
   const sansDefilement = useRef(false)
   // Vrai le temps du clic que le navigateur emet juste apres un glisser.
   const clicApresGlisse = useRef(false)
+  // Moment du dernier toucher sur une pastille (cf. `debuterGlisse`).
+  const dernierToucher = useRef(0)
   useEffect(() => {
     if (selection && !sansDefilement.current) editionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     sansDefilement.current = false
@@ -615,6 +623,12 @@ export function VueCarte({
     // Shift+clic sert a ouvrir le popup flash/reussi/echec en vue complete
     // (le clic seul deplace/selectionne le bloc) : pas de glisse dans ce cas.
     if (!edition || e.shiftKey) return
+    // Au doigt, le navigateur emet aussi mousedown/mouseup simules apres le
+    // toucher : sans ce garde-fou, leur relachement selectionnait le bloc sans
+    // `sansDefilement` et la page defilait jusqu'a sa fiche avant meme le clic
+    // (signale par Raphael et Liv sur RB2, 2026-11-05). Le toucher a son
+    // propre chemin (`debuterAppuiLong`, puis le clic).
+    if (Date.now() - dernierToucher.current < DELAI_SOURIS_SIMULEE) return
     e.stopPropagation()
     glisse.current = { id, deplace: false }
     let position: { x: number; y: number } | null = null
@@ -653,6 +667,7 @@ export function VueCarte({
   // jamais annuler un mouvement avant : Chrome abandonnerait alors le
   // defilement de tout le geste).
   const debuterAppuiLong = (id: string) => (e: React.TouchEvent) => {
+    dernierToucher.current = Date.now()
     if (!edition || e.touches.length !== 1) return
     const { clientX: x0, clientY: y0 } = e.touches[0]
     let actif = false

@@ -829,6 +829,17 @@ de la limite de 2 s de CPU d'une Edge Function. À refaire côté API (vit dans 
 la cote par style recalée (`VueGrimpeurs.tsx`, `rating − departStyles` ajouté au Mélange) et la
 position au classement. Pas encore testé : un vrai déploiement sur Supabase.
 
+**Saisie de RB2 faite le 2026-11-05** par Raphaël et Liv. Bug signalé : au téléphone, un tap
+d'ouvreur sur une pastille faisait encore défiler vers la fiche (le correctif du 2026-11-02
+n'avait jamais vraiment marché). Cause : le `mousedown`/`mouseup` simulés que le navigateur émet
+après un toucher passaient par `debuterGlisse`, qui sélectionnait le bloc sans `sansDefilement`.
+Ils sont désormais ignorés pendant 2,5 s après un `touchstart` (`dernierToucher`,
+`DELAI_SOURIS_SIMULEE`, `VueCarte.tsx`). **Méthode** : `page.touchscreen.tap` de puppeteer émet
+bien la séquence réelle (touchstart, touchend, mousedown, mouseup, click), contrairement à
+`Input.synthesizeTapGesture` (pas de clic en sans interface) ; le défilement se lit sur
+`main.scrollTop`, pas `window.scrollY`. Bug reproduit (532 px de défilement) puis corrigé (0),
+bouton « Modifier le bloc ↓ » et clic souris inchangés. **À confirmer sur un vrai téléphone.**
+
 **Fin de session du 2026-10-28.** Tout est poussé (dernier commit de code `55c2d47`), déploiement
 vérifié vert. Raphaël s'est connecté avec succès sur le site en ligne aussi (pas seulement en
 local). Il a fallu lui expliquer la différence entre `localhost` (copie de travail sur son
